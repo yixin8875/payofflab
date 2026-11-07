@@ -28,8 +28,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.0.2_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.0.2_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.0.3_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.0.3_x64_zh-CN.msi`
 
 ## 目录
 

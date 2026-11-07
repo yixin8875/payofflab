@@ -3,10 +3,33 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.0.3",
+    date: "2026-11-07",
+    title: "单色字标",
+    latest: true,
+    groups: [
+      {
+        label: "变更",
+        items: [
+          "重绘品牌标识：参考 X 的几何字标，做了一枚带 45° 斜切的粗体 P。",
+          "改为纯黑 / 白单色方案，去掉蓝白渐变与行权点插画。",
+          "界面内使用纯黑字标，应用图标为黑底白标；标题栏、关于页与 favicon 同步更新。",
+        ],
+      },
+      {
+        label: "构建",
+        items: [
+          "版本号提升到 1.0.3，可执行文件名与安装包前缀保持不变。",
+          "应用标识保持，PayoffLab 1.0.2 的本机数据继续可用。",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.0.2",
     date: "2026-11-07",
     title: "英文品牌与蓝白图标",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "变更",

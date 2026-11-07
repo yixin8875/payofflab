@@ -12,7 +12,7 @@ import {
   Target,
 } from "../components/Icons";
 
-export const VERSION = "1.0.2";
+export const VERSION = "1.0.3";
 
 export type NavItem = {
   href: string;
