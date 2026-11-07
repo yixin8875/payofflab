@@ -8,6 +8,26 @@
 - 网络不可用时自动回退到本地合成报价，可在期权链页面手动切换「在线 / 合成」。
 - 所有计算都在本机完成，不上传持仓或设置。
 
+## 自选
+
+- 期权链左侧的「自选」区按分组展示收藏标的，点击即可进入对应期权链。
+- 在标的页或期权链页点「自选」，可同时加入多个分组，也可以现场新建分组。
+- 「自选」页支持新建、改名、删除分组，以及添加或移除标的；数据保存在本机 `localStorage`。
+
+## 自动更新
+
+- 桌面版启动时会检查 GitHub Releases；发现新版本后在右下角提示，可下载安装并自动重启。
+- 发布流程由 `.github/workflows/release.yml` 完成：推送 `v*` 标签后，GitHub Actions 会构建、签名并发布安装包与 `latest.json`。
+- 仓库需要配置两个 Actions Secrets：`TAURI_SIGNING_PRIVATE_KEY`（私钥文件内容）与 `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`（私钥密码）。
+- 本机签名私钥位于 `~/.payofflab/payofflab-updater.key`，不要提交到仓库；客户端内置对应公钥，签名不匹配的更新包会被拒绝。
+
+发布新版本时，先同步修改 `app/package.json`、`app/src-tauri/Cargo.toml`、`app/src-tauri/tauri.conf.json` 与 `app/src/desktop/nav.ts` 中的版本号，提交后执行：
+
+```bash
+git tag v1.3.0
+git push origin v1.3.0
+```
+
 ## 技术栈
 
 - **界面**：React 19 + TypeScript + Vite 7 + Tailwind CSS 4
@@ -34,8 +54,9 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.2.0_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.2.0_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.3.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.3.0_x64_zh-CN.msi`
+- 更新包：同目录下的 `*.nsis.zip` 与 `*.sig`，由发布流程上传。
 
 ## 目录
 

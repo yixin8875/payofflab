@@ -3,6 +3,7 @@ export type Density = "comfortable" | "compact";
 export type AppSettings = {
   density: Density;
   rememberWindowSize: boolean;
+  autoCheckUpdates: boolean;
 };
 
 const KEY = "payoff:settings";
@@ -10,6 +11,7 @@ const KEY = "payoff:settings";
 export const DEFAULT_SETTINGS: AppSettings = {
   density: "comfortable",
   rememberWindowSize: true,
+  autoCheckUpdates: true,
 };
 
 export function readSettings(): AppSettings {
@@ -20,6 +22,7 @@ export function readSettings(): AppSettings {
     return {
       density: parsed.density === "compact" ? "compact" : "comfortable",
       rememberWindowSize: parsed.rememberWindowSize !== false,
+      autoCheckUpdates: parsed.autoCheckUpdates !== false,
     };
   } catch {
     return DEFAULT_SETTINGS;

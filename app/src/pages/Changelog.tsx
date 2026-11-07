@@ -3,10 +3,42 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.3.0",
+    date: "2026-11-07",
+    title: "自选分组与自动更新",
+    latest: true,
+    groups: [
+      {
+        label: "新增",
+        items: [
+          "期权链侧栏新增「自选」区：收藏任意标的，并按主题分组展示，可直接进入对应期权链。",
+          "标的页与期权链页新增「自选」菜单，可同时把标的放入多个分组，或现场新建分组。",
+          "自选页支持分组管理：新建、改名、删除分组，添加或移除标的，全部保存在本机。",
+          "设置新增「更新」页：启动时自动检查 GitHub Releases，也可手动检查、查看说明、下载安装并自动重启。",
+        ],
+      },
+      {
+        label: "变更",
+        items: [
+          "行情说明更新为 CBOE 延迟 15 分钟；在线不可用时仍会回退到合成数据。",
+          "设置的数据页显示实际自选分组数与标的数。",
+        ],
+      },
+      {
+        label: "构建",
+        items: [
+          "新增 GitHub Actions 发布流程，推送 v* 标签后自动构建、签名并发布安装包与 latest.json。",
+          "接入 Tauri updater 与 process 插件，更新包使用 minisign 公钥校验。",
+          "版本号提升到 1.3.0。",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.2.0",
     date: "2026-11-07",
     title: "在线期权行情",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "新增",

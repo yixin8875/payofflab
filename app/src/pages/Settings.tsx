@@ -1,7 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BrandMark } from "../components/Brand";
-import { Command, Info, Lock, Settings as SettingsIcon, Sun } from "../components/Icons";
+import {
+  Command,
+  Download,
+  Info,
+  Lock,
+  Settings as SettingsIcon,
+  Sun,
+} from "../components/Icons";
 import {
   DetailScroll,
   ListGroup,
@@ -14,11 +21,14 @@ import { VERSION } from "../desktop/nav";
 import { readSettings, writeSettings, type AppSettings } from "../desktop/settings";
 import { clearSavedWindowSize } from "../desktop/window";
 import { clearTrades, useTrades } from "../lib/store";
+import { useUpdater } from "../lib/updater";
+import { countSymbols, useWatchlist } from "../lib/watchlist";
 
 const SECTIONS = [
   { key: "general", label: "通用", hint: "窗口与数据", icon: SettingsIcon },
   { key: "appearance", label: "外观", hint: "密度与主题", icon: Sun },
   { key: "data", label: "数据", hint: "本机存储", icon: Lock },
+  { key: "update", label: "更新", hint: "版本与自动更新", icon: Download },
   { key: "shortcuts", label: "快捷键", hint: "键盘操作", icon: Command },
   { key: "about", label: "关于", hint: "版本与声明", icon: Info },
 ] as const;
@@ -26,7 +36,13 @@ const SECTIONS = [
 type SectionKey = (typeof SECTIONS)[number]["key"];
 
 export default function Settings() {
-  const [active, setActive] = useState<SectionKey>("general");
+  const [params] = useSearchParams();
+  const requested = params.get("section");
+  const [active, setActive] = useState<SectionKey>(() =>
+    SECTIONS.some((section) => section.key === requested)
+      ? (requested as SectionKey)
+      : "general",
+  );
   const [settings, setSettings] = useState<AppSettings>(() => readSettings());
   const [hasWindowSize, setHasWindowSize] = useState(() => {
     try {
@@ -36,6 +52,8 @@ export default function Settings() {
     }
   });
   const trades = useTrades();
+  const watchlist = useWatchlist();
+  const watchCount = countSymbols(watchlist);
   const section = SECTIONS.find((s) => s.key === active) ?? SECTIONS[0];
 
   const update = (patch: Partial<AppSettings>) => {
@@ -100,7 +118,11 @@ export default function Settings() {
                 />
               </div>
               <InfoRow title="启动页面" value="概览" note="桌面版固定从工作台开始" />
-              <InfoRow title="行情数据" value="延迟行情" note="按上一交易时段合成，非实时" />
+              <InfoRow
+                title="行情数据"
+                value="CBOE 延迟 15 分钟"
+                note="在线不可用时自动回退合成数据"
+              />
               <InfoRow title="语言" value="简体中文" note="界面与模型说明均为中文" />
             </div>
           )}
@@ -156,7 +178,11 @@ export default function Settings() {
             <div className="space-y-3">
               <div className="overflow-hidden rounded-lg border border-line bg-white">
                 <InfoRow title="保存的策略" value={`${trades.length} 笔`} note="保存于本机 localStorage" />
-                <InfoRow title="自选列表" value="8 个标的" note="示例列表，仅保存在本机" />
+                <InfoRow
+                  title="自选分组"
+                  value={`${watchlist.length} 组 · ${watchCount} 个标的`}
+                  note="按主题分组，仅保存在本机"
+                />
                 <InfoRow
                   title="窗口尺寸"
                   value={hasWindowSize ? "已记录" : "未记录"}
@@ -199,6 +225,13 @@ export default function Settings() {
             </div>
           )}
 
+          {active === "update" && (
+            <UpdatePanel
+              autoCheck={settings.autoCheckUpdates}
+              onAutoCheck={(value) => update({ autoCheckUpdates: value })}
+            />
+          )}
+
           {active === "shortcuts" && (
             <div className="overflow-hidden rounded-lg border border-line bg-white">
               {[
@@ -236,8 +269,8 @@ export default function Settings() {
                   </div>
                 </div>
                 <p className="mt-3 text-[11.5px] leading-5 text-muted">
-                  多腿期权构建器、盈亏图、盈利概率与净希腊值。行情为延迟数据，期权价格由
-                  Black-Scholes-Merton 模型合成，仅用于情景分析，不构成投资建议。
+                  多腿期权构建器、盈亏图、盈利概率与净希腊值。在线行情为 CBOE 延迟 15 分钟
+                  数据，离线时回退合成报价；所有结果仅用于情景分析，不构成投资建议。
                 </p>
               </div>
               <div className="overflow-hidden rounded-lg border border-line bg-white">
@@ -252,6 +285,126 @@ export default function Settings() {
         </div>
       </DetailScroll>
     </Split>
+  );
+}
+
+function UpdatePanel({
+  autoCheck,
+  onAutoCheck,
+}: {
+  autoCheck: boolean;
+  onAutoCheck: (value: boolean) => void;
+}) {
+  const update = useUpdater();
+  const percent = update.progress != null ? Math.round(update.progress * 100) : null;
+  const busy = update.status === "checking" || update.status === "downloading";
+  const checked = update.checkedAt
+    ? new Date(update.checkedAt).toLocaleString("zh-CN", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+    : "";
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-lg border border-line bg-white p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-[12.5px] font-medium">当前版本 v{VERSION}</p>
+            <p className="mt-0.5 text-[11px] leading-4 text-dim">
+              从 GitHub Releases 获取更新，下载完成后会自动重启。
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void update.check()}
+            disabled={busy}
+            className="btn-secondary h-7 px-2.5 disabled:opacity-40"
+          >
+            {update.status === "checking" ? "检查中…" : "检查更新"}
+          </button>
+        </div>
+
+        {update.status !== "idle" && (
+          <p
+            className={`mt-3 text-[11px] leading-4 ${
+              update.status === "error" ? "text-loss" : "text-dim"
+            }`}
+          >
+            {update.status === "unsupported"
+              ? "网页预览不检查更新；安装桌面版后可自动更新。"
+              : update.status === "checking"
+                ? "正在连接 GitHub 检查版本…"
+                : update.status === "current"
+                  ? "已是最新版本。"
+                  : update.status === "available"
+                    ? "发现新版本，可以下载安装。"
+                    : update.status === "downloading"
+                      ? `正在下载${percent != null ? ` ${percent}%` : ""}…`
+                      : update.status === "ready"
+                        ? "更新已安装，正在重启…"
+                        : (update.error ?? "检查更新失败")}
+          </p>
+        )}
+        {checked && update.status !== "idle" && update.status !== "available" && (
+          <p className="mt-1 text-[9.5px] text-faint">上次检查 {checked}</p>
+        )}
+
+        {update.status === "available" && (
+          <div className="mt-3 rounded-md border border-accent-line bg-accent-soft/50 p-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11.5px] font-medium text-accent">新版本 v{update.version}</p>
+              <button
+                type="button"
+                onClick={() => void update.install()}
+                className="btn-primary h-7 px-2.5"
+              >
+                下载并安装
+              </button>
+            </div>
+            {update.notes && (
+              <p className="mt-1.5 whitespace-pre-line text-[10.5px] leading-4 text-dim">
+                {update.notes}
+              </p>
+            )}
+          </div>
+        )}
+
+        {update.status === "downloading" && (
+          <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-[#ece8e2]">
+            <div
+              className="h-full rounded-full bg-accent transition-[width] duration-300"
+              style={{ width: `${percent ?? 12}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between gap-6 rounded-lg border border-line bg-white px-4 py-3">
+        <div>
+          <p className="text-[12.5px] font-medium">启动时检查更新</p>
+          <p className="mt-0.5 text-[11px] leading-4 text-dim">
+            每次打开 PayoffLab 时向 GitHub 检查一次，发现新版本会在右下角提示。
+          </p>
+        </div>
+        <Toggle checked={autoCheck} onChange={onAutoCheck} label="启动时检查更新" />
+      </div>
+
+      <div className="rounded-lg border border-line bg-white p-4 text-[10.5px] leading-4 text-faint">
+        更新包由 GitHub Actions 使用 minisign 私钥签名，客户端内置公钥校验；签名不匹配的包不会安装。
+        <a
+          href="https://github.com/yixin8875/payofflab/releases"
+          target="_blank"
+          rel="noreferrer"
+          className="ml-1 font-medium text-accent hover:underline"
+        >
+          查看 Releases
+        </a>
+      </div>
+    </div>
   );
 }
 

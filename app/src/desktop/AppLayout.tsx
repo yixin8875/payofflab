@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Lock } from "../components/Icons";
+import { UpdateToast } from "../components/UpdateToast";
+import { maybeAutoCheck } from "../lib/updater";
 import { CommandPalette } from "./CommandPalette";
 import { Sidebar } from "./Sidebar";
 import { TitleBar } from "./TitleBar";
@@ -15,6 +17,7 @@ export default function AppLayout() {
   useEffect(() => {
     const settings = readSettings();
     applySettings(settings);
+    maybeAutoCheck();
     if (settings.rememberWindowSize) {
       void restoreSavedWindowSize();
       return trackWindowSize();
@@ -55,6 +58,7 @@ export default function AppLayout() {
         </main>
       </div>
       <StatusBar />
+      <UpdateToast />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );

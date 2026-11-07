@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, Calendar, Search } from "../components/Icons";
+import { WatchlistMenu } from "../components/WatchlistMenu";
 import {
   Badge,
   DetailScroll,
@@ -16,6 +17,7 @@ import { liveRows } from "../lib/live";
 import { useLiveChain } from "../lib/useLiveChain";
 import { EXPIRIES, SYMBOL_COUNT, TICKER_NAME, ticker } from "../data/tickers";
 import { pct } from "../lib/format";
+import { useWatchlist } from "../lib/watchlist";
 
 const GROUPS = [
   { title: "主要 ETF", symbols: ["SPY", "QQQ", "IWM", "DIA"] },
@@ -33,6 +35,9 @@ function nameOf(symbol: string) {
 export default function Chain() {
   const { symbol } = useParams<{ symbol?: string }>();
   const [query, setQuery] = useState("");
+  const watchGroups = useWatchlist();
+  const watchingGroups = watchGroups.filter((group) => group.symbols.length > 0);
+  const selectedSymbol = symbol?.toUpperCase();
   const q = query.trim();
   const visibleGroups = GROUPS.map((group) => ({
     ...group,
@@ -62,6 +67,41 @@ export default function Chain() {
               />
             </div>
           </div>
+
+          <section className="border-b border-line-subtle pb-1">
+            <div className="flex items-baseline justify-between px-3 pb-1 pt-3">
+              <h3 className="text-[10.5px] font-semibold tracking-[0.02em] text-faint">自选</h3>
+              <Link to="/watchlist" className="text-[10px] font-medium text-accent hover:underline">
+                管理
+              </Link>
+            </div>
+            {watchingGroups.map((group) => (
+              <div key={group.id} className="pb-1">
+                <p className="flex items-baseline gap-1.5 px-3 pb-0.5 pt-1 text-[10px] text-dim">
+                  <span className="truncate">{group.name}</span>
+                  <span className="shrink-0 text-faint/80">{group.symbols.length}</span>
+                </p>
+                <ul>
+                  {group.symbols.map((s) => (
+                    <ListRow
+                      key={`${group.id}:${s}`}
+                      to={`/chain/${s.toLowerCase()}`}
+                      selected={selectedSymbol === s}
+                      badge={<Badge label={s.slice(0, 2)} seed={s} size={26} />}
+                      title={s}
+                      subtitle={nameOf(s)}
+                    />
+                  ))}
+                </ul>
+              </div>
+            ))}
+            {watchingGroups.length === 0 && (
+              <p className="px-3 pb-1 text-[10.5px] text-faint">
+                在标的页点「自选」即可收藏。
+              </p>
+            )}
+          </section>
+
           {visibleGroups.map((group) => (
             <ListGroup key={group.title} label={group.title} count={group.symbols.length}>
               {group.symbols.map((s) => {
@@ -166,6 +206,7 @@ function ChainView({ symbol }: { symbol: string }) {
         title={`${t.symbol} · ${t.name}`}
         subtitle={`$${market.spot.toFixed(2)} · ${market.change >= 0 ? "+" : "−"}${Math.abs(market.changePct * 100).toFixed(2)}% · IV ${pct(market.iv, 1)}${online ? " · 在线" : ` · IVR ${t.ivRank}`}`}
       >
+        <WatchlistMenu symbol={t.symbol} />
         <Link
           to={`/calculator?ticker=${t.symbol}&expiry=${expiry.iso}`}
           className="btn-primary h-7 px-2.5"

@@ -75,6 +75,7 @@ export function ListRow({
   subtitle,
   meta,
   trailing,
+  action,
 }: {
   to?: string;
   onSelect?: () => void;
@@ -84,6 +85,8 @@ export function ListRow({
   subtitle?: string;
   meta?: ReactNode;
   trailing?: ReactNode;
+  /** Optional control anchored at the right edge, outside the link hit area. */
+  action?: ReactNode;
 }) {
   const body = (
     <>
@@ -101,24 +104,32 @@ export function ListRow({
 
   if (to) {
     return (
-      <li>
-        <Link to={to} className="list-row" data-selected={selected ? "true" : undefined}>
+      <li className="relative">
+        <Link
+          to={to}
+          className={`list-row ${action ? "pr-9" : ""}`}
+          data-selected={selected ? "true" : undefined}
+        >
           {body}
         </Link>
+        {action && (
+          <span className="absolute inset-y-0 right-1.5 flex items-center">{action}</span>
+        )}
       </li>
     );
   }
 
   return (
-    <li>
+    <li className="relative">
       <button
         type="button"
         onClick={onSelect}
-        className="list-row"
+        className={`list-row ${action ? "pr-9" : ""}`}
         data-selected={selected ? "true" : undefined}
       >
         {body}
       </button>
+      {action && <span className="absolute inset-y-0 right-1.5 flex items-center">{action}</span>}
     </li>
   );
 }
