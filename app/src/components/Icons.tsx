@@ -276,3 +276,60 @@ export const Download = (p: P) => (
     <path d="M5 19.5h14" />
   </svg>
 );
+
+export const ArrowLeft = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M19 12H6" />
+    <path d="M11.5 6.5 6 12l5.5 5.5" />
+  </svg>
+);
+
+export const Home = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 10.4 12 4l8 6.4V20a1 1 0 0 1-1 1h-4.6v-6.2H9.6V21H5a1 1 0 0 1-1-1v-9.6Z" />
+  </svg>
+);
+
+export const Settings = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.2 14.4a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.55V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1.03H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.55-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.55V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1.03H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.55 1.03Z" />
+  </svg>
+);
+
+export const History = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" />
+    <path d="M3.5 4.5V9H8" />
+    <path d="M12 7.5V12l3 1.8" />
+  </svg>
+);
+
+export const PanelLeft = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+    <path d="M9.5 4.5v15" />
+  </svg>
+);
+
+export const Maximize = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="5" y="5" width="14" height="14" rx="1" />
+  </svg>
+);
+
+export const Restore = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="4.5" y="7.5" width="12" height="12" rx="1" />
+    <path d="M7.5 4.5h11a1 1 0 0 1 1 1v11" />
+  </svg>
+);
+
+export const Trash = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4.5 6.5h15" />
+    <path d="M9 6.5v-2h6v2" />
+    <path d="m6.5 6.5 1 13.5h9l1-13.5" />
+    <path d="M10 10.5v6M14 10.5v6" />
+  </svg>
+);

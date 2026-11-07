@@ -1,12 +1,21 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { AppShell } from "../components/AppShell";
-import { ChevronRight, Search } from "../components/Icons";
-import { ALL_GRID, TICKER_NAME, ticker } from "../data/tickers";
+import { useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowRight, Calendar, Search } from "../components/Icons";
+import {
+  Badge,
+  DetailScroll,
+  EmptyDetail,
+  ListGroup,
+  ListPane,
+  ListRow,
+  PaneHeader,
+  Split,
+} from "../desktop/Split";
+import { buildChain } from "../lib/chain";
+import { EXPIRIES, SYMBOL_COUNT, TICKER_NAME, ticker } from "../data/tickers";
+import { pct } from "../lib/format";
 
-type Group = { title: string; symbols: string[] };
-
-const GROUPS: Group[] = [
+const GROUPS = [
   { title: "主要 ETF", symbols: ["SPY", "QQQ", "IWM", "DIA"] },
   { title: "大型科技股", symbols: ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"] },
   { title: "热门个股", symbols: ["AMD", "PLTR", "SOFI", "COIN", "HOOD", "NFLX", "BA", "DIS"] },
@@ -15,92 +24,232 @@ const GROUPS: Group[] = [
   { title: "杠杆 ETF", symbols: ["TQQQ", "SQQQ", "SOXL", "SPXL", "UVXY"] },
 ];
 
-function nameOf(sym: string) {
-  return TICKER_NAME[sym] ?? ticker(sym).name;
+function nameOf(symbol: string) {
+  return TICKER_NAME[symbol] ?? ticker(symbol).name;
 }
 
 export default function Chain() {
-  const [q, setQ] = useState("");
-  const query = q.trim().toUpperCase();
-  const visible = query
-    ? ALL_GRID.filter((s) => s.includes(query) || nameOf(s).includes(q.trim()))
-    : ALL_GRID;
+  const { symbol } = useParams<{ symbol?: string }>();
+  const [query, setQuery] = useState("");
+  const q = query.trim();
+  const visibleGroups = GROUPS.map((group) => ({
+    ...group,
+    symbols: group.symbols.filter(
+      (s) => !q || s.includes(q.toUpperCase()) || nameOf(s).includes(q),
+    ),
+  })).filter((group) => group.symbols.length > 0);
 
   return (
-    <AppShell title="期权链" footer>
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
-        <div className="flex h-[52px] items-center gap-3">
-          <h1 className="shrink-0 truncate text-[15px] font-semibold tracking-[-0.01em]">期权链</h1>
-          <span className="hidden truncate text-[13px] text-dim sm:inline">99 个热门标的 · 任意可交易标的</span>
-          <div className="relative ml-auto w-full max-w-[256px]">
-            <Search size={16} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-faint" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="搜索任意标的"
-              className="h-8 w-full rounded-md border border-line bg-sunken pl-8 pr-3 text-[13px] text-text outline-none placeholder:text-dim focus:border-accent/50 focus:ring-2 focus:ring-accent/15"
-            />
+    <Split
+      list={
+        <ListPane title="期权链" count={SYMBOL_COUNT}>
+          <div className="px-2 pb-2">
+            <div className="relative">
+              <Search
+                size={13}
+                className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-faint"
+              />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索标的"
+                className="field h-7 pl-7 text-[12px]"
+                aria-label="搜索标的"
+              />
+            </div>
           </div>
+          {visibleGroups.map((group) => (
+            <ListGroup key={group.title} label={group.title} count={group.symbols.length}>
+              {group.symbols.map((s) => {
+                const t = ticker(s);
+                return (
+                  <ListRow
+                    key={s}
+                    to={`/chain/${s.toLowerCase()}`}
+                    selected={symbol?.toUpperCase() === s}
+                    badge={<Badge label={s.slice(0, 2)} seed={s} size={26} />}
+                    title={s}
+                    subtitle={nameOf(s)}
+                    meta={`$${t.spot.toFixed(2)}`}
+                  />
+                );
+              })}
+            </ListGroup>
+          ))}
+          {visibleGroups.length === 0 && (
+            <p className="px-3 py-10 text-center text-[11.5px] text-dim">没有匹配的标的</p>
+          )}
+        </ListPane>
+      }
+    >
+      {symbol ? (
+        <ChainView symbol={symbol.toUpperCase()} />
+      ) : (
+        <>
+          <PaneHeader title="期权链" subtitle={`${SYMBOL_COUNT} 个热门标的 · 任意可交易标的`} />
+          <EmptyDetail
+            title="选择一个标的"
+            body="看涨、行权价与看跌并排，附买价、卖价、成交量、未平仓量与隐含波动率。"
+            action={
+              <Link to="/calculator" className="btn-secondary h-8 px-3">
+                打开构建器
+              </Link>
+            }
+          />
+        </>
+      )}
+    </Split>
+  );
+}
+
+function ChainView({ symbol }: { symbol: string }) {
+  const t = ticker(symbol);
+  const [expiryIso, setExpiryIso] = useState(EXPIRIES[3].iso);
+  const expiry = EXPIRIES.find((e) => e.iso === expiryIso) ?? EXPIRIES[3];
+  const rows = useMemo(() => buildChain(t, expiryIso, 13), [t, expiryIso]);
+  const minDistance = Math.min(...rows.map((r) => Math.abs(r.strike - t.spot)));
+
+  return (
+    <>
+      <PaneHeader
+        title={`${t.symbol} · ${t.name}`}
+        subtitle={`$${t.spot.toFixed(2)} · ${t.change >= 0 ? "+" : "−"}${Math.abs(t.changePct * 100).toFixed(2)}% · IV ${pct(t.iv, 1)} · IVR ${t.ivRank}`}
+      >
+        <Link
+          to={`/calculator?ticker=${t.symbol}&expiry=${expiryIso}`}
+          className="btn-primary h-7 px-2.5"
+        >
+          在构建器中打开
+          <ArrowRight size={12} />
+        </Link>
+      </PaneHeader>
+
+      <DetailScroll wide>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 flex items-center gap-1 text-[10.5px] text-faint">
+            <Calendar size={12} />
+            到期日
+          </span>
+          {EXPIRIES.map((e) => (
+            <button
+              key={e.iso}
+              type="button"
+              onClick={() => setExpiryIso(e.iso)}
+              className={`flex h-6 shrink-0 items-center gap-1 rounded-md border px-2 text-[11px] font-medium transition-colors ${
+                e.iso === expiryIso
+                  ? "border-accent-line bg-accent-soft text-accent"
+                  : "border-line bg-white text-dim hover:text-text"
+              }`}
+            >
+              {e.label}
+              <span className={`tnum text-[9.5px] ${e.iso === expiryIso ? "text-accent/70" : "text-faint"}`}>
+                {e.dte}天
+              </span>
+            </button>
+          ))}
+          <span className="ml-auto text-[10.5px] text-faint">
+            行权价按 {t.strikeStep} 递增 · 延迟行情 · 合成报价
+          </span>
         </div>
-      </div>
 
-      <div className="mx-auto max-w-[1152px] px-4 pb-20 pt-6 sm:px-6">
-        <p className="max-w-2xl text-[13px] leading-relaxed text-muted">
-          浏览 99 个热门股票与 ETF 的期权链：看涨、行权价与看跌并排，附买价、卖价、成交量、
-          未平仓量与隐含波动率。挑一个标的，把任何一条腿直接带进构建器。
-        </p>
-
-        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {GROUPS.map((g) => (
-            <section key={g.title} className="overflow-hidden rounded-xl border border-line bg-panel">
-              <h2 className="flex h-10 items-center border-b border-line-subtle bg-surface/50 px-3 text-[12px] font-semibold">
-                {g.title}
-              </h2>
-              <ul>
-                {g.symbols.map((sym) => {
+        <div className="mt-3 overflow-hidden rounded-lg border border-line bg-white">
+          <div className="flex items-center justify-between border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[10.5px]">
+            <span className="font-semibold">看涨期权</span>
+            <span className="text-faint">行权价居中</span>
+            <span className="font-semibold">看跌期权</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[820px] border-collapse text-[11px] tnum">
+              <thead>
+                <tr className="border-b border-line-subtle text-[9.5px] uppercase tracking-wide text-faint">
+                  <th className="px-2.5 py-1.5 text-right font-medium">买价</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">卖价</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">成交量</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">未平仓</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">IV</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">Delta</th>
+                  <th className="border-x border-line bg-[#fbfaf8] px-2.5 py-1.5 text-center font-semibold">
+                    行权价
+                  </th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">Delta</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">IV</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">未平仓</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">成交量</th>
+                  <th className="px-1.5 py-1.5 text-right font-medium">卖价</th>
+                  <th className="px-2.5 py-1.5 text-right font-medium">买价</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => {
+                  const atm = Math.abs(row.strike - t.spot) === minDistance;
                   return (
-                    <li key={sym}>
-                      <Link
-                        to={`/options-chain/${sym.toLowerCase()}`}
-                        className="group flex h-10 items-center gap-3 px-3 text-[13px] transition-colors hover:bg-hover pointer-coarse:h-12"
+                    <tr
+                      key={row.strike}
+                      className={`border-b border-line-subtle last:border-0 ${
+                        atm ? "bg-accent-soft/60" : "hover:bg-hover"
+                      }`}
+                    >
+                      <td className={`px-2.5 py-1.5 text-right ${atm ? "text-accent" : "text-profit"}`}>
+                        {row.call.bid.toFixed(2)}
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-muted">{row.call.ask.toFixed(2)}</td>
+                      <td className="px-1.5 py-1.5 text-right text-dim">
+                        {row.call.volume.toLocaleString("en-US")}
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-dim">
+                        {row.call.oi.toLocaleString("en-US")}
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-muted">
+                        {(row.call.iv * 100).toFixed(1)}%
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-muted">{row.call.delta.toFixed(2)}</td>
+                      <td
+                        className={`border-x border-line px-2.5 py-1.5 text-center font-semibold ${
+                          atm ? "bg-accent-soft text-accent" : "bg-[#fbfaf8] text-text"
+                        }`}
                       >
-                        <span className="w-12 shrink-0 font-code text-[12px] font-semibold tracking-[0.06em]">{sym}</span>
-                        <span className="min-w-0 flex-1 truncate text-[12.5px] text-dim">{nameOf(sym)}</span>
-                        <ChevronRight size={14} className="text-faint transition-transform group-hover:translate-x-0.5" />
-                      </Link>
-                    </li>
+                        {row.strike.toFixed(2)}
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-muted">{row.put.delta.toFixed(2)}</td>
+                      <td className="px-1.5 py-1.5 text-right text-muted">
+                        {(row.put.iv * 100).toFixed(1)}%
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-dim">
+                        {row.put.oi.toLocaleString("en-US")}
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-dim">
+                        {row.put.volume.toLocaleString("en-US")}
+                      </td>
+                      <td className="px-1.5 py-1.5 text-right text-muted">{row.put.ask.toFixed(2)}</td>
+                      <td className={`px-2.5 py-1.5 text-right ${atm ? "text-accent" : "text-loss"}`}>
+                        {row.put.bid.toFixed(2)}
+                      </td>
+                    </tr>
                   );
                 })}
-              </ul>
-            </section>
-          ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <section className="mt-4 overflow-hidden rounded-xl border border-line bg-panel">
-          <h2 className="flex h-10 items-center border-b border-line-subtle bg-surface/50 px-3 text-[12px] font-semibold">
-            {query ? `“${q.trim()}” 的结果` : "全部热门标的"}
-          </h2>
-          <div className="grid grid-cols-3 gap-1 p-2 sm:grid-cols-5 lg:grid-cols-10">
-            {visible.map((sym) => (
-              <Link
-                key={sym}
-                to={`/options-chain/${sym.toLowerCase()}`}
-                className="flex h-8 items-center justify-center rounded-md font-code text-[12px] text-muted transition-colors hover:bg-hover hover:text-text"
-              >
-                {sym}
-              </Link>
-            ))}
-          </div>
-          {visible.length === 0 && (
-            <p className="px-3 pb-6 text-center text-[12.5px] text-dim">没有匹配的标的，试试 SPY 或 NVDA。</p>
-          )}
-        </section>
-
-        <p className="mt-6 text-[12px] leading-relaxed text-dim">
-          行情为上一交易时段的延迟数据。期权价格用 Black-Scholes 按标的现价合成，仅供情景分析，
-          不代表任何交易所的可成交报价。
-        </p>
-      </div>
-    </AppShell>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Link
+            to={`/calculator?ticker=${t.symbol}&expiry=${expiryIso}&preset=long-call`}
+            className="btn-secondary h-7 px-2.5"
+          >
+            用平值看涨开始
+          </Link>
+          <Link
+            to={`/tools/option-finder?ticker=${t.symbol}`}
+            className="btn-ghost h-7 px-2 text-muted"
+          >
+            扫描 {t.symbol} 的价差
+          </Link>
+          <span className="ml-auto text-[10.5px] text-faint">
+            {expiry.label} · {expiry.dte} 天 · 模型输出，非投资建议
+          </span>
+        </div>
+      </DetailScroll>
+    </>
   );
 }

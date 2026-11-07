@@ -15,12 +15,12 @@ type Props = {
 };
 
 const COLORS = {
-  expiry: "#bc3722",
-  today: "#1f5bdf",
-  profit: "#007558",
-  loss: "#bc3722",
-  grid: "#e2e6eb",
-  axis: "#8a93a1",
+  expiry: "#bf3b2b",
+  today: "#0364d3",
+  profit: "#0b7a52",
+  loss: "#bf3b2b",
+  grid: "#eeebe5",
+  axis: "#9c978f",
 };
 
 function niceTicks(lo: number, hi: number, count: number): number[] {
@@ -191,7 +191,7 @@ export function PayoffChart({
             y={padT}
             width={Math.max(2, bandHi - bandLo)}
             height={chartH}
-            fill="#1f5bdf"
+            fill="#0364d3"
             fillOpacity="0.055"
           />
         )}
@@ -219,7 +219,7 @@ export function PayoffChart({
           </g>
         ))}
 
-        <line x1={padL} x2={padL + chartW} y1={sy(0)} y2={sy(0)} stroke="#b6bec9" strokeWidth="1" />
+        <line x1={padL} x2={padL + chartW} y1={sy(0)} y2={sy(0)} stroke="#d2cec8" strokeWidth="1" />
 
         <path d={areaFor("exp", true)} fill={COLORS.profit} fillOpacity="0.07" />
         <path d={areaFor("exp", false)} fill={COLORS.loss} fillOpacity="0.06" />
@@ -258,7 +258,7 @@ export function PayoffChart({
           x2={sx(spot)}
           y1={padT - 6}
           y2={padT + chartH}
-          stroke="#465060"
+          stroke="#6f6a63"
           strokeDasharray="3 4"
           strokeOpacity="0.45"
         />
@@ -273,10 +273,10 @@ export function PayoffChart({
               x2={sx(b)}
               y1={sy(0) - 8}
               y2={sy(0) + 8}
-              stroke="#465060"
+              stroke="#6f6a63"
               strokeOpacity="0.5"
             />
-            <circle cx={sx(b)} cy={sy(0)} r="3" fill="#f7f8fa" stroke="#465060" strokeWidth="1.4" />
+            <circle cx={sx(b)} cy={sy(0)} r="3" fill="#fbfaf8" stroke="#6f6a63" strokeWidth="1.4" />
             <text
               x={sx(b) + (i % 2 === 0 ? 8 : -8)}
               y={sy(0) + 4}
@@ -298,7 +298,7 @@ export function PayoffChart({
             height="18"
             rx="4"
             fill="#ffffff"
-            stroke="#e2e6eb"
+            stroke="#e3e0da"
           />
           <text
             x={sx(spot)}
@@ -306,7 +306,7 @@ export function PayoffChart({
             textAnchor="middle"
             fontSize="10.5"
             fontWeight="600"
-            fill="#465060"
+            fill="#6f6a63"
             className="tnum"
           >
             {spotLabel}
@@ -320,7 +320,7 @@ export function PayoffChart({
               x2={sx(hoverPoint.p)}
               y1={padT}
               y2={padT + chartH}
-              stroke="#0f141c"
+              stroke="#1c1b19"
               strokeOpacity="0.2"
             />
             <circle cx={sx(hoverPoint.p)} cy={sy(conv(hoverPoint.exp))} r="3" fill={COLORS.expiry} />

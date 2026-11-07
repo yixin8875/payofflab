@@ -1,58 +1,45 @@
-import { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
-import Home from "./pages/Home";
+import { Navigate, Route, Routes } from "react-router-dom";
+import AppLayout from "./desktop/AppLayout";
 import Calculator from "./pages/Calculator";
 import Chain from "./pages/Chain";
-import ChainSymbol from "./pages/ChainSymbol";
-import Strategies from "./pages/Strategies";
-import StrategyDetail from "./pages/StrategyDetail";
+import Changelog from "./pages/Changelog";
+import { Privacy, Terms } from "./pages/Legal";
+import Methodology from "./pages/Methodology";
+import NotFound from "./pages/NotFound";
 import OptionFinder from "./pages/OptionFinder";
-import ToolPage from "./pages/ToolPage";
-import {
-  Changelog,
-  Methodology,
-  NotFound,
-  Privacy,
-  Terms,
-  ToolsHub,
-  Trades,
-  Watchlist,
-} from "./pages/Static";
-
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
-}
+import Overview from "./pages/Overview";
+import Settings from "./pages/Settings";
+import Strategies from "./pages/Strategies";
+import Tools from "./pages/Tools";
+import Trades from "./pages/Trades";
+import Watchlist from "./pages/Watchlist";
 
 export default function App() {
   return (
-    <>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Overview />} />
         <Route path="/calculator" element={<Calculator />} />
-        <Route path="/options-chain" element={<Chain />} />
-        <Route path="/options-chain/:symbol" element={<ChainSymbol />} />
+        <Route path="/chain" element={<Chain />} />
+        <Route path="/chain/:symbol" element={<Chain />} />
         <Route path="/strategies" element={<Strategies />} />
-        <Route path="/strategies/:slug" element={<StrategyDetail />} />
-        <Route path="/tools" element={<ToolsHub />} />
-        <Route path="/tools/option-finder" element={<OptionFinder />} />
-        <Route path="/scan" element={<OptionFinder />} />
-        <Route path="/tools/black-scholes" element={<ToolPage mode="bs" />} />
-        <Route path="/tools/greeks-calculator" element={<ToolPage mode="greeks" />} />
-        <Route path="/tools/iv-calculator" element={<ToolPage mode="iv" />} />
-        <Route path="/tools/breakeven-calculator" element={<ToolPage mode="breakeven" />} />
-        <Route path="/methodology" element={<Methodology />} />
-        <Route path="/trades" element={<Trades />} />
+        <Route path="/strategies/:slug" element={<Strategies />} />
         <Route path="/watchlist" element={<Watchlist />} />
+        <Route path="/watchlist/:symbol" element={<Watchlist />} />
+        <Route path="/trades" element={<Trades />} />
+        <Route path="/trades/:id" element={<Trades />} />
+        <Route path="/tools" element={<Tools />} />
+        <Route path="/tools/option-finder" element={<OptionFinder />} />
+        <Route path="/tools/:mode" element={<Tools />} />
+        <Route path="/methodology" element={<Methodology />} />
+        <Route path="/changelog" element={<Changelog />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/changelog" element={<Changelog />} />
+        <Route path="/options-chain/*" element={<Navigate to="/chain" replace />} />
+        <Route path="/scan" element={<Navigate to="/tools/option-finder" replace />} />
         <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+      </Route>
+    </Routes>
   );
 }
