@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "期权盈亏图",
+  "version": "0.1.0",
+  "identifier": "com.payoffchart.cn",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "期权盈亏图",
+        "width": 1360,
+        "height": 900,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/icon.png"],
+    "category": "Finance",
+    "shortDescription": "中文期权策略计算器与盈亏图",
+    "longDescription": "构建多腿期权策略，查看到期盈亏、盈利概率、净希腊值与预期波动。",
+    "copyright": "© 2026 期权盈亏图"
+  }
+}

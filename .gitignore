@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+app/dist/
+app/src-tauri/target/
+app/src-tauri/gen/schemas/
+
+# Craft tooling artifacts (not part of the app)
+agent-session.jsonl
+build-activity.log
+craft.json
+feed.json
+usage.json
+capture/
+checks/
+inbox/
+reference/
+investigation.cany/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
