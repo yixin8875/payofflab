@@ -12,6 +12,8 @@ import {
   Split,
 } from "../desktop/Split";
 import { buildChain } from "../lib/chain";
+import { liveRows } from "../lib/live";
+import { useLiveChain } from "../lib/useLiveChain";
 import { EXPIRIES, SYMBOL_COUNT, TICKER_NAME, ticker } from "../data/tickers";
 import { pct } from "../lib/format";
 
@@ -38,6 +40,8 @@ export default function Chain() {
       (s) => !q || s.includes(q.toUpperCase()) || nameOf(s).includes(q),
     ),
   })).filter((group) => group.symbols.length > 0);
+  const extra =
+    visibleGroups.length === 0 && /^[A-Za-z][A-Za-z.]{0,5}$/.test(q) ? q.toUpperCase() : "";
 
   return (
     <Split
@@ -76,7 +80,19 @@ export default function Chain() {
               })}
             </ListGroup>
           ))}
-          {visibleGroups.length === 0 && (
+          {extra && (
+            <ListGroup label="在线查询" count={1}>
+              <ListRow
+                to={`/chain/${extra.toLowerCase()}`}
+                selected={symbol?.toUpperCase() === extra}
+                badge={<Badge label={extra.slice(0, 2)} seed={extra} size={26} />}
+                title={extra}
+                subtitle="CBOE 延迟行情中查询"
+                meta="在线"
+              />
+            </ListGroup>
+          )}
+          {visibleGroups.length === 0 && !extra && (
             <p className="px-3 py-10 text-center text-[11.5px] text-dim">没有匹配的标的</p>
           )}
         </ListPane>
@@ -103,20 +119,55 @@ export default function Chain() {
 }
 
 function ChainView({ symbol }: { symbol: string }) {
-  const t = ticker(symbol);
-  const [expiryIso, setExpiryIso] = useState(EXPIRIES[3].iso);
-  const expiry = EXPIRIES.find((e) => e.iso === expiryIso) ?? EXPIRIES[3];
-  const rows = useMemo(() => buildChain(t, expiryIso, 13), [t, expiryIso]);
-  const minDistance = Math.min(...rows.map((r) => Math.abs(r.strike - t.spot)));
+  const t = useMemo(() => ticker(symbol), [symbol]);
+  const live = useLiveChain(symbol);
+  const chain = live.chain;
+  const [source, setSource] = useState<"live" | "offline">("live");
+  const [expiryIso, setExpiryIso] = useState("");
+  const online = source === "live" && !!chain;
+  const expiries = online && chain ? chain.expiries : EXPIRIES;
+
+  const fallbackExpiry = useMemo(
+    () =>
+      expiries.reduce(
+        (best, e) => (Math.abs(e.dte - 30) < Math.abs(best.dte - 30) ? e : best),
+        expiries[0],
+      ),
+    [expiries],
+  );
+  const expiry = expiries.find((e) => e.iso === expiryIso) ?? fallbackExpiry;
+
+  const market = useMemo(() => {
+    if (!online || !chain) return t;
+    return {
+      ...t,
+      spot: chain.spot || t.spot,
+      change: chain.change,
+      changePct: chain.changePct,
+      iv: chain.iv30 || t.iv,
+    };
+  }, [t, chain, online]);
+
+  const rows = useMemo(() => {
+    if (online && chain) {
+      const loaded = liveRows(chain, expiry.iso, 15);
+      if (loaded.length) return loaded;
+    }
+    return buildChain(market, expiry.iso, 15, online);
+  }, [online, chain, expiry.iso, market]);
+  const minDistance = Math.min(...rows.map((r) => Math.abs(r.strike - market.spot)));
+  const quickExpiries = expiries.filter((e) => e.dte <= 45);
+  if (!quickExpiries.some((e) => e.iso === expiry.iso)) quickExpiries.push(expiry);
+  const moreExpiries = expiries.filter((e) => !quickExpiries.some((q) => q.iso === e.iso));
 
   return (
     <>
       <PaneHeader
         title={`${t.symbol} · ${t.name}`}
-        subtitle={`$${t.spot.toFixed(2)} · ${t.change >= 0 ? "+" : "−"}${Math.abs(t.changePct * 100).toFixed(2)}% · IV ${pct(t.iv, 1)} · IVR ${t.ivRank}`}
+        subtitle={`$${market.spot.toFixed(2)} · ${market.change >= 0 ? "+" : "−"}${Math.abs(market.changePct * 100).toFixed(2)}% · IV ${pct(market.iv, 1)}${online ? " · 在线" : ` · IVR ${t.ivRank}`}`}
       >
         <Link
-          to={`/calculator?ticker=${t.symbol}&expiry=${expiryIso}`}
+          to={`/calculator?ticker=${t.symbol}&expiry=${expiry.iso}`}
           className="btn-primary h-7 px-2.5"
         >
           在构建器中打开
@@ -130,27 +181,85 @@ function ChainView({ symbol }: { symbol: string }) {
             <Calendar size={12} />
             到期日
           </span>
-          {EXPIRIES.map((e) => (
+          {quickExpiries.map((e) => (
             <button
               key={e.iso}
               type="button"
               onClick={() => setExpiryIso(e.iso)}
               className={`flex h-6 shrink-0 items-center gap-1 rounded-md border px-2 text-[11px] font-medium transition-colors ${
-                e.iso === expiryIso
+                e.iso === expiry.iso
                   ? "border-accent-line bg-accent-soft text-accent"
                   : "border-line bg-white text-dim hover:text-text"
               }`}
             >
               {e.label}
-              <span className={`tnum text-[9.5px] ${e.iso === expiryIso ? "text-accent/70" : "text-faint"}`}>
+              <span className={`tnum text-[9.5px] ${e.iso === expiry.iso ? "text-accent/70" : "text-faint"}`}>
                 {e.dte}天
               </span>
             </button>
           ))}
-          <span className="ml-auto text-[10.5px] text-faint">
-            行权价按 {t.strikeStep} 递增 · 延迟行情 · 合成报价
-          </span>
+          {moreExpiries.length > 0 && (
+            <select
+              aria-label="更多到期日"
+              value={moreExpiries.some((e) => e.iso === expiry.iso) ? expiry.iso : ""}
+              onChange={(event) => event.target.value && setExpiryIso(event.target.value)}
+              className="h-6 shrink-0 rounded-md border border-line bg-white px-1.5 text-[11px] text-dim"
+            >
+              <option value="">更多到期日</option>
+              {moreExpiries.map((e) => (
+                <option key={e.iso} value={e.iso}>
+                  {e.label} · {e.dte}天
+                </option>
+              ))}
+            </select>
+          )}
+          <div className="ml-auto flex items-center gap-2">
+            <div className="flex rounded-md border border-line bg-white p-0.5">
+              {(["live", "offline"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setSource(value)}
+                  className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                    source === value ? "bg-accent-soft text-accent" : "text-dim hover:text-text"
+                  }`}
+                >
+                  {value === "live" ? "在线" : "合成"}
+                </button>
+              ))}
+            </div>
+            <span className="text-[10px] text-faint">
+              {online
+                ? `CBOE 延迟 15 分钟 · ${chain?.asOf ?? ""}`
+                : source === "live" && live.loading
+                  ? "正在获取在线行情…"
+                  : `合成报价 · 行权价按 ${t.strikeStep} 递增`}
+            </span>
+            {source === "live" && (
+              <button
+                type="button"
+                onClick={live.reload}
+                disabled={live.loading}
+                className="text-[10px] font-medium text-accent disabled:text-faint"
+              >
+                {live.loading ? "刷新中…" : "刷新"}
+              </button>
+            )}
+          </div>
         </div>
+
+        {source === "live" && live.error && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-line bg-[#fbfaf8] px-2.5 py-1.5 text-[10.5px] text-dim">
+            <span>在线行情不可用（{live.error}），当前使用合成数据。</span>
+            <button
+              type="button"
+              onClick={live.reload}
+              className="font-medium text-accent hover:underline"
+            >
+              重试
+            </button>
+          </div>
+        )}
 
         <div className="mt-3 overflow-hidden rounded-lg border border-line bg-white">
           <div className="flex items-center justify-between border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[10.5px]">
@@ -181,7 +290,7 @@ function ChainView({ symbol }: { symbol: string }) {
               </thead>
               <tbody>
                 {rows.map((row) => {
-                  const atm = Math.abs(row.strike - t.spot) === minDistance;
+                  const atm = Math.abs(row.strike - market.spot) === minDistance;
                   return (
                     <tr
                       key={row.strike}
@@ -234,7 +343,7 @@ function ChainView({ symbol }: { symbol: string }) {
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
-            to={`/calculator?ticker=${t.symbol}&expiry=${expiryIso}&preset=long-call`}
+            to={`/calculator?ticker=${t.symbol}&expiry=${expiry.iso}&preset=long-call`}
             className="btn-secondary h-7 px-2.5"
           >
             用平值看涨开始
@@ -246,7 +355,8 @@ function ChainView({ symbol }: { symbol: string }) {
             扫描 {t.symbol} 的价差
           </Link>
           <span className="ml-auto text-[10.5px] text-faint">
-            {expiry.label} · {expiry.dte} 天 · 模型输出，非投资建议
+            {expiry.label} · {expiry.dte} 天 ·{" "}
+            {online ? "CBOE 延迟行情，非投资建议" : "模型输出，非投资建议"}
           </span>
         </div>
       </DetailScroll>

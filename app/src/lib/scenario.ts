@@ -1,4 +1,5 @@
 import { ticker } from "../data/tickers";
+import { cachedChain } from "./live";
 import { greeks, legPrice, type Leg } from "./options";
 import type { SavedTrade } from "./store";
 
@@ -38,8 +39,14 @@ export function maxDte(trades: SavedTrade[]): number {
   return max;
 }
 
-function shift(trade: SavedTrade, spotPct: number, ivPts: number) {
+function baseOf(trade: SavedTrade) {
   const base = ticker(trade.symbol);
+  const live = cachedChain(trade.symbol);
+  return { spot: live?.spot ?? base.spot, iv: live?.iv30 ?? base.iv };
+}
+
+function shift(trade: SavedTrade, spotPct: number, ivPts: number) {
+  const base = baseOf(trade);
   return {
     spot: base.spot * (1 + spotPct / 100),
     iv: Math.max(0.02, base.iv + ivPts / 100),
@@ -127,7 +134,7 @@ export function positionBreakdown(
   input: ScenarioInput,
 ): PositionScenario[] {
   return trades.map((trade) => {
-    const base = ticker(trade.symbol);
+    const base = baseOf(trade);
     const current = tradeMark(trade, 0, 0, 0);
     const scenario = tradeMark(trade, input.spotPct, input.ivPts, input.days);
     const g = tradeGreeks(trade, input.spotPct, input.ivPts, input.days);

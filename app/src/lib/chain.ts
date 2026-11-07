@@ -1,4 +1,5 @@
-import { EXPIRIES, type Ticker } from "../data/tickers";
+import { EXPIRIES, type Expiry, type Ticker } from "../data/tickers";
+import { liveExpiry, liveQuote, liveStrikes } from "./live";
 import { bsPrice, ivFor, type Leg, type LegKind } from "./options";
 
 export type ChainRow = {
@@ -31,7 +32,20 @@ export function quote(
   kind: LegKind,
   strike: number,
   dte: number,
+  expiryIso?: string,
+  useLive = true,
 ): { mid: number; bid: number; ask: number; iv: number } {
+  if (useLive && expiryIso && kind !== "stock") {
+    const live = liveQuote(ticker.symbol, kind, strike, expiryIso);
+    if (live && (live.bid > 0 || live.ask > 0 || live.mid > 0)) {
+      return {
+        mid: Number(live.mid.toFixed(2)),
+        bid: Number(live.bid.toFixed(2)),
+        ask: Number(live.ask.toFixed(2)),
+        iv: live.iv || ivFor(kind, strike, ticker.spot, ticker.iv),
+      };
+    }
+  }
   const T = dteYears(dte);
   const iv = ivFor(kind, strike, ticker.spot, ticker.iv);
   const mid = bsPrice(kind === "stock" ? "call" : kind, ticker.spot, strike, T, iv);
@@ -44,7 +58,23 @@ export function quote(
   };
 }
 
-export function buildChain(ticker: Ticker, expiryIso: string, rows = 11): ChainRow[] {
+/** Live expiry dates when the chain has been fetched, otherwise the offline set. */
+export function expiryFor(symbol: string, iso: string): Expiry {
+  return liveExpiry(symbol, iso) ?? EXPIRIES.find((e) => e.iso === iso) ?? EXPIRIES[3];
+}
+
+/** Snap a model strike onto the nearest exchange-listed strike. */
+export function snapStrike(symbol: string, iso: string, strike: number): number {
+  const listed = liveStrikes(symbol, iso);
+  if (!listed.length) return strike;
+  let best = listed[0];
+  for (const value of listed) {
+    if (Math.abs(value - strike) < Math.abs(best - strike)) best = value;
+  }
+  return best;
+}
+
+export function buildChain(ticker: Ticker, expiryIso: string, rows = 11, useLive = true): ChainRow[] {
   const expiry = EXPIRIES.find((e) => e.iso === expiryIso) ?? EXPIRIES[3];
   const step = ticker.strikeStep;
   const base = roundStrike(ticker.spot, step);
@@ -53,8 +83,8 @@ export function buildChain(ticker: Ticker, expiryIso: string, rows = 11): ChainR
     const strike = Number((base + i * step).toFixed(2));
     if (strike <= 0) continue;
     const seed = hash(`${ticker.symbol}-${expiry.iso}-${strike}`);
-    const c = quote(ticker, "call", strike, expiry.dte);
-    const p = quote(ticker, "put", strike, expiry.dte);
+    const c = quote(ticker, "call", strike, expiry.dte, expiry.iso, useLive);
+    const p = quote(ticker, "put", strike, expiry.dte, expiry.iso, useLive);
     out.push({
       strike,
       call: {
@@ -62,7 +92,7 @@ export function buildChain(ticker: Ticker, expiryIso: string, rows = 11): ChainR
         ask: c.ask,
         volume: Math.round((seed % 900) + 20),
         oi: Math.round((seed % 4200) + 240),
-        iv: Number((c.iv * 100).toFixed(1)),
+        iv: Number(c.iv.toFixed(4)),
         delta: Number(bsDelta("call", ticker.spot, strike, dteYears(expiry.dte), c.iv).toFixed(2)),
       },
       put: {
@@ -70,7 +100,7 @@ export function buildChain(ticker: Ticker, expiryIso: string, rows = 11): ChainR
         ask: p.ask,
         volume: Math.round(((seed >> 5) % 800) + 15),
         oi: Math.round(((seed >> 7) % 3800) + 180),
-        iv: Number((p.iv * 100).toFixed(1)),
+        iv: Number(p.iv.toFixed(4)),
         delta: Number(bsDelta("put", ticker.spot, strike, dteYears(expiry.dte), p.iv).toFixed(2)),
       },
     });
@@ -96,8 +126,9 @@ export function makeLeg(
   strike: number,
   expiryIso: string,
   fill: number,
+  symbol = "",
 ): Leg {
-  const expiry = EXPIRIES.find((e) => e.iso === expiryIso) ?? EXPIRIES[3];
+  const expiry = expiryFor(symbol, expiryIso);
   counter += 1;
   return {
     id: `leg-${counter}`,
@@ -120,8 +151,18 @@ export function pricedLeg(
   strike: number,
   expiryIso: string,
 ): Leg {
-  const expiry = EXPIRIES.find((e) => e.iso === expiryIso) ?? EXPIRIES[3];
-  const fill =
-    kind === "stock" ? ticker.spot : side === 1 ? quote(ticker, kind, strike, expiry.dte).ask : quote(ticker, kind, strike, expiry.dte).bid;
-  return makeLeg(kind, side, qty, strike, expiryIso, Number(fill.toFixed(2)));
+  const expiry = expiryFor(ticker.symbol, expiryIso);
+  const resolved = kind === "stock" ? strike : snapStrike(ticker.symbol, expiry.iso, strike);
+  const q = kind === "stock" ? null : quote(ticker, kind, resolved, expiry.dte, expiry.iso);
+  const fallback = q ? (side === 1 ? q.ask : q.bid) || q.mid : ticker.spot;
+  const fill = kind === "stock" ? ticker.spot : Math.max(0.01, fallback);
+  return makeLeg(
+    kind,
+    side,
+    qty,
+    resolved,
+    expiryIso,
+    Number(fill.toFixed(2)),
+    ticker.symbol,
+  );
 }

@@ -1,5 +1,6 @@
-import { EXPIRIES, type Ticker } from "../data/tickers";
+import { type Ticker } from "../data/tickers";
 import { pricedLeg, roundStrike } from "./chain";
+import { expiriesFor } from "./live";
 import type { Leg } from "./options";
 
 export type Outlook = "bullish" | "bearish" | "neutral" | "volatile";
@@ -214,8 +215,9 @@ export const PRESETS: Preset[] = [
     sentence: "卖出近月、买入远月：赚取时间价值衰减的差异。",
     build: (t, e) => {
       const s = strikes(t);
-      const near = EXPIRIES.find((x) => x.iso === e) ?? EXPIRIES[3];
-      const far = EXPIRIES[EXPIRIES.length - 1];
+      const all = expiriesFor(t.symbol);
+      const near = all.find((x) => x.iso === e) ?? all[Math.min(3, all.length - 1)];
+      const far = all.find((x) => x.dte >= near.dte + 28) ?? all[all.length - 1];
       if (near.dte >= far.dte) return [pricedLeg(t, "call", 1, 1, s.atm, e)];
       return [
         pricedLeg(t, "call", -1, 1, s.atm, near.iso),

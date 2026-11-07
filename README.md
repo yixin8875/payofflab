@@ -1,6 +1,12 @@
 # PayoffLab
 
-中文期权策略工作台：构建多腿持仓、看到期盈亏图、盈利概率与净希腊值。桌面应用，数据全部留在本机。
+中文期权策略工作台：构建多腿持仓、看到期盈亏图、盈利概率与净希腊值。桌面应用，持仓与设置全部留在本机。
+
+## 行情
+
+- 期权链与构建器默认读取 CBOE 公开的延迟行情（约 15 分钟），包含全部到期日与挂牌行权价。
+- 网络不可用时自动回退到本地合成报价，可在期权链页面手动切换「在线 / 合成」。
+- 所有计算都在本机完成，不上传持仓或设置。
 
 ## 技术栈
 
@@ -28,8 +34,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.1.0_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.1.0_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.2.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.2.0_x64_zh-CN.msi`
 
 ## 目录
 

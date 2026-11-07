@@ -9,6 +9,14 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
+    proxy: {
+      // CBOE's CDN does not send CORS headers; proxy it during browser dev.
+      "/cboe": {
+        target: "https://cdn-api.cboe.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/cboe/, ""),
+      },
+    },
   },
   build: {
     outDir: "dist",

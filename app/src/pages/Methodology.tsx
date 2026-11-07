@@ -3,7 +3,7 @@ import { DetailScroll, PaneHeader } from "../desktop/Split";
 const SECTIONS: { title: string; body: string; code?: string[]; list?: string[] }[] = [
   {
     title: "报价与数据",
-    body: "页面里的价格是上一交易时段的延迟数据，不会在盘中实时刷新。期权价格由标的现价、行权价、剩余期限、无风险利率、股息率与隐含波动率共同决定，用 Black-Scholes-Merton 模型合成。合成报价带最小的买卖价差，仅用于情景分析，不代表任何交易所的可成交价格。",
+    body: "期权链与构建器默认读取 CBOE 公开的延迟行情（约 15 分钟），包含全部挂牌到期日、行权价、买卖价、IV、Delta、成交量与未平仓量；标的现价与 30 天 IV 也来自同一份快照。网络不可用时会自动回退到本地合成报价。在线数据仍可能缺失或不准确，仅用于情景分析，不代表可成交价格。",
   },
   {
     title: "定价模型",
@@ -28,7 +28,7 @@ const SECTIONS: { title: string; body: string; code?: string[]; list?: string[] 
     list: [
       "模型假设波动率已知且恒定，真实市场的波动率会随价格与时间变化。",
       "没有考虑提前行权、股息派发时点与期权链的真实微观结构。",
-      "合成报价不含佣金、交易所费用与滑点，实际成交价可能明显不同。",
+      "在线行情延迟约 15 分钟，收盘后为最近一次快照；离线合成报价不含佣金、交易所费用与滑点。",
       "概率与预期价值是模型输出，不保证任何真实结果；本应用不构成投资建议。",
     ],
   },
@@ -76,7 +76,7 @@ export default function Methodology() {
             ))}
           </div>
           <p className="mt-8 border-t border-line-subtle pt-4 text-[10.5px] text-faint">
-            数据截至 2026-11-06 收盘 · 模型输出仅供情景分析 · 非投资建议
+            在线数据来自 CBOE 延迟行情 · 离线为合成报价 · 仅供情景分析 · 非投资建议
           </p>
         </div>
       </DetailScroll>

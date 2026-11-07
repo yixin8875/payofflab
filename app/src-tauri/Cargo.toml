@@ -1,6 +1,6 @@
 [package]
 name = "payofflab"
-version = "1.1.0"
+version = "1.2.0"
 description = "PayoffLab — 中文期权策略工作台"
 authors = ["PayoffLab"]
 edition = "2021"
@@ -16,6 +16,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "charset", "system-proxy"] }
 
 [profile.release]
 codegen-units = 1

@@ -86,25 +86,22 @@ export function ticker(symbol: string): Ticker {
   const upper = symbol.toUpperCase();
   const direct = TICKERS.find((t) => t.symbol === upper);
   if (direct) return direct;
-  if (ALL_GRID.includes(upper)) {
-    // Stable synthetic quote for the long tail of the symbol grid.
-    let h = 0;
-    for (const ch of upper) h = (h * 31 + ch.charCodeAt(0)) % 100000;
-    const spot = 18 + (h % 4200) / 10;
-    const step = spot > 300 ? 5 : spot > 60 ? 2.5 : 1;
-    return {
-      symbol: upper,
-      name: `${upper} · 期权标的`,
-      spot: Number(spot.toFixed(2)),
-      change: Number((((h % 200) - 100) / 100).toFixed(2)),
-      changePct: ((h % 200) - 100) / 10000,
-      iv: 0.2 + ((h % 30) / 100),
-      ivRank: 20 + (h % 70),
-      strikeStep: step,
-      group: "popular",
-    };
-  }
-  return TICKERS[0];
+  // Stable synthetic quote for the long tail and for symbols looked up online.
+  let h = 0;
+  for (const ch of upper) h = (h * 31 + ch.charCodeAt(0)) % 100000;
+  const spot = 18 + (h % 4200) / 10;
+  const step = spot > 300 ? 5 : spot > 60 ? 2.5 : 1;
+  return {
+    symbol: upper,
+    name: TICKER_NAME[upper] ?? "在线标的",
+    spot: Number(spot.toFixed(2)),
+    change: Number((((h % 200) - 100) / 100).toFixed(2)),
+    changePct: ((h % 200) - 100) / 10000,
+    iv: 0.2 + ((h % 30) / 100),
+    ivRank: 20 + (h % 70),
+    strikeStep: step,
+    group: "popular",
+  };
 }
 
 export const TICKER_NAME: Record<string, string> = {

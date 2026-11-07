@@ -14,6 +14,7 @@ import {
 } from "../desktop/Split";
 import { deleteTrade, useTrades } from "../lib/store";
 import { analyse, type Instrument } from "../lib/options";
+import { useLiveChain } from "../lib/useLiveChain";
 import { EXPIRIES, ticker } from "../data/tickers";
 import { money, pct, price } from "../lib/format";
 
@@ -120,9 +121,16 @@ function TradeView({
   onDelete: () => void;
 }) {
   const t = ticker(trade.symbol);
-  const expiry = EXPIRIES.find((e) => e.iso === trade.expiry) ?? EXPIRIES[3];
+  const live = useLiveChain(trade.symbol);
+  const chain = live.chain;
+  const market = chain
+    ? { ...t, spot: chain.spot || t.spot, iv: chain.iv30 || t.iv }
+    : t;
+  const expiries = chain?.expiries ?? EXPIRIES;
+  const expiry =
+    expiries.find((e) => e.iso === trade.expiry) ?? expiries[3] ?? expiries[0];
   const dte = trade.legs[0]?.dte ?? expiry.dte;
-  const instrument: Instrument = { ...t, expiries: EXPIRIES };
+  const instrument: Instrument = { ...market, expiries };
   const a = useMemo(() => analyse(trade.legs, instrument, dte / 365), [trade.legs, instrument, dte]);
 
   return (
@@ -156,8 +164,8 @@ function TradeView({
             </div>
             <PayoffChart
               legs={trade.legs}
-              spot={t.spot}
-              iv={t.iv}
+              spot={market.spot}
+              iv={market.iv}
               dte={dte}
               expiryLabel={expiry.label}
               mode="pnl"

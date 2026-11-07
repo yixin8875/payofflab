@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PayoffChart } from "../components/PayoffChart";
 import {
@@ -21,7 +21,8 @@ import { Workspace } from "../desktop/Split";
 import { analyse, type Analysis, type Instrument, type Leg } from "../lib/options";
 import { CHIP_GROUPS, OUTLOOK_LABEL, PRESET_BY_KEY, legsFor } from "../lib/presets";
 import { pricedLeg, roundStrike } from "../lib/chain";
-import { EXPIRIES, TICKERS, ticker as findTicker } from "../data/tickers";
+import { useLiveChain } from "../lib/useLiveChain";
+import { EXPIRIES, TICKERS, ticker as findTicker, type Expiry } from "../data/tickers";
 import { money, pct, price } from "../lib/format";
 import { saveTrade } from "../lib/store";
 
@@ -40,6 +41,12 @@ function TickerPicker({
   const list = TICKERS.filter(
     (t) => t.symbol.toLowerCase().includes(q.toLowerCase()) || t.name.includes(q),
   );
+  const query = q.trim();
+  const custom =
+    /^[A-Za-z][A-Za-z.]{0,5}$/.test(query) &&
+    !TICKERS.some((t) => t.symbol.toLowerCase() === query.toLowerCase())
+      ? query.toUpperCase()
+      : "";
   return (
     <div className="absolute left-2 top-[50px] z-50 w-[320px] rounded-lg border border-line bg-white p-1.5 shadow-pop">
       <div className="flex items-center gap-1.5 rounded-md border border-line bg-white px-2">
@@ -73,7 +80,23 @@ function TickerPicker({
             </button>
           </li>
         ))}
-        {list.length === 0 && (
+        {custom && (
+          <li>
+            <button
+              onClick={() => {
+                onPick(custom);
+                onClose();
+              }}
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-hover"
+            >
+              <span className="w-11 text-[12px] font-semibold">{custom}</span>
+              <span className="min-w-0 flex-1 truncate text-[11.5px] text-dim">
+                在线查询 · CBOE 延迟行情
+              </span>
+            </button>
+          </li>
+        )}
+        {list.length === 0 && !custom && (
           <li className="px-2 py-4 text-center text-[11.5px] text-dim">没有匹配的标的</li>
         )}
       </ul>
@@ -154,12 +177,14 @@ function LegRow({
   leg,
   spot,
   step,
+  expiryLabel,
   onPatch,
   onRemove,
 }: {
   leg: Leg;
   spot: number;
   step: number;
+  expiryLabel: string;
   onPatch: (patch: Partial<Leg>) => void;
   onRemove: () => void;
 }) {
@@ -225,7 +250,7 @@ function LegRow({
           </div>
         )}
         <span className="flex h-6 flex-1 items-center justify-center rounded border border-line bg-surface px-1 text-[10px] text-dim">
-          {EXPIRIES.find((e) => e.iso === leg.expiry)?.label ?? leg.expiry}
+          {expiryLabel}
         </span>
         <span className="flex h-6 w-[46px] items-center justify-end rounded border border-line bg-white px-1 tnum">
           {price(leg.fill)}
@@ -366,13 +391,15 @@ function Metric({
 
 function PresetChips({
   expiry,
+  expiries,
   expiryOpen,
   onToggleExpiry,
   onPickExpiry,
   presetKey,
   onApply,
 }: {
-  expiry: (typeof EXPIRIES)[number];
+  expiry: Expiry;
+  expiries: Expiry[];
   expiryOpen: boolean;
   onToggleExpiry: () => void;
   onPickExpiry: (iso: string) => void;
@@ -391,8 +418,8 @@ function PresetChips({
           <ChevronDown size={11} className="text-faint" />
         </button>
         {expiryOpen && (
-          <ul className="absolute left-0 top-7 z-40 w-[160px] rounded-lg border border-line bg-white p-1 shadow-pop">
-            {EXPIRIES.map((e) => (
+          <ul className="absolute left-0 top-7 z-40 max-h-[264px] w-[160px] overflow-y-auto rounded-lg border border-line bg-white p-1 shadow-pop">
+            {expiries.map((e) => (
               <li key={e.iso}>
                 <button
                   onClick={() => onPickExpiry(e.iso)}
@@ -447,15 +474,39 @@ function PresetChips({
 export default function Calculator() {
   const [params, setParams] = useSearchParams();
   const symbol = (params.get("ticker") ?? "SPY").toUpperCase();
-  const t = findTicker(symbol);
-  const instrument: Instrument = useMemo(() => ({ ...t, expiries: EXPIRIES }), [t]);
-  const expiryIso = params.get("expiry") ?? EXPIRIES[3].iso;
-  const expiry = EXPIRIES.find((e) => e.iso === expiryIso) ?? EXPIRIES[3];
+  const t = useMemo(() => findTicker(symbol), [symbol]);
+  const live = useLiveChain(t.symbol);
+  const chain = live.chain;
+  const market = useMemo(
+    () =>
+      chain
+        ? {
+            ...t,
+            spot: chain.spot || t.spot,
+            change: chain.change,
+            changePct: chain.changePct,
+            iv: chain.iv30 || t.iv,
+          }
+        : t,
+    [t, chain],
+  );
+  const expiries = chain?.expiries ?? EXPIRIES;
+  const fallbackExpiry = useMemo(
+    () =>
+      expiries.reduce(
+        (best, e) => (Math.abs(e.dte - 27) < Math.abs(best.dte - 27) ? e : best),
+        expiries[0],
+      ),
+    [expiries],
+  );
+  const expiry = expiries.find((e) => e.iso === params.get("expiry")) ?? fallbackExpiry;
   const presetKey = params.get("preset") ?? "";
+  const [pristine, setPristine] = useState(true);
 
   const [legs, setLegs] = useState<Leg[]>(() =>
-    presetKey ? legsFor(presetKey, t, expiryIso) : [],
+    presetKey ? legsFor(presetKey, market, expiry.iso) : [],
   );
+  const instrument: Instrument = useMemo(() => ({ ...market, expiries }), [market, expiries]);
   const [mode, setMode] = useState<"pnl" | "pct">("pnl");
   const [envelope, setEnvelope] = useState(0);
   const [pro, setPro] = useState(false);
@@ -468,10 +519,20 @@ export default function Calculator() {
     [legs, instrument, expiry.dte],
   );
 
+  const liveStamp = useRef("");
+  useEffect(() => {
+    if (!chain || !presetKey || !pristine) return;
+    const stamp = `${chain.symbol}:${expiry.iso}:${chain.asOf}`;
+    if (liveStamp.current === stamp) return;
+    liveStamp.current = stamp;
+    setLegs(legsFor(presetKey, market, expiry.iso));
+  }, [chain, presetKey, pristine, market, expiry.iso]);
+
   const apply = (key: string) => {
     const preset = PRESET_BY_KEY[key];
     if (!preset) return;
-    setLegs(preset.build(t, expiry.iso));
+    setPristine(true);
+    setLegs(preset.build(market, expiry.iso));
     setParams({ ticker: t.symbol, expiry: expiry.iso, preset: key });
   };
 
@@ -482,24 +543,34 @@ export default function Calculator() {
       expiry: expiry.iso,
       ...(presetKey ? { preset: presetKey } : {}),
     });
-    if (presetKey) setLegs(legsFor(presetKey, next, expiry.iso));
+    if (presetKey) {
+      setPristine(true);
+      setLegs(legsFor(presetKey, next, expiry.iso));
+    }
   };
 
   const pickExpiry = (iso: string) => {
     setExpiryOpen(false);
     setParams({ ticker: t.symbol, expiry: iso, ...(presetKey ? { preset: presetKey } : {}) });
-    if (presetKey) setLegs(legsFor(presetKey, t, iso));
+    if (presetKey) {
+      setPristine(true);
+      setLegs(legsFor(presetKey, market, iso));
+    }
   };
 
-  const patchLeg = (id: string, patch: Partial<Leg>) =>
+  const patchLeg = (id: string, patch: Partial<Leg>) => {
+    setPristine(false);
     setLegs((ls) => ls.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+  };
 
   const addLeg = () => {
-    const strike = roundStrike(t.spot, t.strikeStep);
-    setLegs((ls) => [...ls, pricedLeg(t, "call", 1, 1, strike, expiry.iso)]);
+    setPristine(false);
+    const strike = roundStrike(market.spot, t.strikeStep);
+    setLegs((ls) => [...ls, pricedLeg(market, "call", 1, 1, strike, expiry.iso)]);
   };
 
   const reset = () => {
+    setPristine(true);
     setLegs([]);
     setSaved(false);
     const next = new URLSearchParams(params);
@@ -541,16 +612,16 @@ export default function Calculator() {
           <span className="text-[13px] font-semibold tracking-[0.01em]">{t.symbol}</span>
           <span className="hidden min-w-0 truncate text-[11.5px] text-dim lg:inline">{t.name}</span>
           <span className="ml-1.5 text-[16px] font-semibold tracking-[-0.02em] tnum">
-            ${t.spot.toFixed(2)}
+            ${market.spot.toFixed(2)}
           </span>
           <span
             className={`flex items-center gap-0.5 text-[11px] font-medium tnum ${
-              t.change >= 0 ? "text-profit" : "text-loss"
+              market.change >= 0 ? "text-profit" : "text-loss"
             }`}
           >
-            <span aria-hidden="true">{t.change >= 0 ? "▲" : "▼"}</span>
-            {money(Math.abs(t.change))} ({t.changePct >= 0 ? "+" : "−"}
-            {Math.abs(t.changePct * 100).toFixed(2)}%)
+            <span aria-hidden="true">{market.change >= 0 ? "▲" : "▼"}</span>
+            {money(Math.abs(market.change))} ({market.changePct >= 0 ? "+" : "−"}
+            {Math.abs(market.changePct * 100).toFixed(2)}%)
           </span>
           <ChevronDown size={12} className="text-faint" />
         </button>
@@ -560,17 +631,19 @@ export default function Calculator() {
             className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[10px] text-dim tnum xl:flex"
             title="按 IV 估算的到期一个标准差区间"
           >
-            EM ±{money(analysis?.expectedMove ?? t.spot * t.iv * Math.sqrt(expiry.dte / 365))}
+            EM ±{money(analysis?.expectedMove ?? market.spot * market.iv * Math.sqrt(expiry.dte / 365))}
           </span>
           <span
             className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[10px] text-dim tnum 2xl:flex"
-            title="隐含波动率在过去一年区间中的排名"
+            title={chain ? "CBOE 30 天隐含波动率" : "隐含波动率在过去一年区间中的排名"}
           >
-            IVR {t.ivRank}
+            {chain ? `IV30 ${pct(chain.iv30, 1)}` : `IVR ${t.ivRank}`}
           </span>
           <span className="hidden h-6 items-center gap-1.5 px-1 text-[10.5px] text-dim lg:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-dim" />
-            已收盘
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${chain ? "bg-profit" : "bg-dim"}`}
+            />
+            {chain ? "在线 · 延迟" : "已收盘"}
           </span>
           <button
             onClick={save}
@@ -587,9 +660,10 @@ export default function Calculator() {
         )}
       </div>
 
-      <div className="flex h-[38px] shrink-0 items-center gap-1.5 overflow-hidden border-b border-line bg-chrome px-3">
+      <div className="relative z-30 flex h-[38px] shrink-0 items-center gap-1.5 border-b border-line bg-chrome px-3">
         <PresetChips
           expiry={expiry}
+          expiries={expiries}
           expiryOpen={expiryOpen}
           onToggleExpiry={() => setExpiryOpen((v) => !v)}
           onPickExpiry={pickExpiry}
@@ -630,8 +704,9 @@ export default function Calculator() {
                   <LegRow
                     key={leg.id}
                     leg={leg}
-                    spot={t.spot}
+                    spot={market.spot}
                     step={t.strikeStep}
+                    expiryLabel={expiries.find((e) => e.iso === leg.expiry)?.label ?? leg.expiry}
                     onPatch={(patch) => patchLeg(leg.id, patch)}
                     onRemove={() => setLegs((ls) => ls.filter((l) => l.id !== leg.id))}
                   />
@@ -648,7 +723,9 @@ export default function Calculator() {
               </div>
             )}
             <p className="mt-3 border-t border-line-subtle pt-2 text-[9.5px] leading-4 text-faint">
-              成交价来自合成链：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。
+              {chain
+                ? "成交价来自 CBOE 延迟行情：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。"
+                : "成交价来自合成链：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。"}
             </p>
           </div>
         </section>
@@ -706,8 +783,8 @@ export default function Calculator() {
               <div className="min-h-0 min-w-0 flex-1 overflow-hidden px-1 py-1">
                 <PayoffChart
                   legs={legs}
-                  spot={t.spot}
-                  iv={t.iv}
+                  spot={market.spot}
+                  iv={market.iv}
                   dte={expiry.dte}
                   expiryLabel={expiry.label}
                   mode={mode}
@@ -729,7 +806,7 @@ export default function Calculator() {
                   </span>
                   <span>盈利概率 {pct(analysis.probProfit)}</span>
                   <span className="ml-auto hidden xl:inline">
-                    BS 模型 · IV {pct(t.iv, 1)} · {expiry.label}
+                    BS 模型 · IV {pct(market.iv, 1)} · {expiry.label}
                   </span>
                 </div>
               )}
