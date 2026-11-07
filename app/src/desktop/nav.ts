@@ -8,11 +8,12 @@ import {
   Home,
   Info,
   Settings as SettingsIcon,
+  Sigma,
   Star,
   Target,
 } from "../components/Icons";
 
-export const VERSION = "1.0.3";
+export const VERSION = "1.1.0";
 
 export type NavItem = {
   href: string;
@@ -31,6 +32,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/", label: "概览", icon: Home },
       { href: "/calculator", label: "构建器", icon: ChartLine },
+      { href: "/scenario", label: "情景分析", icon: Sigma },
     ],
   },
   {

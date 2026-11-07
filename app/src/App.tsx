@@ -8,6 +8,7 @@ import Methodology from "./pages/Methodology";
 import NotFound from "./pages/NotFound";
 import OptionFinder from "./pages/OptionFinder";
 import Overview from "./pages/Overview";
+import Scenario from "./pages/Scenario";
 import Settings from "./pages/Settings";
 import Strategies from "./pages/Strategies";
 import Tools from "./pages/Tools";
@@ -20,6 +21,7 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<Overview />} />
         <Route path="/calculator" element={<Calculator />} />
+        <Route path="/scenario" element={<Scenario />} />
         <Route path="/chain" element={<Chain />} />
         <Route path="/chain/:symbol" element={<Chain />} />
         <Route path="/strategies" element={<Strategies />} />
