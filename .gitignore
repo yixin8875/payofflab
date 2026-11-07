@@ -18,6 +18,9 @@ inbox/
 reference/
 investigation.cany/
 
+# Local tooling (app launcher config, session data)
+.claude/
+
 # OS / editor noise
 .DS_Store
 Thumbs.db
