@@ -37,17 +37,12 @@ export function TitleBar({
 
   return (
     <header
-      data-tauri-drag-region
+      data-tauri-drag-region="deep"
       className="flex h-[var(--titlebar-h)] shrink-0 select-none"
-      onDoubleClick={(event) => {
-        if ((event.target as HTMLElement).hasAttribute("data-tauri-drag-region")) {
-          void toggleMaximizeWindow().then(setMaximized);
-        }
-      }}
     >
       {/* Brand, aligned with the sidebar */}
       <div
-        data-tauri-drag-region
+        data-tauri-drag-region="deep"
         className="flex w-[var(--sidebar-w)] shrink-0 items-center gap-1.5 border-b border-line bg-canvas pl-2 pr-3"
       >
         <button
@@ -68,7 +63,7 @@ export function TitleBar({
 
       {/* Navigation, search, actions, window controls */}
       <div className="flex min-w-0 flex-1 items-stretch border-b border-line bg-white">
-        <div data-tauri-drag-region className="flex items-center gap-0.5 pl-2">
+        <div data-tauri-drag-region="deep" className="flex items-center gap-0.5 pl-2">
           <button
             type="button"
             disabled={!canBack}

@@ -56,7 +56,7 @@ export async function restoreSavedWindowSize() {
     const raw = localStorage.getItem(SIZE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw) as { w?: number; h?: number };
-    if (!saved.w || !saved.h || saved.w < 900 || saved.h < 600) return;
+    if (!saved.w || !saved.h || saved.w < 1180 || saved.h < 760) return;
     const { LogicalSize } = await import("@tauri-apps/api/window");
     const win = await currentWindow();
     await win.setSize(new LogicalSize(Math.round(saved.w), Math.round(saved.h)));

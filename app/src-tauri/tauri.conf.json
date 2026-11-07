@@ -36,6 +36,15 @@
     "category": "Finance",
     "shortDescription": "中文期权策略工作台",
     "longDescription": "桌面版多腿期权策略工作台：盈亏图、盈利概率、净希腊值、期权链与中文策略库。",
-    "copyright": "© 2026 期权盈亏图"
+    "copyright": "© 2026 期权盈亏图",
+    "windows": {
+      "wix": {
+        "language": "zh-CN"
+      },
+      "nsis": {
+        "languages": ["SimpChinese"],
+        "displayLanguageSelector": false
+      }
+    }
   }
 }

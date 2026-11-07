@@ -27,6 +27,13 @@ type SectionKey = (typeof SECTIONS)[number]["key"];
 export default function Settings() {
   const [active, setActive] = useState<SectionKey>("general");
   const [settings, setSettings] = useState<AppSettings>(() => readSettings());
+  const [hasWindowSize, setHasWindowSize] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem("payoff:window-size"));
+    } catch {
+      return false;
+    }
+  });
   const trades = useTrades();
   const section = SECTIONS.find((s) => s.key === active) ?? SECTIONS[0];
 
@@ -149,7 +156,11 @@ export default function Settings() {
               <div className="overflow-hidden rounded-lg border border-line bg-white">
                 <InfoRow title="保存的策略" value={`${trades.length} 笔`} note="保存于本机 localStorage" />
                 <InfoRow title="自选列表" value="8 个标的" note="示例列表，仅保存在本机" />
-                <InfoRow title="窗口尺寸" value="已记录" note="可在下方清除" />
+                <InfoRow
+                  title="窗口尺寸"
+                  value={hasWindowSize ? "已记录" : "未记录"}
+                  note={hasWindowSize ? "可在下方清除" : "调整窗口后自动记录"}
+                />
               </div>
               <div className="rounded-lg border border-line bg-white p-4">
                 <p className="text-[12.5px] font-medium">本机数据</p>
@@ -172,6 +183,7 @@ export default function Settings() {
                     type="button"
                     onClick={() => {
                       clearSavedWindowSize();
+                      setHasWindowSize(false);
                       window.alert("已清除窗口尺寸记录，下次启动会使用默认大小。");
                     }}
                     className="btn-secondary h-7 px-2.5"

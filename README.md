@@ -25,6 +25,12 @@ npm run build                    # 类型检查 + 前端产物
 npm run tauri build              # 桌面安装包与 exe
 ```
 
+## 产物
+
+- 免安装程序：`app/src-tauri/target/release/payoff-chart.exe`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/期权盈亏图_1.0.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/期权盈亏图_1.0.0_x64_zh-CN.msi`
+
 ## 目录
 
 ```
