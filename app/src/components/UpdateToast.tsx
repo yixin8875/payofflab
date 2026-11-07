@@ -38,7 +38,7 @@ export function UpdateToast() {
             {update.status === "ready" && `v${update.version} 已安装`}
             {update.status === "error" && `更新 v${update.version} 未完成`}
           </p>
-          <p className="mt-0.5 text-[10.5px] leading-4 text-dim">
+          <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-[10.5px] leading-4 text-dim">
             {update.status === "available" &&
               (update.notes?.trim() || "包含最新修复与改进。")}
             {update.status === "downloading" &&

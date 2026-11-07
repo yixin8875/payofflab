@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { BrandMark } from "../components/Brand";
 import {
@@ -51,6 +51,12 @@ export default function Settings() {
       return false;
     }
   });
+
+  useEffect(() => {
+    if (requested && SECTIONS.some((item) => item.key === requested)) {
+      setActive(requested as SectionKey);
+    }
+  }, [requested]);
   const trades = useTrades();
   const watchlist = useWatchlist();
   const watchCount = countSymbols(watchlist);

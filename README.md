@@ -17,6 +17,7 @@
 ## 自动更新
 
 - 桌面版启动时会检查 GitHub Releases；发现新版本后在右下角提示，可下载安装并自动重启。
+- 自动更新依赖 NSIS 安装版；直接运行免安装 exe 时建议手动替换新版本。
 - 发布流程由 `.github/workflows/release.yml` 完成：推送 `v*` 标签后，GitHub Actions 会构建、签名并发布安装包与 `latest.json`。
 - 仓库需要配置两个 Actions Secrets：`TAURI_SIGNING_PRIVATE_KEY`（私钥文件内容）与 `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`（私钥密码）。
 - 本机签名私钥位于 `~/.payofflab/payofflab-updater.key`，不要提交到仓库；客户端内置对应公钥，签名不匹配的更新包会被拒绝。
@@ -56,7 +57,7 @@ npm run tauri build              # 桌面安装包与 exe
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
 - NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.3.0_x64-setup.exe`
 - MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.3.0_x64_zh-CN.msi`
-- 更新包：同目录下的 `*.nsis.zip` 与 `*.sig`，由发布流程上传。
+- 更新包：安装包同目录的 `.sig` 签名文件，由发布流程上传。
 
 ## 目录
 
