@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "期权盈亏图",
-  "version": "1.0.0",
+  "productName": "权图",
+  "version": "1.0.1",
   "identifier": "com.payoffchart.cn",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "期权盈亏图",
+        "title": "权图",
         "width": 1360,
         "height": 900,
         "minWidth": 1180,
@@ -32,11 +32,17 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "msi"],
-    "icon": ["icons/icon.png", "icons/icon.ico"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "category": "Finance",
     "shortDescription": "中文期权策略工作台",
-    "longDescription": "桌面版多腿期权策略工作台：盈亏图、盈利概率、净希腊值、期权链与中文策略库。",
-    "copyright": "© 2026 期权盈亏图",
+    "longDescription": "权图：桌面版多腿期权策略工作台，提供盈亏图、盈利概率、净希腊值、期权链与中文策略库。",
+    "copyright": "© 2026 权图 QuanTu",
     "windows": {
       "wix": {
         "language": "zh-CN"

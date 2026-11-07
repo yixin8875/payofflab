@@ -55,7 +55,7 @@ export function TitleBar({
           <PanelLeft size={15} />
         </button>
         <BrandMark size={20} />
-        <span className="truncate text-[12.5px] font-semibold tracking-[-0.01em]">期权盈亏图</span>
+        <span className="truncate text-[12.5px] font-semibold tracking-[-0.01em]">权图</span>
         <span className="ml-auto rounded border border-line bg-white/60 px-1 py-px text-[9px] font-medium tracking-wide text-dim">
           桌面版
         </span>
@@ -94,7 +94,7 @@ export function TitleBar({
             aria-label="打开搜索"
           >
             <Search size={14} className="shrink-0" />
-            <span className="truncate">在 期权盈亏图 中搜索</span>
+            <span className="truncate">在权图中搜索</span>
             <kbd className="ml-auto shrink-0 rounded border border-line bg-white px-1 py-px font-sans text-[9.5px] text-faint">
               Ctrl K
             </kbd>

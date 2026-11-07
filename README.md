@@ -1,4 +1,4 @@
-# 期权盈亏图
+# 权图 QuanTu
 
 中文期权策略工作台：构建多腿持仓、看到期盈亏图、盈利概率与净希腊值。桌面应用，数据全部留在本机。
 
@@ -27,9 +27,9 @@ npm run tauri build              # 桌面安装包与 exe
 
 ## 产物
 
-- 免安装程序：`app/src-tauri/target/release/payoff-chart.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/期权盈亏图_1.0.0_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/期权盈亏图_1.0.0_x64_zh-CN.msi`
+- 免安装程序：`app/src-tauri/target/release/quantu.exe`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/权图_1.0.1_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/权图_1.0.1_x64_zh-CN.msi`
 
 ## 目录
 

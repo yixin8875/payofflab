@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { BrandMark } from "../components/Brand";
 import { Command, Info, Lock, Settings as SettingsIcon, Sun } from "../components/Icons";
 import {
   DetailScroll,
@@ -55,7 +56,7 @@ export default function Settings() {
     <Split
       list={
         <ListPane title="设置" count={SECTIONS.length}>
-          <ListGroup label="期权盈亏图">
+          <ListGroup label="权图">
             {SECTIONS.map((item) => {
               const Icon = item.icon;
               return (
@@ -228,11 +229,9 @@ export default function Settings() {
             <div className="space-y-3">
               <div className="rounded-lg border border-line bg-white p-4">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-white text-[15px] font-semibold">
-                    权
-                  </span>
+                  <BrandMark size={40} />
                   <div>
-                    <p className="text-[14px] font-semibold">期权盈亏图</p>
+                    <p className="text-[14px] font-semibold">权图 QuanTu</p>
                     <p className="text-[11px] text-dim">中文期权策略工作台 · v{VERSION}</p>
                   </div>
                 </div>
@@ -247,7 +246,7 @@ export default function Settings() {
                 <LinkRow to="/terms" title="使用条款" note="教育工具，不是投资建议" />
                 <LinkRow to="/privacy" title="隐私" note="不收集数据，一切留在本机" />
               </div>
-              <p className="px-1 text-[10.5px] text-faint">© 2026 期权盈亏图 · Tauri 2 + React 19</p>
+              <p className="px-1 text-[10.5px] text-faint">© 2026 权图 QuanTu · Tauri 2 + React 19</p>
             </div>
           )}
         </div>

@@ -2,5 +2,5 @@
 pub fn run() {
     tauri::Builder::default()
         .run(tauri::generate_context!())
-        .expect("error while running 期权盈亏图");
+        .expect("error while running 权图");
 }

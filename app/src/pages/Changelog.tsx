@@ -3,10 +3,34 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.0.1",
+    date: "2026-11-07",
+    title: "品牌焕新",
+    latest: true,
+    groups: [
+      {
+        label: "变更",
+        items: [
+          "产品更名为「权图 QuanTu」，副标题仍为「中文期权策略工作台」。",
+          "全新应用标识：蓝色渐变圆角块、奶白盈亏曲线与金色行权节点。",
+          "窗口、任务栏、开始菜单与安装包图标同步换新；界面内加入矢量 logo 与 favicon。",
+          "标题栏、设置「关于」卡片、使用条款与搜索占位符改用新名称。",
+        ],
+      },
+      {
+        label: "构建",
+        items: [
+          "可执行文件重命名为 quantu.exe，安装包前缀改为「权图_1.0.1」。",
+          "保留原有应用标识，已保存的策略、自选与设置升级后照常读取。",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.0.0",
     date: "2026-11-07",
     title: "桌面版",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "新增",
