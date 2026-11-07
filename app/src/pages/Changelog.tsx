@@ -3,10 +3,33 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.0.2",
+    date: "2026-11-07",
+    title: "英文品牌与蓝白图标",
+    latest: true,
+    groups: [
+      {
+        label: "变更",
+        items: [
+          "产品更名为 PayoffLab，中文副标题仍为「中文期权策略工作台」。",
+          "图标改为蓝白小清新：天空蓝渐变底、白色盈亏曲线与白色行权节点。",
+          "标题栏、设置「关于」、使用条款、favicon、窗口与安装包图标同步更新。",
+        ],
+      },
+      {
+        label: "构建",
+        items: [
+          "可执行文件重命名为 payofflab.exe，安装包前缀改为「PayoffLab_1.0.2」。",
+          "应用标识保持不变，已保存的策略、自选与设置升级后照常读取。",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.0.1",
     date: "2026-11-07",
     title: "品牌焕新",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "变更",

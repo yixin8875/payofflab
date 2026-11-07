@@ -1,12 +1,12 @@
 [package]
-name = "quantu"
-version = "1.0.1"
-description = "权图 — 中文期权策略工作台"
-authors = ["权图"]
+name = "payofflab"
+version = "1.0.2"
+description = "PayoffLab — 中文期权策略工作台"
+authors = ["PayoffLab"]
 edition = "2021"
 
 [lib]
-name = "quantu_lib"
+name = "payofflab_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

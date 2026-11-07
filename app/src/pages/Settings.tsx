@@ -56,7 +56,7 @@ export default function Settings() {
     <Split
       list={
         <ListPane title="设置" count={SECTIONS.length}>
-          <ListGroup label="权图">
+          <ListGroup label="PayoffLab">
             {SECTIONS.map((item) => {
               const Icon = item.icon;
               return (
@@ -231,7 +231,7 @@ export default function Settings() {
                 <div className="flex items-center gap-3">
                   <BrandMark size={40} />
                   <div>
-                    <p className="text-[14px] font-semibold">权图 QuanTu</p>
+                    <p className="text-[14px] font-semibold">PayoffLab</p>
                     <p className="text-[11px] text-dim">中文期权策略工作台 · v{VERSION}</p>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function Settings() {
                 <LinkRow to="/terms" title="使用条款" note="教育工具，不是投资建议" />
                 <LinkRow to="/privacy" title="隐私" note="不收集数据，一切留在本机" />
               </div>
-              <p className="px-1 text-[10.5px] text-faint">© 2026 权图 QuanTu · Tauri 2 + React 19</p>
+              <p className="px-1 text-[10.5px] text-faint">© 2026 PayoffLab · Tauri 2 + React 19</p>
             </div>
           )}
         </div>
