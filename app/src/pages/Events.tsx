@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, Trash } from "../components/Icons";
 import { PaneHeader, Workspace } from "../desktop/Split";
@@ -8,23 +8,91 @@ import {
   daysToEvent,
   EVENT_KIND_LABEL,
   eventLabel,
+  lastEarningsSync,
+  syncEarnings,
   todayIso,
   useEvents,
+  type EarningsSyncResult,
+  type EarningsSyncState,
   type EventKind,
 } from "../lib/events";
-import { useTrades } from "../lib/store";
+import { hasOpenLegs, useTrades } from "../lib/store";
+import { useWatchlist } from "../lib/watchlist";
 
 const KINDS: EventKind[] = ["earnings", "macro", "dividend", "other"];
 
 export default function Events() {
   const events = useEvents();
   const trades = useTrades();
+  const watchlist = useWatchlist();
   const today = todayIso();
   const [symbol, setSymbol] = useState("");
   const [iso, setIso] = useState(today);
   const [kind, setKind] = useState<EventKind>("earnings");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [syncState, setSyncState] = useState<EarningsSyncState | null>(() => lastEarningsSync());
+  const [syncResult, setSyncResult] = useState<EarningsSyncResult | null>(null);
+  const [syncError, setSyncError] = useState("");
+  const busy = useRef(false);
+  const autoRan = useRef(false);
+
+  const targets = useMemo(() => {
+    const held = trades.filter(hasOpenLegs).map((trade) => trade.symbol);
+    const watched = watchlist.flatMap((group) => group.symbols);
+    return [...new Set([...held, ...watched])].slice(0, 24);
+  }, [trades, watchlist]);
+
+  const runSync = useCallback(async () => {
+    if (busy.current || targets.length === 0) return;
+    busy.current = true;
+    setSyncing(true);
+    setProgress({ done: 0, total: 0 });
+    setSyncError("");
+    try {
+      const result = await syncEarnings(targets, (done, total) =>
+        setProgress({ done, total }),
+      );
+      setSyncResult(result);
+      setSyncState(lastEarningsSync());
+    } catch (reason) {
+      setSyncError(
+        reason instanceof Error ? reason.message : "同步失败，检查网络后重试。",
+      );
+    } finally {
+      busy.current = false;
+      setSyncing(false);
+      setProgress(null);
+    }
+  }, [targets]);
+
+  useEffect(() => {
+    if (autoRan.current) return;
+    autoRan.current = true;
+    if (targets.length === 0) return;
+    const last = lastEarningsSync();
+    const lastTime = last ? new Date(last.at).getTime() : Number.NaN;
+    const stale =
+      !last ||
+      !Number.isFinite(lastTime) ||
+      Date.now() - lastTime > 24 * 60 * 60 * 1000;
+    if (stale) void runSync();
+  }, [runSync, targets.length]);
+
+  const syncTime = (value: string) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? value
+      : date.toLocaleString("zh-CN", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+  };
 
   const upcoming = useMemo(
     () => events.filter((event) => event.iso >= today),
@@ -74,9 +142,62 @@ export default function Events() {
       <div className="scroll-pane flex-1">
         <div className="mx-auto w-full max-w-[980px] px-7 py-5">
           <section className="rounded-lg border border-line bg-white p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-[12px] font-semibold">自动同步财报日</h2>
+                <p className="mt-1 max-w-[660px] text-[10.5px] leading-4 text-faint">
+                  从纳斯达克公开日历获取未来 60 天的已确认财报日，只保留持仓与自选标的。
+                  手工条目不会被覆盖；删掉的财报条目在下次同步时也不会重新出现。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void runSync()}
+                disabled={syncing || targets.length === 0}
+                className="btn-secondary h-7 shrink-0 px-3 disabled:opacity-40"
+              >
+                {syncing
+                  ? progress && progress.total > 0
+                    ? `同步中 ${progress.done}/${progress.total}`
+                    : "同步中…"
+                  : "立即同步"}
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-faint">
+              <span>标的 {targets.length} 个（持仓 + 自选，最多 24 个）</span>
+              {syncState && <span>上次同步 {syncTime(syncState.at)}</span>}
+              {syncState && !syncState.complete && (
+                <span className="text-loss">上次同步不完整</span>
+              )}
+              {syncResult && (
+                <span>
+                  更新 {syncResult.updated} 个 · 未找到 {syncResult.missing.length} 个
+                  {(syncResult.dismissed?.length ?? 0) > 0
+                    ? ` · 已忽略 ${syncResult.dismissed?.length ?? 0} 个`
+                    : ""}
+                  {syncResult.failed > 0 ? ` · ${syncResult.failed} 天获取失败` : ""}
+                </span>
+              )}
+            </div>
+            {syncResult && syncResult.missing.length > 0 && (
+              <p className="mt-1 text-[10px] leading-4 text-faint">
+                未找到：{syncResult.missing.slice(0, 10).join("、")}
+                {syncResult.missing.length > 10 ? "…" : ""}
+                。ETF 或不发布财报的标的会出现在这里。
+              </p>
+            )}
+            {syncError && <p className="mt-1 text-[10.5px] text-loss">{syncError}</p>}
+            {targets.length === 0 && (
+              <p className="mt-1 text-[10.5px] text-faint">
+                先在自选或持仓里添加标的，才能自动同步。
+              </p>
+            )}
+          </section>
+
+          <section className="mt-3 rounded-lg border border-line bg-white p-4">
             <div className="flex items-baseline justify-between gap-2">
               <h2 className="text-[12px] font-semibold">添加事件</h2>
-              <span className="text-[10px] text-faint">CBOE 行情不含财报日，需要手工录入</span>
+              <span className="text-[10px] text-faint">可手工补充宏观、分红或日历未收录的事件</span>
             </div>
             <div className="mt-3 flex flex-wrap items-end gap-2">
               <label className="block">
@@ -186,7 +307,14 @@ export default function Events() {
                       </span>
                       <span className="font-medium">{event.symbol}</span>
                       <span className="text-dim">{EVENT_KIND_LABEL[event.kind]}</span>
-                      <span className="truncate text-dim">{event.note || "—"}</span>
+                      <span className="flex min-w-0 items-center gap-1 text-dim">
+                        <span className="truncate">{event.note || "—"}</span>
+                        {event.source === "nasdaq" && (
+                          <span className="shrink-0 rounded border border-line bg-[#fbfaf8] px-1 text-[9px] text-faint">
+                            自动
+                          </span>
+                        )}
+                      </span>
                       <span className="text-right tnum text-dim">
                         {count > 0 ? `${count} 笔` : "—"}
                       </span>
@@ -208,8 +336,8 @@ export default function Events() {
           </section>
 
           <p className="mt-4 border-t border-line-subtle pt-3 text-[10px] leading-4 text-faint">
-            事件日期为手工录入，不保证与实际公告一致；“影响持仓”统计到期日不早于该事件的未平仓策略。
-            跨事件提醒只做提示，不会自动调整定价。
+            自动条目来自纳斯达克公开财报日历，公司改期或日历滞后时可能不准确；手工条目只保存在本机。
+            “影响持仓”统计到期日不早于该事件的未平仓策略。跨事件提醒只做提示，不会自动调整定价。
           </p>
         </div>
       </div>
