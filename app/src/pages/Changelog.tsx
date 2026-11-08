@@ -3,10 +3,33 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.4.1",
+    date: "2026-11-08",
+    title: "更优雅的启动体验",
+    latest: true,
+    groups: [
+      {
+        label: "新增",
+        items: [
+          "启动时显示品牌载入画面：Logo、字标与细线扫描动画在应用就绪前铺满窗口，随后平滑淡出，消除冷启动白屏。",
+          "尊重系统「减少动态效果」设置，开启后显示静态载入状态。",
+        ],
+      },
+      {
+        label: "变更",
+        items: ["Tauri 窗口底色改为应用同款暖灰，WebView 首帧之前不再闪白。"],
+      },
+      {
+        label: "构建",
+        items: ["版本号提升到 1.4.1。"],
+      },
+    ],
+  },
+  {
     version: "1.4.0",
     date: "2026-11-07",
     title: "真实持仓账本与实时期权扫描",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "新增",

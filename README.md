@@ -39,8 +39,8 @@
 发布新版本时，先同步修改 `app/package.json`、`app/src-tauri/Cargo.toml`、`app/src-tauri/tauri.conf.json` 与 `app/src/desktop/nav.ts` 中的版本号，提交后执行：
 
 ```bash
-git tag v1.4.0
-git push origin v1.4.0
+git tag v1.4.1
+git push origin v1.4.1
 ```
 
 ## 技术栈
@@ -69,8 +69,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.4.0_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.4.0_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.4.1_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.4.1_x64_zh-CN.msi`
 - 更新包：安装包同目录的 `.sig` 签名文件，由发布流程上传。
 
 ## 目录

@@ -10,8 +10,176 @@
       content="PayoffLab：桌面版期权策略工作台，多腿构建器、盈亏图、希腊值、盈利概率与中文策略库。"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      html,
+      body {
+        background: #f5f3ef;
+      }
+
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        display: grid;
+        place-items: center;
+        background: #f5f3ef;
+        color: #1c1b19;
+        font-family: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei", "PingFang SC",
+          system-ui, sans-serif;
+        opacity: 1;
+        transform: scale(1);
+        transition:
+          opacity 0.42s cubic-bezier(0.22, 0.61, 0.36, 1),
+          transform 0.42s cubic-bezier(0.22, 0.61, 0.36, 1);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #boot::before {
+        content: "";
+        position: absolute;
+        width: 540px;
+        height: 540px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0) 68%);
+        opacity: 0.75;
+        transform: translateY(-26px);
+        pointer-events: none;
+      }
+
+      #boot.is-ready {
+        opacity: 0;
+        transform: scale(1.008);
+        pointer-events: none;
+      }
+
+      .boot-inner {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 22px;
+      }
+
+      .boot-tile {
+        display: grid;
+        place-items: center;
+        width: 58px;
+        height: 58px;
+        border: 1px solid #e3e0da;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow:
+          0 1px 2px rgba(28, 27, 25, 0.04),
+          0 10px 28px rgba(28, 27, 25, 0.07);
+        animation: boot-rise 0.58s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      }
+
+      .boot-tile svg {
+        display: block;
+      }
+
+      .boot-word {
+        margin-top: 18px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.012em;
+        animation: boot-fade 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) 0.08s both;
+      }
+
+      .boot-sub {
+        margin-top: 5px;
+        font-size: 10.5px;
+        letter-spacing: 0.06em;
+        color: #9c978f;
+        animation: boot-fade 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) 0.14s both;
+      }
+
+      .boot-track {
+        position: relative;
+        margin-top: 26px;
+        width: 108px;
+        height: 2px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e3e0da;
+        animation: boot-fade 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s both;
+      }
+
+      .boot-track span {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 34px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(3, 100, 211, 0.25), #0364d3);
+        animation: boot-sweep 1.5s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+      }
+
+      @keyframes boot-rise {
+        from {
+          opacity: 0;
+          transform: translateY(7px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes boot-fade {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes boot-sweep {
+        0% {
+          transform: translateX(-38px);
+        }
+        62%,
+        100% {
+          transform: translateX(112px);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #boot,
+        .boot-tile,
+        .boot-word,
+        .boot-sub,
+        .boot-track {
+          animation: none;
+          transition: opacity 0.2s linear;
+        }
+        .boot-track span {
+          animation: none;
+          width: 100%;
+          background: #cfcac2;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="boot" role="status" aria-live="polite" aria-label="PayoffLab 正在启动">
+      <div class="boot-inner">
+        <div class="boot-tile">
+          <svg width="30" height="30" viewBox="32 32 448 448" fill="none" aria-hidden="true">
+            <path
+              fill="currentColor"
+              fill-rule="evenodd"
+              d="M96 56H352L416 120V232L352 296H224V456H96V56ZM224 136H296L320 160V192L296 216H224V136Z"
+            />
+          </svg>
+        </div>
+        <div class="boot-word">PayoffLab</div>
+        <div class="boot-sub">期权策略工作台</div>
+        <div class="boot-track"><span></span></div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
