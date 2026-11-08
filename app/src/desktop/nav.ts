@@ -12,6 +12,7 @@ import {
   Sigma,
   Star,
   Target,
+  Waves,
 } from "../components/Icons";
 
 export const VERSION = "1.5.0";
@@ -41,6 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/chain", label: "期权链", icon: Chain },
       { href: "/gex", label: "Gamma 敞口", icon: Pulse },
+      { href: "/vol", label: "波动率曲面", icon: Waves },
       { href: "/tools/option-finder", label: "扫描器", icon: Target },
     ],
   },

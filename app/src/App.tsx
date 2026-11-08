@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import Strategies from "./pages/Strategies";
 import Tools from "./pages/Tools";
 import Trades from "./pages/Trades";
+import Vol from "./pages/Vol";
 import Watchlist from "./pages/Watchlist";
 
 export default function App() {
@@ -27,6 +28,8 @@ export default function App() {
         <Route path="/chain/:symbol" element={<Chain />} />
         <Route path="/gex" element={<Gex />} />
         <Route path="/gex/:symbol" element={<Gex />} />
+        <Route path="/vol" element={<Vol />} />
+        <Route path="/vol/:symbol" element={<Vol />} />
         <Route path="/strategies" element={<Strategies />} />
         <Route path="/strategies/:slug" element={<Strategies />} />
         <Route path="/watchlist" element={<Watchlist />} />

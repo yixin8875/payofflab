@@ -1,5 +1,5 @@
 import { ticker } from "../data/tickers";
-import { cachedChain, daysUntil } from "./live";
+import { cachedChain, daysUntil, quoteKey } from "./live";
 import { greeks, legPrice, type Leg } from "./options";
 import type { SavedTrade } from "./store";
 
@@ -48,12 +48,18 @@ function baseOf(trade: SavedTrade) {
   return { spot: live?.spot ?? base.spot, iv: live?.iv30 ?? base.iv };
 }
 
-function shift(trade: SavedTrade, spotPct: number, ivPts: number) {
-  const base = baseOf(trade);
-  return {
-    spot: base.spot * (1 + spotPct / 100),
-    iv: Math.max(0.02, base.iv + ivPts / 100),
-  };
+function legWithIv(
+  leg: Leg,
+  symbol: string,
+  baseIv: number,
+  ivPts: number,
+): Leg {
+  if (leg.kind === "stock") return leg;
+  const quote = cachedChain(symbol)?.quotes.get(
+    quoteKey(leg.expiry, leg.kind, leg.strike),
+  );
+  const current = quote && quote.iv > 0 ? quote.iv : leg.iv ?? baseIv;
+  return { ...leg, iv: Math.max(0.01, current + ivPts / 100) };
 }
 
 export function legMark(leg: Leg, spot: number, days: number, baseIv: number): number {
@@ -68,8 +74,14 @@ export function tradeMark(
   ivPts: number,
   days: number,
 ): number {
-  const { spot, iv } = shift(trade, spotPct, ivPts);
-  return trade.legs.reduce((sum, leg) => sum + legMark(leg, spot, days, iv), 0);
+  const base = baseOf(trade);
+  const spot = base.spot * (1 + spotPct / 100);
+  const fallbackIv = Math.max(0.02, base.iv + ivPts / 100);
+  return trade.legs.reduce(
+    (sum, leg) =>
+      sum + legMark(legWithIv(leg, trade.symbol, base.iv, ivPts), spot, days, fallbackIv),
+    0,
+  );
 }
 
 export function portfolioMark(
@@ -109,8 +121,13 @@ export function tradeGreeks(
   ivPts: number,
   days: number,
 ): GreekTotals {
-  const { spot, iv } = shift(trade, spotPct, ivPts);
-  return legsGreeks(trade.legs, spot, iv, days);
+  const base = baseOf(trade);
+  const spot = base.spot * (1 + spotPct / 100);
+  const fallbackIv = Math.max(0.02, base.iv + ivPts / 100);
+  const legs = trade.legs.map((leg) =>
+    legWithIv(leg, trade.symbol, base.iv, ivPts),
+  );
+  return legsGreeks(legs, spot, fallbackIv, days);
 }
 
 export function portfolioGreeks(

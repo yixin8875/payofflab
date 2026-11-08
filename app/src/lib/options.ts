@@ -9,6 +9,8 @@ export type Leg = {
   expiry: string;
   dte: number;
   fill: number;
+  /** Entry implied volatility from the live chain, when available. */
+  iv?: number;
 };
 
 export type Instrument = {
@@ -65,9 +67,27 @@ export function ivFor(kind: LegKind, K: number, S: number, baseIv: number): numb
   return Math.max(0.05, baseIv * (1 + skew * m * m * 24));
 }
 
-export function legPrice(leg: Leg, S: number, T: number, baseIv: number): number {
+function sigmaFor(leg: Leg, S: number, baseIv: number, ivShift = 0): number {
+  const stored =
+    leg.kind !== "stock" &&
+    typeof leg.iv === "number" &&
+    Number.isFinite(leg.iv) &&
+    leg.iv > 0
+      ? leg.iv
+      : null;
+  const base = stored ?? ivFor(leg.kind, leg.strike, S, baseIv);
+  return Math.max(0.01, base + ivShift);
+}
+
+export function legPrice(
+  leg: Leg,
+  S: number,
+  T: number,
+  baseIv: number,
+  ivShift = 0,
+): number {
   if (leg.kind === "stock") return S;
-  return bsPrice(leg.kind, S, leg.strike, T, ivFor(leg.kind, leg.strike, S, baseIv));
+  return bsPrice(leg.kind, S, leg.strike, T, sigmaFor(leg, S, baseIv, ivShift));
 }
 
 export function expiryPayoff(leg: Leg, S: number): number {
@@ -81,9 +101,15 @@ export function payoffAt(legs: Leg[], S: number): number {
   return legs.reduce((sum, leg) => sum + expiryPayoff(leg, S), 0);
 }
 
-export function markAt(legs: Leg[], S: number, T: number, baseIv: number): number {
+export function markAt(
+  legs: Leg[],
+  S: number,
+  T: number,
+  baseIv: number,
+  ivShift = 0,
+): number {
   return legs.reduce((sum, leg) => {
-    const value = legPrice(leg, S, T, baseIv);
+    const value = legPrice(leg, S, T, baseIv, ivShift);
     return sum + leg.side * leg.qty * 100 * (value - leg.fill);
   }, 0);
 }
@@ -92,7 +118,7 @@ export function netCash(legs: Leg[]): number {
   return legs.reduce((sum, leg) => sum + leg.side * leg.qty * 100 * leg.fill, 0);
 }
 
-export function greeks(legs: Leg[], S: number, T: number, baseIv: number) {
+export function greeks(legs: Leg[], S: number, T: number, baseIv: number, ivShift = 0) {
   let delta = 0;
   let gamma = 0;
   let theta = 0;
@@ -106,7 +132,7 @@ export function greeks(legs: Leg[], S: number, T: number, baseIv: number) {
       continue;
     }
     const K = leg.strike;
-    const sigma = ivFor(leg.kind, K, S, baseIv);
+    const sigma = sigmaFor(leg, S, baseIv, ivShift);
     const { d1, d2, sqrtT } = d1d2(S, K, Math.max(T, 1e-6), sigma);
     const disc = Math.exp(-r * T);
     const div = Math.exp(-q * T);

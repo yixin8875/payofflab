@@ -127,10 +127,11 @@ export function makeLeg(
   expiryIso: string,
   fill: number,
   symbol = "",
+  iv?: number,
 ): Leg {
   const expiry = expiryFor(symbol, expiryIso);
   counter += 1;
-  return {
+  const leg: Leg = {
     id: `leg-${counter}`,
     kind,
     side,
@@ -140,6 +141,10 @@ export function makeLeg(
     dte: expiry.dte,
     fill,
   };
+  if (kind !== "stock" && iv != null && Number.isFinite(iv) && iv > 0) {
+    leg.iv = Number(iv.toFixed(4));
+  }
+  return leg;
 }
 
 /** Price a leg off the synthetic chain so presets always arrive with a quote. */
@@ -164,5 +169,6 @@ export function pricedLeg(
     expiryIso,
     Number(fill.toFixed(2)),
     ticker.symbol,
+    q?.iv,
   );
 }

@@ -122,6 +122,13 @@ export const ChartLine = (p: P) => (
   </svg>
 );
 
+export const Waves = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M3 8.5c2.2-2 4.2-2 6.4 0s4.2 2 6.4 0 4.2-2 5.2-1.5" />
+    <path d="M3 15.5c2.2-2 4.2-2 6.4 0s4.2 2 6.4 0 4.2-2 5.2-1.5" />
+  </svg>
+);
+
 export const Chain = (p: P) => (
   <svg {...base(p)}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="2" />

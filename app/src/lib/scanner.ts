@@ -132,7 +132,7 @@ function buildLegs(
     if ((quote.ask - quote.bid) / mid > policy.spread) return null;
     const fill = spec.side === 1 ? quote.ask : quote.bid;
     if (!Number.isFinite(fill) || fill <= 0) return null;
-    legs.push({
+    const leg: Leg = {
       id: `scan-${legs.length}-${spec.kind}-${spec.side}-${spec.strike}`,
       kind: spec.kind,
       side: spec.side,
@@ -141,7 +141,9 @@ function buildLegs(
       expiry: iso,
       dte,
       fill: Number(fill.toFixed(2)),
-    });
+    };
+    if (quote.iv > 0) leg.iv = Number(quote.iv.toFixed(4));
+    legs.push(leg);
   }
   return legs.length ? legs : null;
 }

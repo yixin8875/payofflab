@@ -147,7 +147,13 @@ export function positionMetrics(trade: SavedTrade, chain?: LiveChain): PositionM
       continue;
     }
     if (nearest < 0 || priced.dte < nearest) nearest = priced.dte;
-    const g = greeks([leg], spot, Math.max(priced.dte, 0.5) / 365, iv);
+    const legIv = priced.quote && priced.quote.iv > 0 ? priced.quote.iv : leg.iv ?? iv;
+    const g = greeks(
+      [{ ...leg, iv: legIv }],
+      spot,
+      Math.max(priced.dte, 0.5) / 365,
+      iv,
+    );
     delta += g.delta;
     gamma += g.gamma;
     theta += g.theta;

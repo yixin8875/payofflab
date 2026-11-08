@@ -21,7 +21,7 @@ import { Workspace } from "../desktop/Split";
 import { decodeDraft } from "../lib/draft";
 import { analyse, type Analysis, type Instrument, type Leg } from "../lib/options";
 import { CHIP_GROUPS, OUTLOOK_LABEL, PRESET_BY_KEY, legsFor } from "../lib/presets";
-import { pricedLeg, roundStrike } from "../lib/chain";
+import { pricedLeg, quote, roundStrike } from "../lib/chain";
 import { useLiveChain } from "../lib/useLiveChain";
 import { EXPIRIES, TICKERS, ticker as findTicker, type Expiry } from "../data/tickers";
 import { money, pct, price } from "../lib/format";
@@ -579,7 +579,27 @@ export default function Calculator() {
 
   const patchLeg = (id: string, patch: Partial<Leg>) => {
     setPristine(false);
-    setLegs((ls) => ls.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+    setLegs((ls) =>
+      ls.map((leg) => {
+        if (leg.id !== id) return leg;
+        const next = { ...leg, ...patch };
+        if (next.kind === "stock") {
+          next.strike = market.spot;
+          next.fill = market.spot;
+          delete next.iv;
+          return next;
+        }
+        if (patch.strike === undefined && patch.kind === undefined) return next;
+        if (!(next.strike > 0)) return next;
+        const legExpiry = expiries.find((item) => item.iso === next.expiry) ?? expiry;
+        const nextQuote = quote(market, next.kind, next.strike, legExpiry.dte, next.expiry);
+        next.iv = nextQuote.iv;
+        next.fill = Number(
+          Math.max(0.01, next.side === 1 ? nextQuote.ask : nextQuote.bid).toFixed(2),
+        );
+        return next;
+      }),
+    );
   };
 
   const addLeg = () => {
@@ -826,7 +846,11 @@ export default function Calculator() {
                   </span>
                   <span>盈利概率 {pct(analysis.probProfit)}</span>
                   <span className="ml-auto hidden xl:inline">
-                    BS 模型 · IV {pct(market.iv, 1)} · {expiry.label}
+                    BS 模型 ·{" "}
+                    {legs.some((leg) => leg.kind !== "stock" && leg.iv)
+                      ? "逐腿 IV"
+                      : `IV ${pct(market.iv, 1)}`}{" "}
+                    · {expiry.label}
                   </span>
                 </div>
               )}
