@@ -1,0 +1,1427 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEX 新手图解 · PayoffLab</title>
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --paper: #ffffff;
+    --ink: #1c1a17;
+    --muted: #6f6a63;
+    --faint: #9a948b;
+    --line: #e6e1d8;
+    --line-soft: #efeae1;
+    --accent: #0364d3;
+    --accent-soft: #eaf2fd;
+    --green: #0b7a52;
+    --green-soft: #e8f5ef;
+    --red: #bf3b2b;
+    --red-soft: #fbeceb;
+    --amber: #9a6510;
+    --amber-soft: #fdf4e3;
+    --shadow: 0 1px 2px rgba(28, 26, 23, .04), 0 10px 34px rgba(28, 26, 23, .06);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.78 "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  code, .mono { font-family: "Geist Mono", "SFMono-Regular", Consolas, monospace; }
+  .wrap { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  #progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0;
+    background: linear-gradient(90deg, #0364d3, #4c9af0);
+    z-index: 100; transition: width .08s linear;
+  }
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(245, 243, 239, .92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner { display: flex; align-items: center; gap: 16px; height: 56px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 650; letter-spacing: -.01em; white-space: nowrap; }
+  .brand-mark {
+    width: 26px; height: 26px; border-radius: 8px; background: var(--ink); color: white;
+    display: grid; place-items: center; font-size: 13px; font-weight: 800;
+  }
+  .topnav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  .topnav::-webkit-scrollbar { display: none; }
+  .topnav a {
+    color: var(--muted); text-decoration: none; font-size: 12.5px; font-weight: 500;
+    padding: 6px 9px; border-radius: 7px; white-space: nowrap;
+  }
+  .topnav a:hover { background: #ebe7df; color: var(--ink); }
+  .topbar .badge {
+    margin-left: auto; font-size: 11px; color: var(--muted); border: 1px solid var(--line);
+    background: var(--paper); padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .hero { padding: 72px 0 44px; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: 40px; align-items: center; }
+  .eyebrow { font-size: 12px; font-weight: 650; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; }
+  h1 { font-size: clamp(30px, 5vw, 54px); line-height: 1.12; letter-spacing: -.035em; margin: 12px 0 18px; }
+  .hero p.lead { font-size: 18px; line-height: 1.7; color: var(--muted); margin: 0 0 22px; max-width: 620px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { font-size: 12px; color: var(--muted); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
+  .hero-art {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 18px 18px 14px;
+  }
+  .hero-art svg { width: 100%; height: auto; display: block; }
+  .hero-art .art-label { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--faint); margin-top: 8px; }
+  .hero-art .art-note { text-align: center; font-size: 11.5px; color: var(--faint); margin: 4px 0 0; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .btn {
+    appearance: none; border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+    font: inherit; font-size: 13.5px; font-weight: 600; padding: 9px 15px; border-radius: 9px;
+    cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:hover { box-shadow: 0 4px 14px rgba(28, 26, 23, .08); transform: translateY(-1px); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn.primary:hover { background: #0257b8; }
+  .btn.ghost { background: transparent; }
+  .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: #bcd7f8; color: var(--accent); }
+  .btn.small { padding: 6px 11px; font-size: 12px; }
+  .sec { padding: 58px 0; border-top: 1px solid var(--line); scroll-margin-top: 70px; }
+  .sec:first-of-type { border-top: 0; }
+  .kicker { font-size: 12px; font-weight: 650; letter-spacing: .1em; color: var(--faint); text-transform: uppercase; }
+  h2 { font-size: clamp(26px, 3.2vw, 34px); line-height: 1.25; letter-spacing: -.025em; margin: 8px 0 14px; }
+  h3 { font-size: 20px; line-height: 1.4; letter-spacing: -.015em; margin: 30px 0 10px; }
+  h4 { font-size: 15px; margin: 0 0 6px; }
+  .sec > .wrap > p, .prose p { color: var(--muted); }
+  .lead { font-size: 18px; line-height: 1.72; color: var(--muted); max-width: 780px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; box-shadow: 0 1px 1px rgba(28, 26, 23, .02);
+  }
+  .card h4 { font-size: 15px; }
+  .card p { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+  .card .big { font-size: 26px; font-weight: 700; letter-spacing: -.03em; line-height: 1.2; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 650; border-radius: 5px; padding: 2px 7px; margin-bottom: 8px; }
+  .tag.green { background: var(--green-soft); color: var(--green); }
+  .tag.red { background: var(--red-soft); color: var(--red); }
+  .tag.blue { background: var(--accent-soft); color: var(--accent); }
+  .tag.amber { background: var(--amber-soft); color: var(--amber); }
+  .note, .warn, .tip {
+    border-radius: 12px; padding: 14px 16px; font-size: 14px; line-height: 1.7;
+    border: 1px solid var(--line); background: var(--paper); color: var(--muted);
+  }
+  .note { border-left: 3px solid var(--faint); }
+  .warn { background: var(--red-soft); border-color: #f1d6d2; color: #7d2a1e; border-left: 3px solid var(--red); }
+  .tip { background: var(--green-soft); border-color: #cfe8dd; color: #155f43; border-left: 3px solid var(--green); }
+  .note b, .warn b, .tip b { color: inherit; }
+  .figure {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px; margin: 20px 0; box-shadow: 0 1px 1px rgba(28, 26, 23, .02);
+  }
+  .figure svg { width: 100%; height: auto; display: block; }
+  .figure figcaption { font-size: 12px; color: var(--faint); line-height: 1.55; margin-top: 10px; }
+  .scene { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin: 22px 0; box-shadow: var(--shadow); }
+  .scene-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .scene-head h4 { margin: 0; font-size: 14px; }
+  .scene-head .hint { font-size: 11.5px; color: var(--faint); margin-left: auto; }
+  .scene svg { width: 100%; height: auto; display: block; }
+  .scene-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .scene-caption { font-size: 13px; color: var(--muted); margin: 10px 0 0; line-height: 1.65; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th { font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); font-weight: 650; background: #fbfaf8; }
+  tr:last-child td { border-bottom: 0; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pos { color: var(--green); font-weight: 600; }
+  .neg { color: var(--red); font-weight: 600; }
+  .table-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+  .table-wrap table { min-width: 560px; }
+  .formula {
+    background: #fbfaf8; border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; font-size: 15px; line-height: 1.8; overflow-x: auto;
+  }
+  .formula .hl { color: var(--accent); font-weight: 650; }
+  .steps { counter-reset: step; display: grid; gap: 12px; margin: 18px 0; }
+  .step { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; font-size: 12.5px; font-weight: 700; margin-top: 1px;
+  }
+  .step p { margin: 0; font-size: 14px; color: var(--muted); }
+  .step b { color: var(--ink); }
+  .calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .75fr); gap: 20px; align-items: start; }
+  .calc-field { margin-bottom: 16px; }
+  .calc-field label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+  .calc-field label b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+  .calc-out { background: #fbfaf8; border: 1px solid var(--line); border-radius: 12px; padding: 18px; text-align: center; }
+  .calc-out .value { font-size: clamp(30px, 4vw, 42px); font-weight: 720; letter-spacing: -.04em; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .calc-out .sub { font-size: 12px; color: var(--faint); margin-top: 6px; }
+  .calc-out .expr { font-size: 11.5px; color: var(--muted); margin-top: 12px; font-family: "Geist Mono", Consolas, monospace; line-height: 1.6; word-break: break-word; }
+  .shot-wrap { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #e9e5de; }
+  .shot-wrap img { display: block; width: 100%; height: auto; }
+  .pin {
+    position: absolute; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--ink); color: white; font-size: 11px; font-weight: 700;
+    display: grid; place-items: center; border: 2px solid white;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .25); transform: translate(-50%, -50%);
+  }
+  .shot-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .shot-legend b { color: var(--ink); }
+  .term-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) 72px; gap: 10px; align-items: center; margin: 7px 0; font-size: 13px; }
+  .term-row .track { height: 14px; background: #f1ede6; border-radius: 4px; overflow: hidden; }
+  .term-row .bar { height: 100%; border-radius: 4px; transition: width .5s ease, opacity .3s ease; }
+  .term-row.quiet { opacity: .35; }
+  .term-row .val { text-align: right; font-variant-numeric: tabular-nums; }
+  .timeline { display: grid; gap: 10px; margin-top: 14px; }
+  .tl-item { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 12px; font-size: 14px; color: var(--muted); }
+  .tl-item time { color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 2px; }
+  .tl-item b { color: var(--ink); }
+  details { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; margin: 10px 0; }
+  details summary { cursor: pointer; font-weight: 600; font-size: 14.5px; padding: 14px 0; list-style: none; display: flex; gap: 10px; align-items: baseline; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "+"; color: var(--accent); font-weight: 700; width: 14px; flex: none; }
+  details[open] summary::before { content: "−"; }
+  details .answer { padding: 0 0 14px 24px; font-size: 14px; color: var(--muted); }
+  details .answer p:first-child { margin-top: 0; }
+  .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .scene-badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 650;
+    border-radius: 999px; padding: 4px 10px; background: var(--green-soft); color: var(--green);
+  }
+  .scene-badge.bad { background: var(--red-soft); color: var(--red); }
+  .meter { height: 8px; background: #f1ede6; border-radius: 999px; overflow: hidden; margin-top: 6px; }
+  .meter > span { display: block; height: 100%; width: 35%; background: var(--green); border-radius: 999px; transition: width .5s ease, background .5s ease; }
+  .toc { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 26px 0 0; }
+  .toc a {
+    display: block; text-decoration: none; color: var(--muted); font-size: 12.5px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px;
+  }
+  .toc a:hover { color: var(--accent); border-color: #bcd7f8; }
+  .toc a b { color: var(--ink); font-weight: 650; margin-right: 5px; }
+  footer { padding: 34px 0 50px; border-top: 1px solid var(--line); color: var(--faint); font-size: 12.5px; line-height: 1.7; }
+  @media (max-width: 860px) {
+    .hero { padding: 46px 0 30px; }
+    .hero-grid, .calc, .grid3 { grid-template-columns: 1fr; }
+    .grid2, .two-col { grid-template-columns: 1fr; }
+    .toc { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .shot-legend { grid-template-columns: 1fr; }
+    .topnav { display: none; }
+    .sec { padding: 42px 0; }
+    .wrap { padding: 0 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    #progress { transition: none; }
+  }
+  @media print {
+    #progress, .topbar, .scene-controls, .hero-actions { display: none !important; }
+    body { background: white; }
+    .sec { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand"><span class="brand-mark">P</span> PayoffLab · GEX 新手图解</div>
+    <nav class="topnav" aria-label="章节目录">
+      <a href="#basics">期权基础</a>
+      <a href="#gamma">Gamma</a>
+      <a href="#gex">GEX</a>
+      <a href="#numbers">五个数字</a>
+      <a href="#flip">Flip</a>
+      <a href="#walls">Wall</a>
+      <a href="#term">期限</a>
+      <a href="#example">算例</a>
+      <a href="#app">软件</a>
+      <a href="#faq">问答</a>
+    </nav>
+    <span class="badge">适用 1.5.0</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Zero to GEX · 完全新手版</div>
+        <h1>不用金融背景，<br>也能看懂 Gamma 敞口</h1>
+        <p class="lead">
+          你不需要会定价、会希腊值，甚至不需要交易过期权。这篇文章只做一件事：
+          用比喻、动画和三个行权价的小算例，把 GEX 页面上的五个数字讲清楚。
+        </p>
+        <div class="hero-meta">
+          <span class="pill">约 20 分钟读完</span>
+          <span class="pill">含 6 个动画与交互</span>
+          <span class="pill">一个完整算例</span>
+          <span class="pill">两个交易日剧本</span>
+        </div>
+        <div class="hero-actions">
+          <a class="btn primary" href="#basics">从零开始</a>
+          <a class="btn ghost" href="#example">直接看算例</a>
+          <a class="btn ghost" href="GEX-实战指南.md">进阶版文字指南</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="做市商对冲示意图">
+        <svg viewBox="0 0 360 250" role="img" aria-label="客户、做市商与股票对冲之间的关系">
+          <defs>
+            <marker id="arrowHero" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#9a948b"></path>
+            </marker>
+          </defs>
+          <rect x="18" y="24" width="112" height="54" rx="10" fill="#eaf2fd" stroke="#bcd7f8"></rect>
+          <text x="74" y="47" text-anchor="middle" font-size="13" font-weight="650" fill="#1c1a17">客户</text>
+          <text x="74" y="65" text-anchor="middle" font-size="11" fill="#6f6a63">买入 / 卖出期权</text>
+          <rect x="124" y="112" width="112" height="54" rx="10" fill="#fdf4e3" stroke="#ecd6ab"></rect>
+          <text x="180" y="135" text-anchor="middle" font-size="13" font-weight="650" fill="#1c1a17">做市商</text>
+          <text x="180" y="153" text-anchor="middle" font-size="11" fill="#6f6a63">承担 Gamma 风险</text>
+          <rect x="230" y="200" width="112" height="42" rx="10" fill="#e8f5ef" stroke="#cfe8dd"></rect>
+          <text x="286" y="226" text-anchor="middle" font-size="12.5" font-weight="650" fill="#1c1a17">买卖标的股票</text>
+          <path d="M78 78 C88 104 110 116 124 124" fill="none" stroke="#9a948b" stroke-width="1.5" marker-end="url(#arrowHero)"></path>
+          <path d="M232 132 C250 150 264 174 278 200" fill="none" stroke="#9a948b" stroke-width="1.5" marker-end="url(#arrowHero)"></path>
+        </svg>
+        <div class="art-label"><span>期权持仓</span><span>现货对冲</span></div>
+        <p class="art-note">对冲盘 = 价格波动的“隐形推手”</p>
+      </div>
+    </div>
+    <nav class="toc" aria-label="本文目录">
+      <a href="#basics"><b>01</b>期权 60 秒</a>
+      <a href="#gamma"><b>02</b>Delta 与 Gamma</a>
+      <a href="#gex"><b>03</b>GEX 怎么算</a>
+      <a href="#numbers"><b>04</b>五个数字</a>
+      <a href="#flip"><b>05</b>Gamma Flip</a>
+      <a href="#walls"><b>06</b>Call / Put Wall</a>
+      <a href="#term"><b>07</b>期限结构</a>
+      <a href="#example"><b>08</b>完整算例</a>
+      <a href="#app"><b>09</b>软件实操</a>
+      <a href="#playbook"><b>10</b>两个剧本</a>
+      <a href="#faq"><b>11</b>新手问答</a>
+      <a href="#quiz"><b>12</b>十分钟练习</a>
+    </nav>
+  </div>
+</section>
+
+<main>
+  <section class="sec" id="basics">
+    <div class="wrap">
+      <div class="kicker">01 · 先补三块积木</div>
+      <h2>期权 60 秒：Call、Put、行权价、到期日</h2>
+      <p class="lead">
+        看懂 GEX 只需要四个词。你不需要学会给期权定价，只需要知道它们分别代表什么。
+      </p>
+
+      <div class="grid2" style="margin-top: 20px;">
+        <div class="card">
+          <span class="tag blue">Call 看涨期权</span>
+          <h4>“涨价保险”</h4>
+          <p>你付一笔权利金（买这份权利的价格），换取在到期日前按某个价格<b>买入</b>标的的权利。标的涨得越多，这份权利通常越值钱。</p>
+        </div>
+        <div class="card">
+          <span class="tag red">Put 看跌期权</span>
+          <h4>“跌价保险”</h4>
+          <p>你付一笔权利金（买这份权利的价格），换取在到期日前按某个价格<b>卖出</b>标的的权利。标的跌得越多，这份权利通常越值钱。</p>
+        </div>
+        <div class="card">
+          <span class="tag amber">行权价 Strike</span>
+          <h4>合同里写死的价格</h4>
+          <p>例如“100 的 Call”，就是按 $100 买入的权利。GEX 图表横轴上的 95、100、105，就是不同的行权价。</p>
+        </div>
+        <div class="card">
+          <span class="tag amber">到期日 Expiry</span>
+          <h4>合同的有效期</h4>
+          <p>到期后权利作废。距离到期越近，平值附近的 Gamma 通常越大，这也是“近端到期日”更重要的原因。</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top: 16px;">
+        <b>一张合约 = 100 股。</b>所以计算美元敞口时，合约数要乘以 100。这是后文公式里那个 100 的来源。
+      </div>
+
+      <h3>做市商站在中间，必须对冲</h3>
+      <p>
+        你买期权时，对手方常常是做市商。做市商并不想赌方向，它更愿意收权利金、赚买卖价差，
+        然后把方向风险用标的股票对冲掉。问题是：<b>标的每动一下，需要对冲的数量也会变。</b>
+        这个“需要跟着变”的部分，就是 Gamma。
+      </p>
+      <div class="figure">
+        <svg viewBox="0 0 760 210" role="img" aria-label="客户通过做市商交易期权，做市商在现货市场对冲">
+          <defs>
+            <marker id="arrFlow" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#6f6a63"></path>
+            </marker>
+          </defs>
+          <rect x="30" y="64" width="170" height="82" rx="12" fill="#eaf2fd" stroke="#bcd7f8"></rect>
+          <text x="115" y="96" text-anchor="middle" font-size="14" font-weight="650">客户</text>
+          <text x="115" y="118" text-anchor="middle" font-size="12" fill="#6f6a63">买 Call / 买 Put</text>
+          <rect x="295" y="64" width="170" height="82" rx="12" fill="#fdf4e3" stroke="#ecd6ab"></rect>
+          <text x="380" y="96" text-anchor="middle" font-size="14" font-weight="650">做市商</text>
+          <text x="380" y="118" text-anchor="middle" font-size="12" fill="#6f6a63">收权利金，承担 Gamma</text>
+          <rect x="560" y="64" width="170" height="82" rx="12" fill="#e8f5ef" stroke="#cfe8dd"></rect>
+          <text x="645" y="96" text-anchor="middle" font-size="14" font-weight="650">现货市场</text>
+          <text x="645" y="118" text-anchor="middle" font-size="12" fill="#6f6a63">买入 / 卖出标的</text>
+          <line x1="204" y1="105" x2="287" y2="105" stroke="#6f6a63" stroke-width="1.5" marker-end="url(#arrFlow)"></line>
+          <line x1="469" y1="105" x2="552" y2="105" stroke="#6f6a63" stroke-width="1.5" marker-end="url(#arrFlow)"></line>
+          <text x="380" y="176" text-anchor="middle" font-size="12" fill="#9a948b">做市商不断调整现货仓位，让自己的方向暴露接近零</text>
+        </svg>
+        <figcaption>对冲不是一次性动作，而是随着价格变化持续买卖。GEX 测量的就是这条“持续调整”的规模。</figcaption>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="gamma">
+    <div class="wrap">
+      <div class="kicker">02 · 一个汽车比喻</div>
+      <h2>Delta 是速度，Gamma 是加速度</h2>
+      <p class="lead">
+        如果你只记住一句话：<b>Delta 告诉你现在踩多深，Gamma 告诉你油门还在不在加深。</b>
+      </p>
+
+      <div class="two-col" style="margin-top: 18px;">
+        <div class="card">
+          <span class="tag blue">Delta</span>
+          <h4>方向暴露</h4>
+          <p>标的涨 $1，期权价格大约涨多少；或者一份期权相当于多少股标的。Delta 0.5 的 Call，大约相当于 50 股的方向暴露。</p>
+        </div>
+        <div class="card">
+          <span class="tag green">Gamma</span>
+          <h4>Delta 的变化速度</h4>
+          <p>标的涨 $1，Delta 会变多少。Gamma 越大，做市商越需要频繁调整对冲；平值附近的 Gamma 通常最大。</p>
+        </div>
+      </div>
+
+      <div class="figure">
+        <svg viewBox="0 0 760 250" role="img" aria-label="Gamma 在平值附近最大，深度价内和价外较小">
+          <line x1="70" y1="200" x2="710" y2="200" stroke="#d8d2c8"></line>
+          <line x1="70" y1="30" x2="70" y2="200" stroke="#d8d2c8"></line>
+          <path d="M80 192 C180 190 280 170 340 80 C370 38 400 38 430 80 C490 170 590 190 690 192"
+                fill="none" stroke="#0364d3" stroke-width="3" stroke-linecap="round"></path>
+          <line x1="385" y1="44" x2="385" y2="200" stroke="#9a948b" stroke-dasharray="5 5"></line>
+          <text x="385" y="222" text-anchor="middle" font-size="12" fill="#6f6a63">平值（Strike ≈ 现价）</text>
+          <text x="110" y="222" text-anchor="middle" font-size="12" fill="#9a948b">深度价内</text>
+          <text x="660" y="222" text-anchor="middle" font-size="12" fill="#9a948b">深度价外</text>
+          <text x="385" y="26" text-anchor="middle" font-size="12" fill="#0364d3" font-weight="650">Gamma 最大</text>
+          <text x="92" y="60" font-size="12" fill="#9a948b">Gamma</text>
+        </svg>
+        <figcaption>越接近平值、越接近到期，Gamma 通常越大。深度价内或深度价外的期权，Gamma 很小。</figcaption>
+      </div>
+
+      <h3>为什么 Gamma 会“推”市场</h3>
+      <p>
+        做市商的目标是保持方向中性。假设它卖给你一张 Call，自己变成“短 Call”，需要买股票来对冲。
+        当标的上涨，这张 Call 的 Delta 变大，做市商需要买<b>更多</b>股票；当标的下跌，Delta 变小，它又要卖出。
+        于是它的对冲动作变成：<b>涨了买、跌了卖</b>——这正是放大波动的方向。
+      </p>
+      <p>
+        反过来，如果做市商整体是“长 Gamma”，它的对冲动作会变成：<b>涨了卖、跌了买</b>，
+        像减震器一样吸收波动。GEX 页面上的“正 / 负”，就是在描述这个整体方向。
+      </p>
+
+      <div class="note">
+        <b>重要：</b>做市商的真实持仓不公开。软件用的是常见的“naive GEX”假设：
+        把 Call 未平仓记为正 Gamma、Put 记为负 Gamma，等价于假设做市商整体“长 Call、短 Put”
+        （也就是站在卖出 Call、买入 Put 的客户对面）。所以它是一个<b>估计</b>，不是交易所公布的真相。
+      </div>
+
+      <div class="scene">
+        <div class="scene-head">
+          <h4>动画 1 · 正 Gamma 与负 Gamma 的对冲差异</h4>
+          <span class="hint">看圆点经过波峰/波谷时，做市商在买还是卖</span>
+        </div>
+        <svg viewBox="0 0 760 300" role="img" aria-label="正负 Gamma 对冲动作对比">
+          <rect x="16" y="18" width="352" height="240" rx="12" fill="#fbfdfb" stroke="#d9ece3"></rect>
+          <rect x="392" y="18" width="352" height="240" rx="12" fill="#fdfafa" stroke="#f1d6d2"></rect>
+
+          <text x="34" y="44" font-size="13" font-weight="650" fill="#0b7a52">正 GEX · 长 Gamma</text>
+          <text x="410" y="44" font-size="13" font-weight="650" fill="#bf3b2b">负 GEX · 短 Gamma</text>
+
+          <path id="posWave" d="M34 140 C64 92 94 92 124 140 S184 188 214 140 S264 103 294 140 S334 167 356 140"
+                fill="none" stroke="#0b7a52" stroke-width="2" opacity=".45"></path>
+          <path id="negWave" d="M410 140 C430 128 450 128 470 140 S510 158 530 140 S570 108 590 140 S630 186 650 140 S700 210 728 140"
+                fill="none" stroke="#bf3b2b" stroke-width="2" opacity=".45"></path>
+
+          <circle id="posDot" r="7" fill="#0b7a52"></circle>
+          <circle id="negDot" r="7" fill="#bf3b2b"></circle>
+
+          <text x="122" y="78" text-anchor="middle" font-size="11" fill="#bf3b2b">卖出</text>
+          <text x="214" y="204" text-anchor="middle" font-size="11" fill="#0b7a52">买入</text>
+          <text x="294" y="128" text-anchor="middle" font-size="11" fill="#bf3b2b">卖出</text>
+          <text x="590" y="96" text-anchor="middle" font-size="11" fill="#0b7a52">买入</text>
+          <text x="650" y="168" text-anchor="middle" font-size="11" fill="#bf3b2b">卖出</text>
+          <text x="710" y="204" text-anchor="middle" font-size="11" fill="#0b7a52">买入</text>
+
+          <text x="192" y="238" text-anchor="middle" font-size="11.5" fill="#6f6a63">涨了卖、跌了买 → 波动被吸收</text>
+          <text x="568" y="238" text-anchor="middle" font-size="11.5" fill="#6f6a63">涨了买、跌了卖 → 波动被放大</text>
+        </svg>
+        <p class="scene-caption">
+          左边是减震器，右边是放大器。注意：这只是<b>对冲行为</b>的示意，不代表价格一定涨或一定跌。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="gex">
+    <div class="wrap">
+      <div class="kicker">03 · 从 Gamma 到美元</div>
+      <h2>GEX 就是把每个行权价的 Gamma 换成“多少钱”</h2>
+      <p class="lead">
+        不同行权价的 Gamma 不能直接相加，因为现价、合约数都不同。GEX 统一换成
+        “标的每变动 1%，需要调整多少美元”，这样就能横向比较、纵向加总。
+      </p>
+
+      <div class="formula">
+        美元 Gamma ＝ <span class="hl">Gamma</span> × <span class="hl">未平仓量</span> × 100 × <span class="hl">现价²</span> × 0.01
+        <br><span style="font-size: 13px; color: var(--muted);">读作：标的每变动 1%，这个行权价上的美元 Delta 需要调整多少。</span>
+      </div>
+
+      <div class="steps" style="margin-top: 18px;">
+        <div class="step"><p><b>乘 100：</b>一张合约代表 100 股。</p></div>
+        <div class="step"><p><b>乘现价² 再乘 0.01：</b>把“每涨 $1 的 Delta 变化”换算成“每涨 1% 的 Delta 变化”。</p></div>
+        <div class="step"><p><b>Call 记正、Put 记负：</b>再把同一行权价的 Call 与 Put 相加，得到净 GEX。</p></div>
+        <div class="step"><p><b>把所有行权价相加：</b>得到总 GEX；按行权价画出来，就是页面上的柱状图。</p></div>
+      </div>
+
+      <div class="scene">
+        <div class="scene-head">
+          <h4>动手试一试 · 一个行权价值多少钱</h4>
+          <span class="hint">拖动滑块，看公式怎么变</span>
+        </div>
+        <div class="calc">
+          <div>
+            <div class="calc-field">
+              <label for="cSpot">现价 <b id="cSpotVal">$100</b></label>
+              <input id="cSpot" type="range" min="20" max="800" step="1" value="100">
+            </div>
+            <div class="calc-field">
+              <label for="cGamma">Gamma <b id="cGammaVal">0.020</b></label>
+              <input id="cGamma" type="range" min="0.002" max="0.08" step="0.001" value="0.02">
+            </div>
+            <div class="calc-field">
+              <label for="cOi">未平仓量（张） <b id="cOiVal">5,000</b></label>
+              <input id="cOi" type="range" min="100" max="20000" step="100" value="5000">
+            </div>
+            <div class="calc-out">
+              <div class="value" id="cOut">$1.00M</div>
+              <div class="sub">标的每变动 1% 的美元 Gamma 敞口</div>
+              <div class="expr" id="cExpr">0.020 × 5,000 × 100 × 100² × 0.01</div>
+            </div>
+          </div>
+          <div class="card" style="align-self: stretch;">
+            <span class="tag blue">怎么读</span>
+            <h4>这个数字是“对冲规模”</h4>
+            <p>它不表示你会赚或亏这么多，而是表示：标的价格每动 1%，这个行权价附近的 Delta 对冲大约要调整这么多美元。</p>
+            <p style="margin-top: 12px;">把它和相邻行权价相加，就得到总 GEX；把它按行权价画成柱子，就是 GEX 分布图。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn">
+        <b>不要跨标的比较绝对值。</b>SPY 的 −$13.5B 和一只小盘股的 +$1.5M 不能直接比大小。
+        有意义的比较是同一标的在不同日期、不同范围之间的变化。
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="numbers">
+    <div class="wrap">
+      <div class="kicker">04 · 页面上的五个数字</div>
+      <h2>先看结论，再看细节</h2>
+      <p class="lead">
+        打开「Gamma 敞口」页面，顶部有五张卡。它们分别回答五个问题：
+        总体是减震还是放大？边界在哪？上下关键位在哪？
+      </p>
+
+      <div class="grid3" style="margin-top: 20px;">
+        <div class="card">
+          <span class="tag blue">1</span>
+          <h4>总 GEX</h4>
+          <div class="big" style="color: var(--red);">−$13.50B</div>
+          <p>所有行权价净 GEX 的加总。负号表示“整体偏短 Gamma”，环境更容易放大波动。</p>
+        </div>
+        <div class="card">
+          <span class="tag red">2</span>
+          <h4>Gamma 状态</h4>
+          <div class="big" style="color: var(--red);">短 Gamma</div>
+          <p>只是根据总 GEX 的正负给出的粗标签。它不告诉你涨跌，只告诉你“减震器还是放大器”。</p>
+        </div>
+        <div class="card">
+          <span class="tag amber">3</span>
+          <h4>Gamma Flip</h4>
+          <div class="big">无交叉</div>
+          <p>环境切换的边界。当前范围内累计 GEX 没有穿过零轴，所以没有可识别的 Flip。</p>
+        </div>
+        <div class="card">
+          <span class="tag green">4</span>
+          <h4>Call Wall</h4>
+          <div class="big">$750</div>
+          <p>Call 正 GEX 最大的行权价。像一个“减速带”，不是铁顶；突破后波动可能更大。</p>
+        </div>
+        <div class="card">
+          <span class="tag red">5</span>
+          <h4>Put Wall</h4>
+          <div class="big">$740</div>
+          <p>Put 负 GEX 最大的行权价。注意它可能在现价上方，不要假设它一定是“支撑”。</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top: 16px;">
+        上面是 2026-11-07 的 SPY 延迟行情快照（现价 $735.29），只用于演示，数字会变。
+        下面会解释为什么 Put Wall 会跑到现价上方。
+      </div>
+
+      <h3>五个数字合起来怎么用</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>你看到的组合</th><th>更像什么环境</th><th>新手怎么理解</th></tr></thead>
+          <tbody>
+            <tr><td>正 GEX + Flip 在下方 + 两个 Wall 在两侧</td><td>减震、区间、到期钉住</td><td>价格更容易在 Wall 之间来回，而不是单边狂奔</td></tr>
+            <tr><td>负 GEX + 现价在 Flip 下方</td><td>放大、趋势、跳空风险</td><td>一旦动起来，对冲盘可能顺着方向推一把</td></tr>
+            <tr><td>Flip 距离现价小于 1%</td><td>边界就在脚下</td><td>今天随时可能切换环境，别把话说死</td></tr>
+            <tr><td>无 Flip</td><td>环境单一</td><td>没有零轴交叉，不代表没有风险，直接看总 GEX</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="flip">
+    <div class="wrap">
+      <div class="kicker">05 · 环境的分界线</div>
+      <h2>Gamma Flip：减震区和放大区的边界</h2>
+      <p class="lead">
+        把每个行权价的净 GEX 从左到右累加，会得到一条累计曲线。曲线穿过零轴的位置，就是 Flip。
+        现价在 Flip 上方，累计 Gamma 偏正；在下方，累计 Gamma 偏负。
+      </p>
+
+      <div class="scene">
+        <div class="scene-head">
+          <h4>动画 2 · 价格穿过 Flip 会发生什么</h4>
+          <span class="hint">点按钮，把价格移到边界两侧</span>
+        </div>
+        <svg viewBox="0 0 760 330" role="img" aria-label="价格在 Gamma Flip 上下时环境的变化">
+          <rect x="0" y="0" width="760" height="165" fill="#e8f5ef"></rect>
+          <rect x="0" y="165" width="760" height="165" fill="#fbeceb"></rect>
+          <line x1="0" y1="165" x2="760" y2="165" stroke="#0364d3" stroke-width="2" stroke-dasharray="8 7"></line>
+          <text x="18" y="34" font-size="12" font-weight="650" fill="#0b7a52">上方 · 累计 Gamma 偏正</text>
+          <text x="18" y="54" font-size="11.5" fill="#3f7d62">减震区：对冲盘倾向于低买高卖</text>
+          <text x="18" y="318" font-size="12" font-weight="650" fill="#bf3b2b">下方 · 累计 Gamma 偏负</text>
+          <text x="18" y="298" font-size="11.5" fill="#9b4a3e">放大区：对冲盘倾向于追涨杀跌</text>
+          <text x="742" y="158" text-anchor="end" font-size="12" font-weight="650" fill="#0364d3">Gamma Flip</text>
+          <g id="flipDot" style="transition: transform .9s cubic-bezier(.4,0,.2,1);">
+            <line x1="380" y1="145" x2="380" y2="185" stroke="#1c1a17" stroke-width="1.5"></line>
+            <circle cx="380" cy="165" r="11" fill="#1c1a17"></circle>
+            <text x="380" y="137" text-anchor="middle" font-size="12.5" font-weight="650" fill="#1c1a17">现价</text>
+          </g>
+        </svg>
+        <div class="scene-controls">
+          <button class="btn small primary" id="flipAbove" aria-pressed="true">放到 Flip 上方</button>
+          <button class="btn small" id="flipBelow" aria-pressed="false">跌破 Flip</button>
+          <button class="btn small ghost" id="flipAuto">自动演示</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap;">
+          <span class="scene-badge" id="flipBadge">正 Gamma 环境 · 波动被吸收</span>
+          <span style="font-size: 12px; color: var(--faint);">波动计</span>
+          <div class="meter" style="flex: 1; min-width: 120px;"><span id="flipMeter" style="width: 32%; background: var(--green);"></span></div>
+        </div>
+        <p class="scene-caption">
+          这只是“环境”的示意。现实里，价格穿越 Flip 后还需要收盘价、成交量和回踩确认，不能只看一眼就下单。
+        </p>
+      </div>
+
+      <h3>“无交叉”是什么意思</h3>
+      <p>
+        如果累计曲线在你选择的范围和行权价内没有穿过零轴，页面就不会给出 Flip，而是显示「无交叉」。
+        这不是“市场没有边界”，而是“这个口径下找不到可识别的边界”。此时环境更均匀，直接看总 GEX 和柱状图。
+      </p>
+      <div class="warn">
+        <b>三个新手最容易犯的错：</b>
+        把 Flip 当磁铁（价格不会自动被吸过去）；把“触及 Flip”当“立刻反转”；忘了切换范围后 Flip 会变。
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="walls">
+    <div class="wrap">
+      <div class="kicker">06 · 上下两个“减速带”</div>
+      <h2>Call Wall 与 Put Wall：Gamma 最集中的行权价</h2>
+      <p class="lead">
+        Wall 是某一侧 Gamma 最集中的行权价：Call Wall 对应最大的 Call 正 GEX，Put Wall 对应最负的 Put GEX。
+        它代表对冲盘最密集的位置，价格靠近时容易被“吸住”或“减速”；但一旦有效突破，原本的对冲盘可能反向调整，波动反而变大。
+      </p>
+      <p>
+        图上的柱子画的是净 GEX（Call + Put），所以某个 Wall 不一定正好是视觉上最高的那根；
+        以卡片里的 Call Wall / Put Wall 和「Gamma 集中的行权价」表为准。
+      </p>
+
+      <div class="scene">
+        <div class="scene-head">
+          <h4>动画 3 · 在 Wall 之间钉住，还是突破</h4>
+          <span class="hint">先看来回拉扯，再点“突破上墙”</span>
+        </div>
+        <svg viewBox="0 0 760 330" role="img" aria-label="价格在两个 Wall 之间钉住，突破后波动放大">
+          <rect x="0" y="0" width="760" height="330" rx="10" fill="#fdfcf9"></rect>
+          <line x1="40" y1="100" x2="720" y2="100" stroke="#0b7a52" stroke-width="2" stroke-dasharray="7 6"></line>
+          <line x1="40" y1="240" x2="720" y2="240" stroke="#bf3b2b" stroke-width="2" stroke-dasharray="7 6"></line>
+          <text x="48" y="92" font-size="12" font-weight="650" fill="#0b7a52">Call Wall · $105</text>
+          <text x="48" y="260" font-size="12" font-weight="650" fill="#bf3b2b">Put Wall · $95</text>
+          <line x1="40" y1="170" x2="720" y2="170" stroke="#d8d2c8" stroke-width="1"></line>
+          <text x="48" y="164" font-size="11" fill="#9a948b">现价 $100</text>
+          <polyline id="wallTrail" points="" fill="none" stroke="#0364d3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          <g id="wallDot">
+            <circle r="9" fill="#0364d3" stroke="#fff" stroke-width="2"></circle>
+          </g>
+        </svg>
+        <div class="scene-controls">
+          <button class="btn small primary" id="wallPin" aria-pressed="true">钉住模式</button>
+          <button class="btn small" id="wallBreak">突破上墙</button>
+          <button class="btn small ghost" id="wallReset">重置</button>
+          <span class="scene-badge" id="wallBadge" style="margin-left: auto;">在两个 Wall 之间来回</span>
+        </div>
+        <p class="scene-caption">
+          正 Gamma 集中时，价格更容易被“钉”在 Wall 之间；有效突破后，对冲盘可能顺势调整，波动放大。
+          Wall 不是铁顶铁底，突破需要成交量与收盘价确认。
+        </p>
+      </div>
+
+      <h3>为什么 Put Wall 可能在现价上方？</h3>
+      <p>
+        行权价 740 的 Put，在现价 735 时已经是价内（按 740 卖出更划算），Gamma 可能很大。
+        Put 的 GEX 记负，所以“最负的那根柱子”完全可能出现在现价上方。页面会直接写「高于/低于现价 x%」，
+        <b>不要靠名字猜方向。</b>
+      </p>
+
+      <div class="grid2" style="margin-top: 16px;">
+        <div class="card">
+          <span class="tag green">Call Wall</span>
+          <h4>上方正 Gamma 集中</h4>
+          <p>常见于现价上方，但也可以在下方（深度价内的 Call）。它更像“上方减速带”，不是保证不破的墙。</p>
+        </div>
+        <div class="card">
+          <span class="tag red">Put Wall</span>
+          <h4>负 Gamma 集中</h4>
+          <p>常见于现价下方，但价内 Put 会让它跑到上方。突破后可能加速，而不是“自动反弹”。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="term">
+    <div class="wrap">
+      <div class="kicker">07 · 谁在主导今天</div>
+      <h2>期限结构：近端到期日通常更重要</h2>
+      <p class="lead">
+        Gamma 会随着到期日临近而变大，尤其是平值附近。所以“全部到期”看起来是正 Gamma，
+        不代表“7 天内”也是正 Gamma。两个范围给出的结论可能完全相反。
+      </p>
+
+      <div class="scene">
+        <div class="scene-head">
+          <h4>动画 4 · 近端与远端的贡献</h4>
+          <span class="hint">切换范围，观察哪些到期日被计入</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button class="btn small primary" id="termAll" aria-pressed="true">全部到期</button>
+          <button class="btn small" id="termWeek" aria-pressed="false">7 天内</button>
+        </div>
+        <div id="termChart" aria-label="各到期日净 GEX 示意"></div>
+        <div class="scene-controls" style="justify-content: space-between;">
+          <span style="font-size: 13px; color: var(--muted);" id="termSummary">全部到期合计：+$1.6B</span>
+          <span style="font-size: 12px; color: var(--faint);">示意数据 · 柱子长度代表净 GEX 绝对值</span>
+        </div>
+        <p class="scene-caption">
+          这张示意里，全部到期是 +$1.6B，但 7 天内是 −$0.4B。如果你只看“全部”，会误以为本周是减震环境。
+        </p>
+      </div>
+
+      <div class="note">
+        <b>0DTE 的特殊问题：</b>未平仓量是上一交易日收盘值。当天新开的 0DTE 合约不会出现在 OI 里，
+        所以当天到期的 GEX 往往被低估。越临近收盘，这个偏差越明显。
+      </div>
+
+      <div class="steps" style="margin-top: 16px;">
+        <div class="step"><p><b>先看全部到期：</b>得到中期背景。</p></div>
+        <div class="step"><p><b>再切 7 天内：</b>看本周的波动环境；两者不一致时，以近端为主。</p></div>
+        <div class="step"><p><b>点开最大贡献的到期日：</b>确认它的 Flip 和 Wall，而不是被远端的正 Gamma 稀释。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="example">
+    <div class="wrap">
+      <div class="kicker">08 · 从原始数据到五个数字</div>
+      <h2>完整算例：三个行权价，手算一遍</h2>
+      <p class="lead">
+        下面是一个虚构但完整的例子。现价 $100，只有三个行权价有足够的未平仓量。
+        我们一步步算出每个行权价的美元 Gamma、总 GEX、累计曲线、Flip 和两个 Wall。
+      </p>
+
+      <div class="table-wrap" style="margin-top: 18px;">
+        <table>
+          <thead><tr><th>行权价</th><th>类型</th><th class="num">Gamma</th><th class="num">未平仓量</th><th class="num">美元 Gamma</th><th class="num">带符号 GEX</th></tr></thead>
+          <tbody>
+            <tr><td>95</td><td>Put</td><td class="num">0.030</td><td class="num">4,000</td><td class="num">$1.20M</td><td class="num neg">−$1.20M</td></tr>
+            <tr><td>100</td><td>Call</td><td class="num">0.025</td><td class="num">6,000</td><td class="num">$1.50M</td><td class="num pos">+$1.50M</td></tr>
+            <tr><td>105</td><td>Call</td><td class="num">0.015</td><td class="num">5,000</td><td class="num">$0.75M</td><td class="num pos">+$0.75M</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="steps" style="margin-top: 18px;">
+        <div class="step"><p><b>95 Put：</b>0.030 × 4,000 × 100 × 100² × 0.01 = <b>$1.20M</b>；Put 记负，所以是 −$1.20M。</p></div>
+        <div class="step"><p><b>100 Call：</b>0.025 × 6,000 × 100 × 100² × 0.01 = <b>$1.50M</b>；Call 记正。</p></div>
+        <div class="step"><p><b>105 Call：</b>0.015 × 5,000 × 100 × 100² × 0.01 = <b>$0.75M</b>；Call 记正。</p></div>
+        <div class="step"><p><b>总 GEX：</b>−1.20 + 1.50 + 0.75 = <b>+$1.05M</b>。整体是正 Gamma 环境。</p></div>
+        <div class="step"><p><b>累计曲线：</b>95 处 −1.20；100 处 +0.30；105 处 +1.05。零轴交叉在 95 与 100 之间。</p></div>
+        <div class="step"><p><b>Flip：</b>95 + 5 × (1.20 ÷ 1.50) = <b>99.0</b>。现价 100 在 Flip 上方约 1%。</p></div>
+        <div class="step"><p><b>Wall：</b>Call Wall = 100（+$1.50M），Put Wall = 95（−$1.20M）。</p></div>
+      </div>
+
+      <div class="scene">
+        <div class="scene-head">
+          <h4>把算例画出来</h4>
+          <span class="hint">绿柱 Call、红柱 Put、蓝线累计</span>
+        </div>
+        <svg viewBox="0 0 760 360" role="img" aria-label="算例的 GEX 柱状图与累计曲线">
+          <line x1="60" y1="160" x2="730" y2="160" stroke="#d8d2c8"></line>
+          <line x1="60" y1="30" x2="60" y2="300" stroke="#d8d2c8"></line>
+          <text x="52" y="36" text-anchor="end" font-size="10.5" fill="#9a948b">+1.5M</text>
+          <text x="52" y="164" text-anchor="end" font-size="10.5" fill="#9a948b">0</text>
+          <text x="52" y="284" text-anchor="end" font-size="10.5" fill="#9a948b">−1.5M</text>
+
+          <g id="cumBars">
+            <rect class="gbar" x="162" y="160" width="56" height="104" fill="#bf3b2b" opacity=".32"></rect>
+            <rect class="gbar" x="352" y="30" width="56" height="130" fill="#0b7a52" opacity=".32"></rect>
+            <rect class="gbar" x="542" y="95" width="56" height="65" fill="#0b7a52" opacity=".32"></rect>
+          </g>
+
+          <line x1="342" y1="40" x2="342" y2="300" stroke="#0364d3" stroke-width="1.5" stroke-dasharray="6 5" class="flipMark"></line>
+          <text x="342" y="26" text-anchor="middle" font-size="11" font-weight="650" fill="#0364d3" class="flipMark">Flip ≈ 99</text>
+
+          <polyline class="cumline" points="190,264 380,134 570,69" fill="none" stroke="#0364d3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          <circle cx="190" cy="264" r="4" fill="#0364d3"></circle>
+          <circle cx="380" cy="134" r="4" fill="#0364d3"></circle>
+          <circle cx="570" cy="69" r="4" fill="#0364d3"></circle>
+
+          <text x="190" y="322" text-anchor="middle" font-size="12" fill="#6f6a63">95 Put</text>
+          <text x="380" y="322" text-anchor="middle" font-size="12" fill="#6f6a63">100 Call</text>
+          <text x="570" y="322" text-anchor="middle" font-size="12" fill="#6f6a63">105 Call</text>
+          <text x="190" y="342" text-anchor="middle" font-size="11" fill="#bf3b2b">−$1.20M</text>
+          <text x="380" y="342" text-anchor="middle" font-size="11" fill="#0b7a52">+$1.50M</text>
+          <text x="570" y="342" text-anchor="middle" font-size="11" fill="#0b7a52">+$0.75M</text>
+        </svg>
+        <div class="scene-controls">
+          <button class="btn small primary" id="cumReplay">重播动画</button>
+          <span class="scene-badge" id="cumBadge" style="margin-left: auto;">总 GEX +$1.05M · 正 Gamma</span>
+        </div>
+        <p class="scene-caption">
+          蓝线从左到右累计：−1.20 → +0.30 → +1.05，在 99 附近穿过零轴。现价 100 在 Flip 上方，
+          所以是正 Gamma 环境；但 Flip 距离只有约 1%，并不“遥远”。
+        </p>
+      </div>
+
+      <div class="tip">
+        <b>这个例子的实战读法：</b>整体正 Gamma、Flip 在现价下方 1%、Call Wall 就在现价 100。
+        这意味着 100 附近有大量 Call Gamma，价格更容易被“钉”在 100 附近；但 Flip 很近，
+        一旦跌破 99，环境可能迅速转向放大。不要只记住“正 Gamma = 安全”。
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="app">
+    <div class="wrap">
+      <div class="kicker">09 · 打开软件照着做</div>
+      <h2>在 PayoffLab 里，五分钟完成一次阅读</h2>
+      <p class="lead">
+        侧边栏「市场 → Gamma 敞口」，选择 SPY。下面这张是实际页面快照，数字会随行情变化。
+      </p>
+
+      <figure class="figure">
+        <div class="shot-wrap">
+          <img src="data:image/jpeg;base64,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" alt="PayoffLab Gamma 敞口页面截图，包含指标卡、柱状图、到期日贡献与行权价表" loading="lazy">
+          <span class="pin" style="left: 12%; top: 44%;">1</span>
+          <span class="pin" style="left: 55%; top: 12%;">2</span>
+          <span class="pin" style="left: 55%; top: 30%;">3</span>
+          <span class="pin" style="left: 55%; top: 57%;">4</span>
+          <span class="pin" style="left: 40%; top: 87%;">5</span>
+          <span class="pin" style="left: 76%; top: 87%;">6</span>
+        </div>
+        <figcaption>SPY 页面快照（延迟行情）。标注 1–6 对应下面的阅读顺序。</figcaption>
+      </figure>
+
+      <div class="shot-legend">
+        <div><b>1 · 左栏标的</b>：自选分组、搜索、热门标的。建议固定看 SPY、QQQ。</div>
+        <div><b>2 · 标题与范围</b>：先确认现价、IV30、数据时间，再选「全部到期 / 7 天内」。</div>
+        <div><b>3 · 五张指标卡</b>：总 GEX、状态、Flip、Call Wall、Put Wall。</div>
+        <div><b>4 · 柱状图</b>：绿柱 Call、红柱 Put，灰色虚线现价，蓝色虚线 Flip。</div>
+        <div><b>5 · 到期日贡献</b>：点任意一行，隔离到该到期日。</div>
+        <div><b>6 · 集中行权价</b>：按净 GEX 绝对值排序，附 Call/Put OI。</div>
+      </div>
+
+      <h3>五分钟阅读顺序</h3>
+      <div class="steps">
+        <div class="step"><p><b>看时间：</b>标题行的 CBOE 延迟时间是不是今天的？不是就先刷新。</p></div>
+        <div class="step"><p><b>读五卡：</b>记下总 GEX 正负、Flip 距离、两个 Wall 与现价的距离。</p></div>
+        <div class="step"><p><b>看柱状图：</b>现价附近最大的绿柱/红柱在哪？有没有低 Gamma 的“空洞”？</p></div>
+        <div class="step"><p><b>切 7 天内：</b>如果与“全部到期”结论不同，以近端为主。</p></div>
+        <div class="step"><p><b>点最大到期日：</b>确认它的 Flip 和 Wall，避免被远端结构误导。</p></div>
+        <div class="step"><p><b>写下失效条件：</b>例如“收盘跌破 Flip 且近端转负，就不再按区间思路”。</p></div>
+      </div>
+
+      <div class="note">
+        页面底部写着口径与限制：美元 Gamma = Gamma × OI × 100 × 现价² × 0.01；OI 为上一交易日收盘值；
+        行情延迟约 15 分钟。看结论前，先接受这三个限制。
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="playbook">
+    <div class="wrap">
+      <div class="kicker">10 · 两个虚构交易日</div>
+      <h2>把读数放进一天里</h2>
+      <p class="lead">
+        下面两个剧本都是虚构的，只用于演示“读数如何影响观察重点”。它们不是交易建议，也不保证结果。
+      </p>
+
+      <div class="two-col" style="margin-top: 20px;">
+        <div class="card">
+          <span class="tag green">剧本 A · 正 Gamma 钉住日</span>
+          <h4>现价 100，Flip 98，Wall 95 / 105</h4>
+          <p style="margin-top: 8px;">总 GEX +$2.5B，7 天内也为正；IV（隐含波动率）处于中低位，无事件。</p>
+          <div class="timeline">
+            <div class="tl-item"><time>09:20</time><div>读数：正 Gamma、Flip 在下方 2%、Wall 分列两侧 → <b>减震环境</b>。</div></div>
+            <div class="tl-item"><time>10:00</time><div>跌到 99.2，接近 Flip 但未破 → 观察，不急着下结论。</div></div>
+            <div class="tl-item"><time>11:30</time><div>回到 100.4，上方 105 的 Call Wall 仍远 → 区间内来回。</div></div>
+            <div class="tl-item"><time>14:30</time><div>仍在 99.6–100.5 之间，钉住迹象增强。</div></div>
+            <div class="tl-item"><time>15:45</time><div>收在 100.1。全天没有有效突破任何 Wall。</div></div>
+          </div>
+          <p style="margin-top: 12px;"><b>新手要点：</b>正 Gamma 不等于“不会跌”，而是“常态波动更容易被吸收”。Flip 98 是失效参考，不是保证。</p>
+        </div>
+        <div class="card">
+          <span class="tag red">剧本 B · 负 Gamma 趋势日</span>
+          <h4>现价 100，Flip 102，Wall 95 / 105</h4>
+          <p style="margin-top: 8px;">总 GEX −$3.1B，7 天内也为负；现价在 Flip 下方。</p>
+          <div class="timeline">
+            <div class="tl-item"><time>09:20</time><div>读数：短 Gamma、现价在 Flip 下方 → <b>放大环境</b>。</div></div>
+            <div class="tl-item"><time>10:30</time><div>跌破 98，成交量放大；对冲盘顺势卖出 → 跌势加速。</div></div>
+            <div class="tl-item"><time>11:15</time><div>反抽 99 不过，未能收回 Flip → 环境切换得到确认。</div></div>
+            <div class="tl-item"><time>14:00</time><div>跌到 96，接近 Put Wall 95 → 波动更大，拉锯加剧。</div></div>
+            <div class="tl-item"><time>15:30</time><div>收在 95.8，Wall 附近反复；没有“自动反弹”。</div></div>
+          </div>
+          <p style="margin-top: 12px;"><b>新手要点：</b>负 Gamma 放大的是波动，不是保证下跌；但在这个环境里，卖出没有保护的期权、或把卖方结构的短腿放在离现价很近的位置，会更危险。</p>
+        </div>
+      </div>
+
+      <div class="warn" style="margin-top: 16px;">
+        <b>两个剧本都强调同一件事：</b>GEX 帮你判断“环境”和“失效条件”，不替你判断方向。
+        真正的开仓仍要结合价格、成交量、IV 和仓位管理。
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="wrap">
+      <div class="kicker">11 · 新手最常问</div>
+      <h2>十个问题，直接回答</h2>
+
+      <details>
+        <summary>正 GEX，为什么市场还是会大跌？</summary>
+        <div class="answer"><p>正 Gamma 主要压制“常态波动”，挡不住新闻、流动性冲击或事件跳空。它像减震器，不是防撞墙。事件日要降低对 GEX 的依赖。</p></div>
+      </details>
+      <details>
+        <summary>为什么 Put Wall 会出现在现价上方？</summary>
+        <div class="answer"><p>Put 变价内时 Gamma 会变大。行权价 740 的 Put，在现价 735 时已经是价内，可能形成最负的 Gamma 集中区。软件会标注“高于/低于现价”，不要按名字猜方向。</p></div>
+      </details>
+      <details>
+        <summary>为什么页面显示“无交叉”？</summary>
+        <div class="answer"><p>在你当前选择的范围和行权价内，累计净 GEX 没有穿过零轴。它表示“这个口径下没有可识别的 Flip”，不是“没有风险”。</p></div>
+      </details>
+      <details>
+        <summary>柱状图加起来，为什么和总 GEX 对不上？</summary>
+        <div class="answer"><p>柱状图只画现价附近最近 61 个行权价，而总 GEX 统计所选范围内的全部行权价。图表是“局部放大”，不是全部。</p></div>
+      </details>
+      <details>
+        <summary>为什么「7 天内」和「全部到期」差这么多？</summary>
+        <div class="answer"><p>Gamma 会随着到期临近而变大，近端到期日往往主导短期波动。两个范围结论不一致时，交易上以近端为主，远端只作为背景。</p></div>
+      </details>
+      <details>
+        <summary>个股也能这样看吗？</summary>
+        <div class="answer"><p>可以，但要更谨慎。个股的客户流可能高度集中，单一 Wall 更容易被事件打破，流动性也更差。个股更适合用来找关键行权价，而不是判断大盘方向。</p></div>
+      </details>
+      <details>
+        <summary>0DTE 为什么不准？</summary>
+        <div class="answer"><p>OI 是上一交易日收盘值，当天新开的 0DTE 合约没有计入。当天到期的 GEX 往往被低估，越临近收盘越明显。</p></div>
+      </details>
+      <details>
+        <summary>刷新后数字变了，是页面错了吗？</summary>
+        <div class="answer"><p>行情延迟约 15 分钟，刷新会带来新的价格与 Gamma；如果切换了范围，统计口径也会变。先确认时间和范围，再判断是不是异常。</p></div>
+      </details>
+      <details>
+        <summary>GEX 能预测涨跌吗？</summary>
+        <div class="answer"><p>不能。它描述的是波动环境和对冲行为，不是方向信号。负 Gamma 可能放大下跌，也可能放大上涨。</p></div>
+      </details>
+      <details>
+        <summary>我该先看哪个标的？</summary>
+        <div class="answer"><p>SPY 或 QQQ。指数 ETF 期权市场深、做市商参与度高，GEX 的参考价值通常比小盘股更稳定。熟悉后再看自己持仓的个股。</p></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="sec" id="quiz">
+    <div class="wrap">
+      <div class="kicker">12 · 检查你真的懂了</div>
+      <h2>十分钟练习：自己算一遍</h2>
+      <p class="lead">
+        现价 $100。三个行权价：90 Put（Gamma 0.020，OI 2,000）、100 Call（Gamma 0.030，OI 5,000）、
+        110 Call（Gamma 0.010，OI 3,000）。请算出总 GEX、累计曲线、Flip 和两个 Wall。
+      </p>
+
+      <div class="table-wrap" style="margin-top: 16px;">
+        <table>
+          <thead><tr><th>行权价 / 类型</th><th class="num">Gamma</th><th class="num">OI</th><th class="num">美元 Gamma</th><th class="num">带符号 GEX</th></tr></thead>
+          <tbody>
+            <tr><td>90 Put</td><td class="num">0.020</td><td class="num">2,000</td><td class="num">?</td><td class="num">?</td></tr>
+            <tr><td>100 Call</td><td class="num">0.030</td><td class="num">5,000</td><td class="num">?</td><td class="num">?</td></tr>
+            <tr><td>110 Call</td><td class="num">0.010</td><td class="num">3,000</td><td class="num">?</td><td class="num">?</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details style="margin-top: 14px;">
+        <summary>看答案（先自己算，再点开）</summary>
+        <div class="answer">
+          <p><b>90 Put：</b>0.020 × 2,000 × 100 × 10,000 × 0.01 = $400k → −$0.40M。</p>
+          <p><b>100 Call：</b>0.030 × 5,000 × 100 × 10,000 × 0.01 = $1.50M → +$1.50M。</p>
+          <p><b>110 Call：</b>0.010 × 3,000 × 100 × 10,000 × 0.01 = $300k → +$0.30M。</p>
+          <p><b>总 GEX：</b>−0.40 + 1.50 + 0.30 = <b>+$1.40M</b>（正 Gamma）。</p>
+          <p><b>累计：</b>90 处 −0.40；100 处 +1.10；110 处 +1.40。</p>
+          <p><b>Flip：</b>90 + 10 × (0.40 ÷ 1.50) = <b>92.67</b>。现价 100 在 Flip 上方。</p>
+          <p><b>Wall：</b>Call Wall = 100（+$1.50M）；Put Wall = 90（−$0.40M）。</p>
+          <p><b>一句话解读：</b>整体正 Gamma，Flip 在下方约 7.3%，Call Wall 就在现价 100，Put Wall 在 90。环境偏减震，但 Wall 就在脚下，价格容易在 100 附近拉锯。</p>
+        </div>
+      </details>
+
+      <h3>最后记住这六句话</h3>
+      <div class="grid2">
+        <div class="card"><p><b>1.</b> GEX 是“波动环境”，不是“涨跌预测”。</p></div>
+        <div class="card"><p><b>2.</b> 正 GEX 像减震器，负 GEX 像放大器。</p></div>
+        <div class="card"><p><b>3.</b> Flip 是环境边界，不是磁铁；要看收盘与成交量确认。</p></div>
+        <div class="card"><p><b>4.</b> Wall 是 Gamma 集中区，不是铁顶铁底，可能在“意外”的一侧。</p></div>
+        <div class="card"><p><b>5.</b> 近端到期日通常更重要；0DTE 的 OI 有滞后。</p></div>
+        <div class="card"><p><b>6.</b> 所有读数都是估计，先看数据时间，再谈结论。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="glossary">
+    <div class="wrap">
+      <div class="kicker">附录</div>
+      <h2>一页术语表</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>词</th><th>用大白话说</th></tr></thead>
+          <tbody>
+            <tr><td>Call / Put</td><td>看涨 / 看跌期权，分别是“按约定价格买入 / 卖出”的权利。</td></tr>
+            <tr><td>行权价</td><td>合同里写死的买卖价格，图表横轴上的数字。</td></tr>
+            <tr><td>权利金</td><td>买期权时付的钱，也就是这份权利的价格。</td></tr>
+            <tr><td>平值 / 价内 / 价外</td><td>行权价接近现价 / 对买方有利 / 对买方不利。</td></tr>
+            <tr><td>IV（隐含波动率）</td><td>市场对未来波动的定价；IV 越高，期权通常越贵。</td></tr>
+            <tr><td>Delta</td><td>方向暴露：标的动 $1，期权大约动多少。</td></tr>
+            <tr><td>Gamma</td><td>Delta 的变化速度；平值附近通常最大。</td></tr>
+            <tr><td>做市商</td><td>站在客户对面、提供买卖报价并管理风险的一方。</td></tr>
+            <tr><td>对冲</td><td>用标的股票抵消期权方向风险的动作。</td></tr>
+            <tr><td>GEX</td><td>把全链 Gamma 换成“每 1% 波动的美元敞口”后的分布。</td></tr>
+            <tr><td>Gamma Flip</td><td>累计 GEX 穿零的位置，环境切换的参考边界。</td></tr>
+            <tr><td>Call Wall / Put Wall</td><td>Call 正 GEX / Put 负 GEX 最大的行权价。</td></tr>
+            <tr><td>OI</td><td>未平仓量，上一交易日收盘值。</td></tr>
+            <tr><td>DTE</td><td>距到期天数；0DTE 就是当天到期。</td></tr>
+            <tr><td>钉住（Pin）</td><td>正 Gamma 集中时，价格在到期日附近被“吸”在行权价附近。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn" style="margin-top: 18px;">
+        <b>风险声明：</b>本文和 PayoffLab 的 GEX 页面仅用于教学与市场结构研究，不构成任何投资建议。
+        GEX 是基于延迟行情和简化假设的估计值；期权交易风险很高，可能导致全部本金损失。请独立判断，必要时咨询持牌专业人士。
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>PayoffLab · GEX 新手图解 · 适用 1.5.0 · 2026-11-08</div>
+    <div style="margin-top: 6px;">配套文字版：<a href="GEX-实战指南.md">GEX-实战指南.md</a>。页面中的 SPY 数字为 2026-11-07 延迟行情快照；其余算例与期限结构均为虚构/示意数据。</div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var progress = document.getElementById("progress");
+  function updateProgress() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progress) progress.style.width = pct + "%";
+  }
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+
+  if (reduced) {
+    document.querySelectorAll("svg").forEach(function (svg) {
+      if (typeof svg.pauseAnimations === "function") {
+        try { svg.pauseAnimations(); } catch (e) { /* ignore */ }
+      }
+    });
+  }
+
+  /* 动画 1：沿波形移动的对冲圆点（用 setInterval，避免被后台节流卡住） */
+  var posPath = document.getElementById("posWave");
+  var negPath = document.getElementById("negWave");
+  var posDot = document.getElementById("posDot");
+  var negDot = document.getElementById("negDot");
+
+  function placeDot(dot, path, seconds, offset) {
+    if (!dot || !path) return;
+    var length = path.getTotalLength();
+    var phase = ((Date.now() / 1000 + offset) % seconds) / seconds;
+    var point = path.getPointAtLength(length * phase);
+    dot.setAttribute("cx", point.x);
+    dot.setAttribute("cy", point.y);
+  }
+  function hedgeTick() {
+    placeDot(posDot, posPath, 6, 0);
+    placeDot(negDot, negPath, 5, 1.2);
+  }
+  if (posPath && negPath && posDot && negDot) {
+    hedgeTick();
+    if (!reduced) {
+      window.setInterval(hedgeTick, 50);
+    }
+  }
+
+  var cSpot = document.getElementById("cSpot");
+  var cGamma = document.getElementById("cGamma");
+  var cOi = document.getElementById("cOi");
+  var cOut = document.getElementById("cOut");
+  var cExpr = document.getElementById("cExpr");
+  var cSpotVal = document.getElementById("cSpotVal");
+  var cGammaVal = document.getElementById("cGammaVal");
+  var cOiVal = document.getElementById("cOiVal");
+
+  function money(v) {
+    if (v >= 1e9) return "$" + (v / 1e9).toFixed(2) + "B";
+    if (v >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M";
+    if (v >= 1e3) return "$" + (v / 1e3).toFixed(0) + "k";
+    return "$" + v.toFixed(0);
+  }
+
+  function updateCalc() {
+    if (!cSpot || !cGamma || !cOi) return;
+    var spot = Number(cSpot.value);
+    var gamma = Number(cGamma.value);
+    var oi = Number(cOi.value);
+    var dollars = gamma * oi * 100 * spot * spot * 0.01;
+    if (cSpotVal) cSpotVal.textContent = "$" + spot;
+    if (cGammaVal) cGammaVal.textContent = gamma.toFixed(3);
+    if (cOiVal) cOiVal.textContent = oi.toLocaleString("en-US");
+    if (cOut) cOut.textContent = money(dollars);
+    if (cExpr) {
+      cExpr.textContent = gamma.toFixed(3) + " × " + oi.toLocaleString("en-US") +
+        " × 100 × " + spot + "² × 0.01";
+    }
+  }
+  [cSpot, cGamma, cOi].forEach(function (el) {
+    if (el) el.addEventListener("input", updateCalc);
+  });
+  updateCalc();
+
+  var flipDot = document.getElementById("flipDot");
+  var flipBadge = document.getElementById("flipBadge");
+  var flipMeter = document.getElementById("flipMeter");
+  var flipAboveBtn = document.getElementById("flipAbove");
+  var flipBelowBtn = document.getElementById("flipBelow");
+  var flipAutoBtn = document.getElementById("flipAuto");
+  var flipTimer = null;
+
+  function setFlip(side) {
+    var above = side === "above";
+    if (flipDot) flipDot.style.transform = above ? "translateY(-70px)" : "translateY(70px)";
+    if (flipBadge) {
+      flipBadge.textContent = above ? "正 Gamma 环境 · 波动被吸收" : "负 Gamma 环境 · 波动被放大";
+      flipBadge.className = "scene-badge" + (above ? "" : " bad");
+    }
+    if (flipMeter) {
+      flipMeter.style.width = above ? "32%" : "78%";
+      flipMeter.style.background = above ? "var(--green)" : "var(--red)";
+    }
+    if (flipAboveBtn) flipAboveBtn.setAttribute("aria-pressed", String(above));
+    if (flipBelowBtn) flipBelowBtn.setAttribute("aria-pressed", String(!above));
+  }
+  function stopFlipAuto() {
+    if (flipTimer) {
+      window.clearInterval(flipTimer);
+      flipTimer = null;
+    }
+  }
+  if (flipAboveBtn) flipAboveBtn.addEventListener("click", function () { stopFlipAuto(); setFlip("above"); });
+  if (flipBelowBtn) flipBelowBtn.addEventListener("click", function () { stopFlipAuto(); setFlip("below"); });
+  if (flipAutoBtn) {
+    flipAutoBtn.addEventListener("click", function () {
+      if (flipTimer) {
+        stopFlipAuto();
+        return;
+      }
+      var above = true;
+      setFlip("above");
+      flipTimer = window.setInterval(function () {
+        above = !above;
+        setFlip(above ? "above" : "below");
+      }, 1400);
+    });
+  }
+  setFlip("above");
+
+  var wallSvg = document.querySelector("#walls .scene svg");
+  var wallDot = document.getElementById("wallDot");
+  var wallTrail = document.getElementById("wallTrail");
+  var wallBadge = document.getElementById("wallBadge");
+  var wallPinBtn = document.getElementById("wallPin");
+  var wallBreakBtn = document.getElementById("wallBreak");
+  var wallResetBtn = document.getElementById("wallReset");
+
+  var wallState = { mode: "pin", t: 0, last: 0, breakStart: 0, startY: 170, y: 170, points: [] };
+  var wallTimer = null;
+
+  function wallPoint(y) {
+    return "380," + y.toFixed(1);
+  }
+  function resetWall() {
+    wallState.mode = "pin";
+    wallState.t = 0;
+    wallState.last = 0;
+    wallState.y = 170;
+    wallState.breakStart = 0;
+    wallState.points = [];
+    if (wallTrail) wallTrail.setAttribute("points", "");
+    if (wallDot) wallDot.setAttribute("transform", "translate(380,170)");
+    if (wallBadge) {
+      wallBadge.textContent = "在两个 Wall 之间来回";
+      wallBadge.className = "scene-badge";
+    }
+    if (wallPinBtn) wallPinBtn.setAttribute("aria-pressed", "true");
+    if (wallBreakBtn) wallBreakBtn.setAttribute("aria-pressed", "false");
+  }
+  function wallTick() {
+    var ts = window.performance.now();
+    if (!wallState.last) wallState.last = ts;
+    var dt = Math.min(0.05, (ts - wallState.last) / 1000);
+    wallState.last = ts;
+    wallState.t += dt;
+    var y;
+    if (wallState.mode === "pin") {
+      y = 170 + Math.sin(wallState.t * 1.7) * 42;
+    } else {
+      if (!wallState.breakStart) {
+        wallState.breakStart = wallState.t;
+        wallState.startY = wallState.y;
+      }
+      var p = Math.min(1, (wallState.t - wallState.breakStart) / 1.4);
+      var eased = 1 - Math.pow(1 - p, 3);
+      y = wallState.startY + (55 - wallState.startY) * eased +
+          Math.sin(wallState.t * 8) * (4 + p * 16);
+    }
+    wallState.y = y;
+    if (wallDot) wallDot.setAttribute("transform", "translate(380," + y.toFixed(1) + ")");
+    wallState.points.push(wallPoint(y));
+    if (wallState.points.length > 46) wallState.points.shift();
+    if (wallTrail) wallTrail.setAttribute("points", wallState.points.join(" "));
+  }
+  if (wallPinBtn) {
+    wallPinBtn.addEventListener("click", function () {
+      wallState.mode = "pin";
+      wallState.breakStart = 0;
+      wallState.t = 0;
+      wallState.points = [];
+      if (wallTrail) wallTrail.setAttribute("points", "");
+      if (wallBadge) {
+        wallBadge.textContent = "在两个 Wall 之间来回";
+        wallBadge.className = "scene-badge";
+      }
+      wallPinBtn.setAttribute("aria-pressed", "true");
+      if (wallBreakBtn) wallBreakBtn.setAttribute("aria-pressed", "false");
+    });
+  }
+  if (wallBreakBtn) {
+    wallBreakBtn.addEventListener("click", function () {
+      wallState.mode = "break";
+      wallState.breakStart = 0;
+      wallState.t = 0;
+      wallState.points = [];
+      if (wallTrail) wallTrail.setAttribute("points", "");
+      if (wallBadge) {
+        wallBadge.textContent = "突破 Wall：波动放大";
+        wallBadge.className = "scene-badge bad";
+      }
+      wallBreakBtn.setAttribute("aria-pressed", "true");
+      if (wallPinBtn) wallPinBtn.setAttribute("aria-pressed", "false");
+    });
+  }
+  if (wallResetBtn) wallResetBtn.addEventListener("click", resetWall);
+  if (reduced) {
+    resetWall();
+    if (wallDot) wallDot.setAttribute("transform", "translate(380,150)");
+  } else {
+    resetWall();
+    if (wallSvg) {
+      wallTimer = window.setInterval(wallTick, 40);
+    }
+  }
+
+  var cumScene = document.getElementById("example");
+  var cumBars = document.querySelectorAll("#cumBars .gbar");
+  var cumLine = document.querySelector(".cumline");
+  var flipMarks = document.querySelectorAll(".flipMark");
+  var cumReplay = document.getElementById("cumReplay");
+
+  cumBars.forEach(function (bar, i) {
+    bar.style.transformBox = "fill-box";
+    bar.style.transformOrigin = i === 0 ? "center top" : "center bottom";
+    bar.style.transform = "scaleY(0)";
+    bar.style.transition = "transform .7s cubic-bezier(.4,0,.2,1)";
+  });
+  if (cumLine) {
+    cumLine.style.strokeDasharray = "1000";
+    cumLine.style.strokeDashoffset = "1000";
+    cumLine.style.transition = "stroke-dashoffset 1.1s .3s ease";
+  }
+  flipMarks.forEach(function (mark) {
+    mark.style.opacity = "0";
+    mark.style.transition = "opacity .4s .9s ease";
+  });
+
+  function playCum() {
+    if (reduced) {
+      cumBars.forEach(function (bar) { bar.style.transform = "scaleY(1)"; });
+      if (cumLine) cumLine.style.strokeDashoffset = "0";
+      flipMarks.forEach(function (mark) { mark.style.opacity = "1"; });
+      return;
+    }
+    cumBars.forEach(function (bar, i) {
+      bar.style.transform = "scaleY(0)";
+      window.setTimeout(function () { bar.style.transform = "scaleY(1)"; }, 60 + i * 120);
+    });
+    if (cumLine) {
+      cumLine.style.strokeDashoffset = "1000";
+      window.setTimeout(function () { cumLine.style.strokeDashoffset = "0"; }, 420);
+    }
+    flipMarks.forEach(function (mark) {
+      mark.style.opacity = "0";
+      window.setTimeout(function () { mark.style.opacity = "1"; }, 1100);
+    });
+  }
+  if (cumScene) {
+    var cumObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          playCum();
+          cumObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.35 });
+    cumObserver.observe(cumScene);
+  }
+  if (cumReplay) {
+    cumReplay.addEventListener("click", function () {
+      if (cumLine) {
+        cumLine.style.transition = "none";
+        cumLine.style.strokeDashoffset = "1000";
+        void cumLine.getBoundingClientRect();
+        cumLine.style.transition = "stroke-dashoffset 1.1s .3s ease";
+      }
+      playCum();
+    });
+  }
+
+  var termData = [
+    { label: "0DTE", value: -0.8, dte: 0 },
+    { label: "1 天", value: -0.4, dte: 1 },
+    { label: "3 天", value: 0.2, dte: 3 },
+    { label: "7 天", value: 0.6, dte: 7 },
+    { label: "30 天", value: 1.1, dte: 30 },
+    { label: "90 天", value: 0.9, dte: 90 }
+  ];
+  var termChart = document.getElementById("termChart");
+  var termSummary = document.getElementById("termSummary");
+  var termAllBtn = document.getElementById("termAll");
+  var termWeekBtn = document.getElementById("termWeek");
+  var termMode = "all";
+
+  function renderTerm() {
+    if (!termChart) return;
+    var max = 1.1;
+    termChart.innerHTML = "";
+    termData.forEach(function (row) {
+      var include = termMode === "all" || row.dte <= 7;
+      var wrap = document.createElement("div");
+      wrap.className = "term-row" + (include ? "" : " quiet");
+      var label = document.createElement("div");
+      label.textContent = row.label;
+      label.style.color = "var(--muted)";
+      var track = document.createElement("div");
+      track.className = "track";
+      var bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.width = Math.max(3, (Math.abs(row.value) / max) * 100) + "%";
+      bar.style.background = row.value >= 0 ? "var(--green)" : "var(--red)";
+      bar.style.opacity = include ? "1" : ".45";
+      track.appendChild(bar);
+      var val = document.createElement("div");
+      val.className = "val " + (row.value >= 0 ? "pos" : "neg");
+      val.textContent = (row.value >= 0 ? "+" : "−") + "$" + Math.abs(row.value).toFixed(1) + "B";
+      wrap.appendChild(label);
+      wrap.appendChild(track);
+      wrap.appendChild(val);
+      termChart.appendChild(wrap);
+    });
+    if (termSummary) {
+      if (termMode === "all") {
+        termSummary.textContent = "全部到期合计：+$1.6B（近端 −$0.4B，远端 +$2.0B）";
+      } else {
+        termSummary.textContent = "7 天内合计：−$0.4B（近端为负，环境与全部到期相反）";
+      }
+    }
+    if (termAllBtn) termAllBtn.setAttribute("aria-pressed", String(termMode === "all"));
+    if (termWeekBtn) termWeekBtn.setAttribute("aria-pressed", String(termMode === "week"));
+  }
+  if (termAllBtn) {
+    termAllBtn.addEventListener("click", function () {
+      termMode = "all";
+      renderTerm();
+    });
+  }
+  if (termWeekBtn) {
+    termWeekBtn.addEventListener("click", function () {
+      termMode = "week";
+      renderTerm();
+    });
+  }
+  renderTerm();
+})();
+</script>
+</body>
+</html>
