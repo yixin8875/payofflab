@@ -58,11 +58,11 @@ export default function Tools() {
                 </span>
               }
               title="期权扫描"
-              subtitle="按观点扫描一条期权链"
+              subtitle="按观点扫描实时期权链"
             />
           </ListGroup>
           <div className="mx-3 mt-1 text-[10.5px] leading-4 text-faint">
-            所有工具共用同一套 Black-Scholes 假设与合成报价。
+            所有工具共用同一套 Black-Scholes 假设；扫描器读取在线期权链。
           </div>
         </ListPane>
       }

@@ -72,7 +72,7 @@ const strikeKey = (strike: number) => strike.toFixed(3);
 export const quoteKey = (iso: string, kind: "call" | "put", strike: number) =>
   `${iso}|${kind}|${strikeKey(strike)}`;
 
-function daysUntil(iso: string): number {
+export function daysUntil(iso: string): number {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return 0;
   const expiry = Date.UTC(y, m - 1, d);

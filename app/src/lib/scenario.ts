@@ -1,5 +1,5 @@
 import { ticker } from "../data/tickers";
-import { cachedChain } from "./live";
+import { cachedChain, daysUntil } from "./live";
 import { greeks, legPrice, type Leg } from "./options";
 import type { SavedTrade } from "./store";
 
@@ -34,7 +34,10 @@ export const SPOT_RANGE = 20;
 export function maxDte(trades: SavedTrade[]): number {
   let max = 0;
   for (const trade of trades) {
-    for (const leg of trade.legs) max = Math.max(max, leg.dte);
+    for (const leg of trade.legs) {
+      if (leg.qty <= 0 || leg.kind === "stock") continue;
+      max = Math.max(max, daysUntil(leg.expiry));
+    }
   }
   return max;
 }
@@ -54,8 +57,9 @@ function shift(trade: SavedTrade, spotPct: number, ivPts: number) {
 }
 
 export function legMark(leg: Leg, spot: number, days: number, baseIv: number): number {
-  const T = Math.max(leg.dte - days, 0) / 365;
-  return leg.side * leg.qty * 100 * (legPrice(leg, spot, T, baseIv) - leg.fill);
+  // Saved legs keep their expiry date, so the position ages with the calendar.
+  const remaining = Math.max(daysUntil(leg.expiry) - days, 0);
+  return leg.side * leg.qty * 100 * (legPrice(leg, spot, remaining / 365, baseIv) - leg.fill);
 }
 
 export function tradeMark(
@@ -87,7 +91,7 @@ function legsGreeks(legs: Leg[], spot: number, iv: number, days: number): GreekT
       delta += leg.side * leg.qty * 100;
       continue;
     }
-    const T = Math.max(leg.dte - days, 0) / 365;
+    const T = Math.max(daysUntil(leg.expiry) - days, 0) / 365;
     // Expired options no longer carry sensitivity.
     if (T <= 0) continue;
     const g = greeks([leg], spot, T, iv);

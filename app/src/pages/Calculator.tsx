@@ -18,6 +18,7 @@ import {
   X,
 } from "../components/Icons";
 import { Workspace } from "../desktop/Split";
+import { decodeDraft } from "../lib/draft";
 import { analyse, type Analysis, type Instrument, type Leg } from "../lib/options";
 import { CHIP_GROUPS, OUTLOOK_LABEL, PRESET_BY_KEY, legsFor } from "../lib/presets";
 import { pricedLeg, roundStrike } from "../lib/chain";
@@ -501,10 +502,12 @@ export default function Calculator() {
   );
   const expiry = expiries.find((e) => e.iso === params.get("expiry")) ?? fallbackExpiry;
   const presetKey = params.get("preset") ?? "";
+  const encodedDraft = params.get("legs");
+  const draft = useMemo(() => decodeDraft(encodedDraft), [encodedDraft]);
   const [pristine, setPristine] = useState(true);
 
   const [legs, setLegs] = useState<Leg[]>(() =>
-    presetKey ? legsFor(presetKey, market, expiry.iso) : [],
+    draft?.legs ?? (presetKey ? legsFor(presetKey, market, expiry.iso) : []),
   );
   const instrument: Instrument = useMemo(() => ({ ...market, expiries }), [market, expiries]);
   const [mode, setMode] = useState<"pnl" | "pct">("pnl");
@@ -528,6 +531,16 @@ export default function Calculator() {
     setLegs(legsFor(presetKey, market, expiry.iso));
   }, [chain, presetKey, pristine, market, expiry.iso]);
 
+  // A scanner result arrives as encoded legs; keep the builder in sync when
+  // the URL changes without a full page reload.
+  useEffect(() => {
+    if (!encodedDraft) return;
+    const next = decodeDraft(encodedDraft);
+    if (!next) return;
+    setPristine(false);
+    setLegs(next.legs);
+  }, [encodedDraft]);
+
   const apply = (key: string) => {
     const preset = PRESET_BY_KEY[key];
     if (!preset) return;
@@ -546,6 +559,9 @@ export default function Calculator() {
     if (presetKey) {
       setPristine(true);
       setLegs(legsFor(presetKey, next, expiry.iso));
+    } else if (encodedDraft) {
+      setPristine(false);
+      setLegs([]);
     }
   };
 
@@ -555,6 +571,9 @@ export default function Calculator() {
     if (presetKey) {
       setPristine(true);
       setLegs(legsFor(presetKey, market, iso));
+    } else if (encodedDraft) {
+      setPristine(false);
+      setLegs([]);
     }
   };
 
@@ -575,13 +594,14 @@ export default function Calculator() {
     setSaved(false);
     const next = new URLSearchParams(params);
     next.delete("preset");
+    next.delete("legs");
     setParams(next);
   };
 
   const save = () => {
     if (!legs.length) return;
     saveTrade({
-      name: PRESET_BY_KEY[presetKey]?.name ?? "自定义策略",
+      name: draft?.name ?? PRESET_BY_KEY[presetKey]?.name ?? "自定义策略",
       symbol: t.symbol,
       expiry: expiry.iso,
       legs,

@@ -21,6 +21,10 @@ export function useLiveChain(symbol: string) {
 
   const run = useCallback(
     (force: boolean) => {
+      if (!key) {
+        setState({ loading: false });
+        return;
+      }
       const id = ++request.current;
       if (!force) {
         const hit = cachedChain(key);

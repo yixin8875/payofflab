@@ -87,9 +87,9 @@ export default function Overview() {
               <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-faint">
                 <Plus size={16} />
               </span>
-              <p className="mt-3 text-[11.5px] text-dim">还没有保存的策略</p>
+              <p className="mt-3 text-[11.5px] text-dim">还没有持仓</p>
               <p className="mx-auto mt-1 max-w-[190px] text-[10.5px] leading-4 text-faint">
-                在构建器里搭好一笔持仓，保存后会按日期列在这里。
+                在构建器里搭好一笔持仓，保存后会按真实行情跟踪盈亏。
               </p>
               <Link to="/calculator" className="btn-secondary mt-3 h-7 px-2.5">
                 打开构建器
@@ -104,7 +104,7 @@ export default function Overview() {
                     to={`/trades/${trade.id}`}
                     badge={<Badge label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
                     title={trade.name}
-                    subtitle={`${trade.symbol} · ${trade.legs.length} 条腿`}
+                    subtitle={`${trade.symbol} · ${trade.legs.filter((leg) => leg.qty > 0).length} 条腿`}
                     meta={dayLabel(trade.savedAt)}
                   />
                 ))}
@@ -112,7 +112,7 @@ export default function Overview() {
             ))
           )}
           <div className="mx-3 mt-2 rounded-md border border-line-subtle bg-white/60 px-2.5 py-2 text-[10.5px] leading-4 text-faint">
-            保存的策略只留在本机，不会同步到任何账户。
+            持仓与平仓记录只留在本机，不会同步到任何账户。
           </div>
         </ListPane>
       }

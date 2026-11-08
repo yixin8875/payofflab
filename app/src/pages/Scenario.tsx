@@ -12,7 +12,7 @@ import {
   SPOT_RANGE,
   type ScenarioInput,
 } from "../lib/scenario";
-import { useTrades } from "../lib/store";
+import { openTrades, useTrades } from "../lib/store";
 
 const PRESETS = [
   { label: "现状", spotPct: 0, ivPts: 0, days: 0 },
@@ -31,7 +31,8 @@ const signed = (v: number, digits = 0) =>
 const moveLabel = (v: number) => `${signed(v)}%`;
 
 export default function Scenario() {
-  const trades = useTrades();
+  const allTrades = useTrades();
+  const trades = useMemo(() => openTrades(allTrades), [allTrades]);
   const [input, setInput] = useState<ScenarioInput>({ spotPct: 0, ivPts: 0, days: 7 });
 
   const maxDays = useMemo(() => Math.max(1, maxDte(trades)), [trades]);
@@ -218,6 +219,7 @@ export default function Scenario() {
 
               <p className="px-1 text-[10.5px] leading-4 text-faint">
                 所有标的按同一百分比变动；期权价格由 Black-Scholes 合成，仅用于情景分析，不构成投资建议。
+                持仓页按 CBOE 行情中间价估值，因此这里的「当前」可能与持仓页的未实现盈亏存在差异。
               </p>
             </aside>
 

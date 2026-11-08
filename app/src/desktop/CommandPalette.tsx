@@ -32,7 +32,7 @@ const PAGE_ITEMS: PaletteItem[] = [...NAV_GROUPS.flatMap((g) => g.items), ...NAV
 }));
 
 const TOOL_ITEMS: PaletteItem[] = [
-  { id: "tool:scan", label: "期权扫描", hint: "按观点扫描整条链", group: "工具", to: "/tools/option-finder", icon: Target },
+  { id: "tool:scan", label: "期权扫描", hint: "按观点扫描实时链", group: "工具", to: "/tools/option-finder", icon: Target },
   { id: "tool:bs", label: "Black-Scholes 计算器", hint: "理论价格与希腊值", group: "工具", to: "/tools/black-scholes", icon: Sigma },
   { id: "tool:greeks", label: "希腊值计算器", hint: "美元净敞口", group: "工具", to: "/tools/greeks-calculator", icon: ChartLine },
   { id: "tool:iv", label: "隐含波动率计算器", hint: "从价格反解 IV", group: "工具", to: "/tools/iv-calculator", icon: Sigma },

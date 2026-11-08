@@ -183,7 +183,11 @@ export default function Settings() {
           {active === "data" && (
             <div className="space-y-3">
               <div className="overflow-hidden rounded-lg border border-line bg-white">
-                <InfoRow title="保存的策略" value={`${trades.length} 笔`} note="保存于本机 localStorage" />
+                <InfoRow
+                  title="持仓记录"
+                  value={`${trades.length} 笔`}
+                  note="含未平仓与已平仓，保存在本机"
+                />
                 <InfoRow
                   title="自选分组"
                   value={`${watchlist.length} 组 · ${watchCount} 个标的`}
@@ -205,12 +209,12 @@ export default function Settings() {
                     type="button"
                     onClick={() => {
                       if (!trades.length) return;
-                      if (window.confirm("删除全部已保存的策略？")) clearTrades();
+                      if (window.confirm("删除全部持仓与平仓记录？")) clearTrades();
                     }}
                     disabled={!trades.length}
                     className="btn-secondary h-7 px-2.5 disabled:opacity-40"
                   >
-                    删除保存的策略
+                    删除全部持仓
                   </button>
                   <button
                     type="button"
