@@ -8,6 +8,7 @@ import {
   type LiveChain,
   type LiveQuote,
 } from "./live";
+import { closePrice, sideFees, tradeMargin, type MarginEstimate } from "./execution";
 import { greeks, legPrice, type Leg } from "./options";
 import { hasOpenLegs, type SavedTrade } from "./store";
 
@@ -17,11 +18,15 @@ export type PositionLeg = {
   leg: Leg;
   /** Calendar days to expiry; 0 for stock. */
   dte: number;
+  /** Mid mark, used for display and model valuation. */
   mark: number;
+  /** Price you would actually close at: bid for longs, ask for shorts. */
+  liqMark: number;
   source: MarkSource;
   value: number;
   cost: number;
   pnl: number;
+  liqPnl: number;
   quote?: LiveQuote;
 };
 
@@ -36,16 +41,28 @@ export type PositionMetrics = {
   expired: boolean;
   marketValue: number;
   cost: number;
+  /** Mark-to-mid P&L. */
   unrealized: number;
+  /** P&L if every open leg were closed at bid/ask now. */
+  liqUnrealized: number;
+  /** Mid minus liquidation: the spread you pay to get out. */
+  spreadCost: number;
+  /** Round-trip fees on the open contracts. */
+  fees: number;
+  /** Liquidation P&L after fees. */
+  netUnrealized: number;
   realized: number;
   total: number;
   delta: number;
   gamma: number;
   theta: number;
   vega: number;
+  margin: MarginEstimate;
   legs: PositionLeg[];
-  /** Current mark per leg id, used by the close dialog. */
+  /** Mid mark per leg id, used by the close dialog default. */
   marks: Record<string, number>;
+  /** Liquidation price per leg id, used when closing at market. */
+  closeMarks: Record<string, number>;
 };
 
 export type SymbolSummary = {
@@ -67,12 +84,16 @@ export type PortfolioMetrics = {
   marketValue: number;
   cost: number;
   unrealized: number;
+  liqUnrealized: number;
+  fees: number;
+  netUnrealized: number;
   realized: number;
   total: number;
   delta: number;
   gamma: number;
   theta: number;
   vega: number;
+  margin: number;
   online: number;
   totalOpen: number;
 };
@@ -109,6 +130,7 @@ export function positionMetrics(trade: SavedTrade, chain?: LiveChain): PositionM
   let marketValue = 0;
   let cost = 0;
   let unrealized = 0;
+  let liqUnrealized = 0;
   let delta = 0;
   let gamma = 0;
   let theta = 0;
@@ -116,6 +138,7 @@ export function positionMetrics(trade: SavedTrade, chain?: LiveChain): PositionM
   let nearest = -1;
   let expired = false;
   const marks: Record<string, number> = {};
+  const closeMarks: Record<string, number> = {};
 
   for (const leg of trade.legs) {
     const priced = markedLeg(leg, chain, spot, iv);
@@ -123,21 +146,27 @@ export function positionMetrics(trade: SavedTrade, chain?: LiveChain): PositionM
     const value = ratio * priced.mark;
     const basis = ratio * leg.fill;
     const pnl = value - basis;
+    const liqMark = closePrice(leg, priced.quote, priced.mark);
+    const liqPnl = ratio * (liqMark - leg.fill);
     marks[leg.id] = priced.mark;
+    closeMarks[leg.id] = liqMark;
     legs.push({
       leg,
       dte: priced.dte,
       mark: priced.mark,
+      liqMark,
       source: priced.source,
       value,
       cost: basis,
       pnl,
+      liqPnl,
       quote: priced.quote,
     });
     if (leg.qty <= 0) continue;
     marketValue += value;
     cost += basis;
     unrealized += pnl;
+    liqUnrealized += liqPnl;
     if (leg.kind === "stock") {
       delta += ratio;
       continue;
@@ -160,6 +189,9 @@ export function positionMetrics(trade: SavedTrade, chain?: LiveChain): PositionM
     vega += g.vega;
   }
 
+  const fees = sideFees(trade.legs) * 2;
+  const margin = tradeMargin(trade, spot, iv);
+
   return {
     trade,
     spot,
@@ -171,14 +203,20 @@ export function positionMetrics(trade: SavedTrade, chain?: LiveChain): PositionM
     marketValue,
     cost,
     unrealized,
+    liqUnrealized,
+    spreadCost: unrealized - liqUnrealized,
+    fees,
+    netUnrealized: liqUnrealized - fees,
     realized: trade.realized,
     total: unrealized + trade.realized,
     delta,
     gamma,
     theta,
     vega,
+    margin,
     legs,
     marks,
+    closeMarks,
   };
 }
 
@@ -193,6 +231,10 @@ export function portfolioMetrics(
   let marketValue = 0;
   let cost = 0;
   let unrealized = 0;
+  let liqUnrealized = 0;
+  let fees = 0;
+  let netUnrealized = 0;
+  let margin = 0;
   let realized = 0;
   let delta = 0;
   let gamma = 0;
@@ -220,6 +262,10 @@ export function portfolioMetrics(
       marketValue += item.marketValue;
       cost += item.cost;
       unrealized += item.unrealized;
+      liqUnrealized += item.liqUnrealized;
+      fees += item.fees;
+      netUnrealized += item.netUnrealized;
+      margin += item.margin.requirement;
       delta += item.delta;
       gamma += item.gamma;
       theta += item.theta;
@@ -243,12 +289,16 @@ export function portfolioMetrics(
     marketValue,
     cost,
     unrealized,
+    liqUnrealized,
+    fees,
+    netUnrealized,
     realized,
     total: unrealized + realized,
     delta,
     gamma,
     theta,
     vega,
+    margin,
     online: onlineSymbols.size,
     totalOpen: open.length,
   };

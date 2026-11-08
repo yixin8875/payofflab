@@ -3,6 +3,7 @@ import AppLayout from "./desktop/AppLayout";
 import Calculator from "./pages/Calculator";
 import Chain from "./pages/Chain";
 import Changelog from "./pages/Changelog";
+import Events from "./pages/Events";
 import Gex from "./pages/Gex";
 import { Privacy, Terms } from "./pages/Legal";
 import Methodology from "./pages/Methodology";
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/watchlist/:symbol" element={<Watchlist />} />
         <Route path="/trades" element={<Trades />} />
         <Route path="/trades/:id" element={<Trades />} />
+        <Route path="/events" element={<Events />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/tools/option-finder" element={<OptionFinder />} />
         <Route path="/tools/:mode" element={<Tools />} />

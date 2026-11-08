@@ -123,6 +123,33 @@ export default function Settings() {
                   label="记住窗口大小"
                 />
               </div>
+              <div className="flex items-center justify-between gap-6 border-b border-line-subtle px-4 py-3">
+                <div>
+                  <p className="text-[12.5px] font-medium">每张合约费用</p>
+                  <p className="mt-0.5 text-[11px] leading-4 text-dim">
+                    单边佣金加交易所费用，用于持仓页的往返费用与净盈亏估算。
+                  </p>
+                </div>
+                <span className="flex shrink-0 items-center gap-1 text-[11.5px] text-dim">
+                  $
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={settings.commissionPerContract}
+                    onChange={(event) =>
+                      update({
+                        commissionPerContract: Math.max(
+                          0,
+                          Number(event.target.value) || 0,
+                        ),
+                      })
+                    }
+                    aria-label="每张合约费用"
+                    className="h-7 w-16 rounded border border-line bg-white px-1.5 text-right text-[11px] tnum outline-none focus:border-accent"
+                  />
+                </span>
+              </div>
               <InfoRow title="启动页面" value="概览" note="桌面版固定从工作台开始" />
               <InfoRow
                 title="行情数据"

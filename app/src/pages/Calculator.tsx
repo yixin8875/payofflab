@@ -19,6 +19,7 @@ import {
 } from "../components/Icons";
 import { Workspace } from "../desktop/Split";
 import { decodeDraft } from "../lib/draft";
+import { eventLabel, eventsUntil, useEvents } from "../lib/events";
 import { analyse, type Analysis, type Instrument, type Leg } from "../lib/options";
 import { CHIP_GROUPS, OUTLOOK_LABEL, PRESET_BY_KEY, legsFor } from "../lib/presets";
 import { pricedLeg, quote, roundStrike } from "../lib/chain";
@@ -501,6 +502,8 @@ export default function Calculator() {
     [expiries],
   );
   const expiry = expiries.find((e) => e.iso === params.get("expiry")) ?? fallbackExpiry;
+  const events = useEvents();
+  const expiryEvents = eventsUntil(events, t.symbol, expiry.iso);
   const presetKey = params.get("preset") ?? "";
   const encodedDraft = params.get("legs");
   const draft = useMemo(() => decodeDraft(encodedDraft), [encodedDraft]);
@@ -711,6 +714,19 @@ export default function Calculator() {
           onApply={apply}
         />
       </div>
+
+      {expiryEvents.length > 0 && (
+        <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line bg-[#fbfaf8] px-3 py-1 text-[10px]">
+          <span className="font-medium text-loss">事件提醒</span>
+          <span className="text-dim">
+            {expiry.label} 到期跨过 {expiryEvents.map(eventLabel).join("、")}；
+            持有跨事件头寸要单独考虑 IV crush。
+          </span>
+          <Link to="/events" className="ml-auto text-accent hover:underline">
+            事件日历
+          </Link>
+        </div>
+      )}
 
       <div className="grid min-h-0 flex-1 grid-cols-[290px_minmax(0,1fr)_300px] gap-2 p-2">
         <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-white">

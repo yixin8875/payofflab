@@ -1,6 +1,7 @@
 import {
   Bars,
   Book,
+  Calendar,
   Chain,
   ChartLine,
   Grid,
@@ -52,6 +53,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/strategies", label: "策略库", icon: Book },
       { href: "/watchlist", label: "自选", icon: Star },
       { href: "/trades", label: "持仓", icon: Bars },
+      { href: "/events", label: "事件日历", icon: Calendar },
     ],
   },
   {

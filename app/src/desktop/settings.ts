@@ -4,6 +4,8 @@ export type AppSettings = {
   density: Density;
   rememberWindowSize: boolean;
   autoCheckUpdates: boolean;
+  /** All-in cost per contract per side, in dollars. */
+  commissionPerContract: number;
 };
 
 const KEY = "payoff:settings";
@@ -12,6 +14,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   density: "comfortable",
   rememberWindowSize: true,
   autoCheckUpdates: true,
+  commissionPerContract: 0.69,
 };
 
 export function readSettings(): AppSettings {
@@ -23,6 +26,12 @@ export function readSettings(): AppSettings {
       density: parsed.density === "compact" ? "compact" : "comfortable",
       rememberWindowSize: parsed.rememberWindowSize !== false,
       autoCheckUpdates: parsed.autoCheckUpdates !== false,
+      commissionPerContract:
+        typeof parsed.commissionPerContract === "number" &&
+        Number.isFinite(parsed.commissionPerContract) &&
+        parsed.commissionPerContract >= 0
+          ? parsed.commissionPerContract
+          : DEFAULT_SETTINGS.commissionPerContract,
     };
   } catch {
     return DEFAULT_SETTINGS;

@@ -13,6 +13,7 @@ import {
   PaneHeader,
   Split,
 } from "../desktop/Split";
+import { eventLabel, eventsUntil, useEvents } from "../lib/events";
 import { money, num, price } from "../lib/format";
 import {
   portfolioMetrics,
@@ -214,6 +215,12 @@ function PortfolioCard({
       <p className={`mt-1 text-[23px] font-semibold leading-7 tnum ${pnlClass(portfolio.unrealized)}`}>
         {money(portfolio.unrealized, { sign: true })}
       </p>
+      <div className="mt-0.5 flex items-baseline justify-between gap-2 text-[10px] tnum">
+        <span className={pnlClass(portfolio.netUnrealized)}>
+          清算后 {money(portfolio.netUnrealized, { sign: true })}
+        </span>
+        <span className="text-faint">费用 {money(portfolio.fees)}</span>
+      </div>
       <div className="mt-2 grid grid-cols-3 gap-2 border-t border-line-subtle pt-2">
         <MiniStat label="已实现" value={money(portfolio.realized, { sign: true })} tone={pnlClass(portfolio.realized)} />
         <MiniStat label="Delta" value={num(portfolio.delta, 0)} />
@@ -221,6 +228,10 @@ function PortfolioCard({
       </div>
       <div className="mt-1.5 flex items-center justify-between text-[9.5px] text-faint">
         <span>{portfolio.totalOpen} 笔未平仓</span>
+        <span className="tnum">占用 {money(portfolio.margin)}</span>
+      </div>
+      <div className="mt-1 flex items-center justify-between text-[9.5px] text-faint">
+        <span>买入腿按买价、卖出腿按卖价清算</span>
         <span>
           {loading
             ? "行情加载中…"
@@ -258,6 +269,8 @@ function PositionView({
   const trade = metrics.trade;
   const open = hasOpenLegs(trade);
   const openLegs = metrics.legs.filter((item) => item.leg.qty > 0);
+  const events = useEvents();
+  const upcoming = eventsUntil(events, trade.symbol, trade.expiry);
   const [closing, setClosing] = useState<{ legId: string; qty: string; price: string } | null>(
     null,
   );
@@ -273,14 +286,24 @@ function PositionView({
 
   const closeAll = () => {
     if (!openLegs.length) return;
-    const marks = Object.fromEntries(openLegs.map((item) => [item.leg.id, item.mark]));
+    const marks = Object.fromEntries(
+      openLegs.map((item) => [
+        item.leg.id,
+        metrics.closeMarks[item.leg.id] ?? item.mark,
+      ]),
+    );
     const estimate = openLegs.reduce(
-      (sum, item) => sum + item.leg.side * item.leg.qty * 100 * (item.mark - item.leg.fill),
+      (sum, item) =>
+        sum +
+        item.leg.side *
+          item.leg.qty *
+          100 *
+          ((metrics.closeMarks[item.leg.id] ?? item.mark) - item.leg.fill),
       0,
     );
     if (
       !window.confirm(
-        `按当前行情平掉全部 ${openLegs.length} 条腿？预计已实现 ${money(estimate, { sign: true })}。`,
+        `按当前买卖价平掉全部 ${openLegs.length} 条腿？预计已实现 ${money(estimate, { sign: true })}（未扣费用）。`,
       )
     ) {
       return;
@@ -335,13 +358,18 @@ function PositionView({
                   : "离线模型报价"}
             </span>
             {metrics.expired && <span className="text-loss">含已到期合约，按内在价值计</span>}
+            {upcoming.length > 0 && (
+              <span className="text-loss">
+                跨过 {upcoming.map(eventLabel).join("、")}
+              </span>
+            )}
           </div>
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryCard label="未实现盈亏" value={money(metrics.unrealized, { sign: true })} tone={pnlClass(metrics.unrealized)} />
-            <SummaryCard label="已实现盈亏" value={money(metrics.realized, { sign: true })} tone={pnlClass(metrics.realized)} />
-            <SummaryCard label="总盈亏" value={money(metrics.total, { sign: true })} tone={pnlClass(metrics.total)} />
-            <SummaryCard label="当前市值" value={money(metrics.marketValue)} />
+            <SummaryCard label="中间价盈亏" value={money(metrics.unrealized, { sign: true })} tone={pnlClass(metrics.unrealized)} />
+            <SummaryCard label="清算盈亏" value={money(metrics.liqUnrealized, { sign: true })} tone={pnlClass(metrics.liqUnrealized)} />
+            <SummaryCard label="费用（往返）" value={money(metrics.fees)} tone="text-dim" />
+            <SummaryCard label="净盈亏（清算后）" value={money(metrics.netUnrealized, { sign: true })} tone={pnlClass(metrics.netUnrealized)} />
           </div>
 
           <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-lg border border-line bg-white px-3 py-2 text-[10.5px]">
@@ -350,6 +378,27 @@ function PositionView({
             <Greek label="Γ" value={num(metrics.gamma, 2)} />
             <Greek label="Θ/日" value={money(metrics.theta, { cents: true })} />
             <Greek label="Vega/点" value={money(metrics.vega, { cents: true })} />
+            <span className="ml-auto flex items-baseline gap-1">
+              <span className="text-faint">占用购买力</span>
+              <span className="font-medium text-muted tnum">
+                {money(metrics.margin.requirement)}
+              </span>
+              <span className="text-[9px] text-faint">
+                {metrics.margin.kind === "naked"
+                  ? "含裸卖"
+                  : metrics.margin.kind === "defined"
+                    ? "定义风险"
+                    : "无期权腿"}
+              </span>
+            </span>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-5 gap-y-1 px-1 text-[10px] text-faint tnum">
+            <span>已实现 {money(metrics.realized, { sign: true })}</span>
+            <span>总盈亏 {money(metrics.total, { sign: true })}</span>
+            <span>当前市值 {money(metrics.marketValue)}</span>
+            <span>价差成本 {money(metrics.spreadCost)}</span>
+            {metrics.margin.stockExcluded && <span>正股保证金未计入</span>}
+            {metrics.margin.crossExpiry && <span>跨到期日分别估算</span>}
           </div>
 
           {open && openLegs.length > 0 && (
@@ -402,7 +451,8 @@ function PositionView({
               ))}
             </div>
             <p className="mt-1.5 text-[9.5px] leading-4 text-faint">
-              市价使用 CBOE 延迟行情的买卖中间价；离线时按 Black-Scholes 模型估值。
+              现价为 CBOE 延迟行情的买卖中间价；清算价按买入腿卖在买价、卖出腿买回在卖价估算。
+              费用默认每张合约每边 $0.69，可在设置中调整；保证金为估算值，不含正股融资。
               平仓操作只记录本机盈亏，不会发送到券商。
             </p>
           </section>
@@ -504,9 +554,17 @@ function LegRow({
           <span className="ml-1 text-[8.5px] text-faint">
             {item.source === "live" ? "实时" : item.source === "expired" ? "到期" : item.source === "stock" ? "" : "模型"}
           </span>
+          <span className="mt-0.5 block text-[8.5px] text-faint tnum">
+            清算 {price(item.liqMark)}
+          </span>
         </span>
         <span className={`text-right font-medium tnum ${pnlClass(item.pnl)}`}>
           {leg.qty > 0 ? money(item.pnl, { sign: true }) : "—"}
+          {leg.qty > 0 && Math.abs(item.liqPnl - item.pnl) >= 1 && (
+            <span className={`mt-0.5 block text-[8.5px] font-normal ${pnlClass(item.liqPnl)}`}>
+              清算 {money(item.liqPnl, { sign: true })}
+            </span>
+          )}
         </span>
         <span className="text-right text-[10px] text-faint">
           {leg.qty <= 0 ? "已平" : leg.kind === "stock" ? "—" : item.dte < 0 ? "已到期" : `${item.dte}天`}
@@ -518,7 +576,7 @@ function LegRow({
               onClick={() =>
                 editing
                   ? setClosing(null)
-                  : setClosing({ legId: leg.id, qty: String(leg.qty), price: item.mark.toFixed(2) })
+                  : setClosing({ legId: leg.id, qty: String(leg.qty), price: item.liqMark.toFixed(2) })
               }
               className="text-[10px] font-medium text-accent hover:underline"
             >
@@ -547,7 +605,7 @@ function LegRow({
               step={1}
               value={closing?.qty ?? String(leg.qty)}
               onChange={(event) =>
-                setClosing({ legId: leg.id, qty: event.target.value, price: closing?.price ?? item.mark.toFixed(2) })
+                setClosing({ legId: leg.id, qty: event.target.value, price: closing?.price ?? item.liqMark.toFixed(2) })
               }
               className="mt-0.5 block h-7 w-16 rounded border border-line bg-white px-1.5 text-[11px] tnum outline-none focus:border-accent"
             />
@@ -558,7 +616,7 @@ function LegRow({
               type="number"
               min={0}
               step={0.01}
-              value={closing?.price ?? item.mark.toFixed(2)}
+              value={closing?.price ?? item.liqMark.toFixed(2)}
               onChange={(event) =>
                 setClosing({ legId: leg.id, qty: closing?.qty ?? String(leg.qty), price: event.target.value })
               }
