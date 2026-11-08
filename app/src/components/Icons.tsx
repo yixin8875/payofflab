@@ -235,6 +235,12 @@ export const Sigma = (p: P) => (
   </svg>
 );
 
+export const Pulse = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M3 12h4l2.5-6 4 12L16 12h5" />
+  </svg>
+);
+
 export const Info = (p: P) => (
   <svg {...base(p)}>
     <circle cx="12" cy="12" r="8.25" />

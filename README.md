@@ -28,6 +28,13 @@
 - 买入按卖价、卖出按买价计算净权利金，可按严格/标准/宽松三档过滤流动性。
 - 结果可按概率、风险回报、预期价值或净权利金排序，并一键带入构建器。
 
+## Gamma 敞口
+
+- 「Gamma 敞口」按 CBOE 延迟链中的 gamma 与未平仓量，计算每个行权价的美元 gamma（标的每变动 1% 的美元敞口）。
+- 展示总 GEX、Gamma 状态、Gamma Flip、Call Wall 与 Put Wall，以及按行权价展开的柱状图。
+- 统计范围支持全部到期、7 天内与指定到期日，并可按到期日拆解贡献。
+- 采用 naive GEX 口径（看涨为正、看跌为负）；未平仓量为上一交易日收盘值，仅供市场结构参考。
+
 ## 自动更新
 
 - 桌面版启动时会检查 GitHub Releases；发现新版本后在右下角提示，可下载安装并自动重启。
@@ -39,8 +46,8 @@
 发布新版本时，先同步修改 `app/package.json`、`app/src-tauri/Cargo.toml`、`app/src-tauri/tauri.conf.json` 与 `app/src/desktop/nav.ts` 中的版本号，提交后执行：
 
 ```bash
-git tag v1.4.1
-git push origin v1.4.1
+git tag v1.5.0
+git push origin v1.5.0
 ```
 
 ## 技术栈
@@ -69,8 +76,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.4.1_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.4.1_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.5.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.5.0_x64_zh-CN.msi`
 - 更新包：安装包同目录的 `.sig` 签名文件，由发布流程上传。
 
 ## 目录

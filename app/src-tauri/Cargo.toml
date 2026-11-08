@@ -1,6 +1,6 @@
 [package]
 name = "payofflab"
-version = "1.4.1"
+version = "1.5.0"
 description = "PayoffLab — 中文期权策略工作台"
 authors = ["PayoffLab"]
 edition = "2021"

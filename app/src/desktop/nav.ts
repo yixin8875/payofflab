@@ -7,13 +7,14 @@ import {
   History,
   Home,
   Info,
+  Pulse,
   Settings as SettingsIcon,
   Sigma,
   Star,
   Target,
 } from "../components/Icons";
 
-export const VERSION = "1.4.1";
+export const VERSION = "1.5.0";
 
 export type NavItem = {
   href: string;
@@ -39,6 +40,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "市场",
     items: [
       { href: "/chain", label: "期权链", icon: Chain },
+      { href: "/gex", label: "Gamma 敞口", icon: Pulse },
       { href: "/tools/option-finder", label: "扫描器", icon: Target },
     ],
   },

@@ -1,141 +1,27 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, Calendar, Search } from "../components/Icons";
+import { ArrowRight, Calendar } from "../components/Icons";
+import { SymbolRail } from "../components/SymbolRail";
 import { WatchlistMenu } from "../components/WatchlistMenu";
-import {
-  Badge,
-  DetailScroll,
-  EmptyDetail,
-  ListGroup,
-  ListPane,
-  ListRow,
-  PaneHeader,
-  Split,
-} from "../desktop/Split";
+import { DetailScroll, EmptyDetail, PaneHeader, Split } from "../desktop/Split";
 import { buildChain } from "../lib/chain";
 import { liveRows } from "../lib/live";
 import { useLiveChain } from "../lib/useLiveChain";
-import { EXPIRIES, SYMBOL_COUNT, TICKER_NAME, ticker } from "../data/tickers";
+import { EXPIRIES, SYMBOL_COUNT, ticker } from "../data/tickers";
 import { pct } from "../lib/format";
-import { useWatchlist } from "../lib/watchlist";
-
-const GROUPS = [
-  { title: "主要 ETF", symbols: ["SPY", "QQQ", "IWM", "DIA"] },
-  { title: "大型科技股", symbols: ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"] },
-  { title: "热门个股", symbols: ["AMD", "PLTR", "SOFI", "COIN", "HOOD", "NFLX", "BA", "DIS"] },
-  { title: "迷因股", symbols: ["GME", "AMC", "MSTR", "IBIT"] },
-  { title: "板块 ETF", symbols: ["XLF", "XLE", "XLK", "XLV", "GLD", "TLT"] },
-  { title: "杠杆 ETF", symbols: ["TQQQ", "SQQQ", "SOXL", "SPXL", "UVXY"] },
-];
-
-function nameOf(symbol: string) {
-  return TICKER_NAME[symbol] ?? ticker(symbol).name;
-}
 
 export default function Chain() {
   const { symbol } = useParams<{ symbol?: string }>();
-  const [query, setQuery] = useState("");
-  const watchGroups = useWatchlist();
-  const watchingGroups = watchGroups.filter((group) => group.symbols.length > 0);
-  const selectedSymbol = symbol?.toUpperCase();
-  const q = query.trim();
-  const visibleGroups = GROUPS.map((group) => ({
-    ...group,
-    symbols: group.symbols.filter(
-      (s) => !q || s.includes(q.toUpperCase()) || nameOf(s).includes(q),
-    ),
-  })).filter((group) => group.symbols.length > 0);
-  const extra =
-    visibleGroups.length === 0 && /^[A-Za-z][A-Za-z.]{0,5}$/.test(q) ? q.toUpperCase() : "";
 
   return (
     <Split
       list={
-        <ListPane title="期权链" count={SYMBOL_COUNT}>
-          <div className="px-2 pb-2">
-            <div className="relative">
-              <Search
-                size={13}
-                className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-faint"
-              />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="搜索标的"
-                className="field h-7 pl-7 text-[12px]"
-                aria-label="搜索标的"
-              />
-            </div>
-          </div>
-
-          <section className="border-b border-line-subtle pb-1">
-            <div className="flex items-baseline justify-between px-3 pb-1 pt-3">
-              <h3 className="text-[10.5px] font-semibold tracking-[0.02em] text-faint">自选</h3>
-              <Link to="/watchlist" className="text-[10px] font-medium text-accent hover:underline">
-                管理
-              </Link>
-            </div>
-            {watchingGroups.map((group) => (
-              <div key={group.id} className="pb-1">
-                <p className="flex items-baseline gap-1.5 px-3 pb-0.5 pt-1 text-[10px] text-dim">
-                  <span className="truncate">{group.name}</span>
-                  <span className="shrink-0 text-faint/80">{group.symbols.length}</span>
-                </p>
-                <ul>
-                  {group.symbols.map((s) => (
-                    <ListRow
-                      key={`${group.id}:${s}`}
-                      to={`/chain/${s.toLowerCase()}`}
-                      selected={selectedSymbol === s}
-                      badge={<Badge label={s.slice(0, 2)} seed={s} size={26} />}
-                      title={s}
-                      subtitle={nameOf(s)}
-                    />
-                  ))}
-                </ul>
-              </div>
-            ))}
-            {watchingGroups.length === 0 && (
-              <p className="px-3 pb-1 text-[10.5px] text-faint">
-                在标的页点「自选」即可收藏。
-              </p>
-            )}
-          </section>
-
-          {visibleGroups.map((group) => (
-            <ListGroup key={group.title} label={group.title} count={group.symbols.length}>
-              {group.symbols.map((s) => {
-                const t = ticker(s);
-                return (
-                  <ListRow
-                    key={s}
-                    to={`/chain/${s.toLowerCase()}`}
-                    selected={symbol?.toUpperCase() === s}
-                    badge={<Badge label={s.slice(0, 2)} seed={s} size={26} />}
-                    title={s}
-                    subtitle={nameOf(s)}
-                    meta={`$${t.spot.toFixed(2)}`}
-                  />
-                );
-              })}
-            </ListGroup>
-          ))}
-          {extra && (
-            <ListGroup label="在线查询" count={1}>
-              <ListRow
-                to={`/chain/${extra.toLowerCase()}`}
-                selected={symbol?.toUpperCase() === extra}
-                badge={<Badge label={extra.slice(0, 2)} seed={extra} size={26} />}
-                title={extra}
-                subtitle="CBOE 延迟行情中查询"
-                meta="在线"
-              />
-            </ListGroup>
-          )}
-          {visibleGroups.length === 0 && !extra && (
-            <p className="px-3 py-10 text-center text-[11.5px] text-dim">没有匹配的标的</p>
-          )}
-        </ListPane>
+        <SymbolRail
+          basePath="/chain"
+          title="期权链"
+          count={SYMBOL_COUNT}
+          selectedSymbol={symbol?.toUpperCase()}
+        />
       }
     >
       {symbol ? (

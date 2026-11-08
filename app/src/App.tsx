@@ -3,6 +3,7 @@ import AppLayout from "./desktop/AppLayout";
 import Calculator from "./pages/Calculator";
 import Chain from "./pages/Chain";
 import Changelog from "./pages/Changelog";
+import Gex from "./pages/Gex";
 import { Privacy, Terms } from "./pages/Legal";
 import Methodology from "./pages/Methodology";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,8 @@ export default function App() {
         <Route path="/scenario" element={<Scenario />} />
         <Route path="/chain" element={<Chain />} />
         <Route path="/chain/:symbol" element={<Chain />} />
+        <Route path="/gex" element={<Gex />} />
+        <Route path="/gex/:symbol" element={<Gex />} />
         <Route path="/strategies" element={<Strategies />} />
         <Route path="/strategies/:slug" element={<Strategies />} />
         <Route path="/watchlist" element={<Watchlist />} />

@@ -3,10 +3,35 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.5.0",
+    date: "2026-11-08",
+    title: "Gamma 敞口（GEX）",
+    latest: true,
+    groups: [
+      {
+        label: "新增",
+        items: [
+          "新增「Gamma 敞口」页：按 CBOE 延迟链的 gamma 与未平仓量，计算每个行权价的美元 gamma（每 1% 价格波动的美元敞口）。",
+          "展示总 GEX、Gamma 状态、Gamma Flip、Call Wall 与 Put Wall，以及按行权价展开的柱状图。",
+          "支持全部到期、7 天内与指定到期日三种范围，并按到期日拆解贡献、列出 gamma 最集中的行权价。",
+          "左栏复用自选与热门分组，可直接切换标的并刷新在线行情。",
+        ],
+      },
+      {
+        label: "变更",
+        items: ["期权链与 Gamma 敞口共用同一套标的侧栏与自选分组。"],
+      },
+      {
+        label: "构建",
+        items: ["版本号提升到 1.5.0。"],
+      },
+    ],
+  },
+  {
     version: "1.4.1",
     date: "2026-11-08",
     title: "更优雅的启动体验",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "新增",
