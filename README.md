@@ -37,6 +37,24 @@
 - 实战读法、盘前流程与案例见 [GEX 实战教学](docs/GEX-实战指南.md)。
 - 完全新手？从 [GEX 新手图解（HTML，带动画）](docs/gex-newbie-guide.html) 开始；下载后用浏览器打开。
 
+## 波动率曲面
+
+- 「波动率曲面」按 CBOE 延迟链的每条腿 IV 展示 ATM 期限结构、25Δ 偏斜、风险逆转与蝶式。
+- 期限斜率使用最接近 90 天的到期日，避免远月 LEAPS 扭曲。
+- 看涨与看跌使用同一套 Black-Scholes 框架，并按每条腿的真实 IV 定价与计算希腊值。
+
+## 情景分析
+
+- 支持统一、Beta 加权与逐标的三种冲击模式，内置“大盘 +5% / 单票 −10%”“财报后 IV −30%”等预设。
+- 显示按标的的美元 Gamma/Vega、Beta 加权 Delta 与压力矩阵。
+- IV 冲击先按百分比压缩，再叠加点数变化；所有结果都是模型估算。
+
+## 事件日历
+
+- 可从纳斯达克公开日历自动同步未来 60 天的已确认财报日，只保留持仓与自选标的。
+- 手工条目优先，删除的财报条目不会在下次同步时重新出现。
+- 构建器、持仓与情景分析会提示到期日跨过的财报或宏观事件；事件只保存在本机。
+
 ## 自动更新
 
 - 桌面版启动时会检查 GitHub Releases；发现新版本后在右下角提示，可下载安装并自动重启。
@@ -48,8 +66,8 @@
 发布新版本时，先同步修改 `app/package.json`、`app/src-tauri/Cargo.toml`、`app/src-tauri/tauri.conf.json` 与 `app/src/desktop/nav.ts` 中的版本号，提交后执行：
 
 ```bash
-git tag v1.5.0
-git push origin v1.5.0
+git tag v1.6.0
+git push origin v1.6.0
 ```
 
 ## 技术栈
@@ -78,8 +96,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.5.0_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.5.0_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.6.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.6.0_x64_zh-CN.msi`
 - 更新包：安装包同目录的 `.sig` 签名文件，由发布流程上传。
 
 ## 目录
