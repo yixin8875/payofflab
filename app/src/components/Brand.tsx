@@ -23,7 +23,7 @@ export function Brand({ size = 32, className = "" }: { size?: number; className?
   return (
     <Link to="/" className={`group flex items-center gap-2 ${className}`} aria-label="PayoffLab 首页">
       <BrandMark size={size} />
-      <span className="text-[15.5px] font-semibold tracking-[-0.012em] text-text">PayoffLab</span>
+      <span className="text-[16px] font-semibold text-text">PayoffLab</span>
     </Link>
   );
 }

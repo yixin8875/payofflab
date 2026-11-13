@@ -56,7 +56,7 @@ export default function Strategies() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="筛选策略"
-                className="field h-7 pl-7 pr-7 text-[12px]"
+                className="field h-7 pl-7 pr-7 text-[13px]"
                 aria-label="筛选策略"
               />
               {query && (
@@ -78,7 +78,7 @@ export default function Strategies() {
                 key={value}
                 type="button"
                 onClick={() => setOutlook(value)}
-                className={`h-6 shrink-0 rounded-full border px-2 text-[11px] font-medium transition-colors ${
+                className={`h-7 shrink-0 rounded-lg border px-2 text-[13px] font-medium transition-colors ${
                   outlook === value
                     ? "border-accent-line bg-accent-soft text-accent"
                     : "border-line bg-white text-dim hover:text-text"
@@ -90,7 +90,7 @@ export default function Strategies() {
           </div>
 
           {filtered.length === 0 && (
-            <p className="px-3 py-10 text-center text-[11.5px] text-dim">没有符合条件的策略</p>
+            <p className="px-3 py-10 text-center text-[12px] text-dim">没有符合条件的策略</p>
           )}
 
           {CATEGORY_ORDER.map((category) => {

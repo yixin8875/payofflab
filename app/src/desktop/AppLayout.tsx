@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Lock } from "../components/Icons";
 import { UpdateToast } from "../components/UpdateToast";
+import { usMarketStatus } from "../lib/market";
 import { maybeAutoCheck } from "../lib/updater";
 import { CommandPalette } from "./CommandPalette";
 import { Sidebar } from "./Sidebar";
@@ -65,18 +66,29 @@ export default function AppLayout() {
 }
 
 function StatusBar() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const market = usMarketStatus(now);
+
   return (
-    <footer className="flex h-[var(--statusbar-h)] shrink-0 items-center gap-4 border-t border-line bg-[#f7f5f1] px-3 text-[10.5px] text-dim">
+    <footer className="flex h-[var(--statusbar-h)] shrink-0 items-center gap-4 border-t border-line bg-[#f7f5f1] px-3 text-[12px] text-dim">
       <span className="flex shrink-0 items-center gap-1.5">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#b8b3aa]" />
-        市场已收盘
-        <span className="hidden text-faint sm:inline">· 2 天 7 小时后开盘</span>
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${market.open ? "bg-profit" : "bg-[#b8b3aa]"}`}
+        />
+        {market.label}
+        <span className="hidden text-faint sm:inline">· {market.detail}</span>
       </span>
-      <span className="hidden truncate md:inline">SPY 行情 美东 4:14 PM · 延迟 15 分钟</span>
+      <span className="hidden truncate md:inline">行情延迟 15 分钟 · CBOE</span>
       <span className="ml-auto flex shrink-0 items-center gap-3">
         <span className="hidden lg:inline">Black-Scholes · r 4.02% · q 1.03%</span>
         <span className="hidden items-center gap-1 sm:flex">
-          <Lock size={10} />
+          <Lock size={11} />
           本机数据
         </span>
         <span className="tnum text-faint">v{VERSION}</span>

@@ -141,11 +141,11 @@ export default function Events() {
 
       <div className="scroll-pane flex-1">
         <div className="mx-auto w-full max-w-[980px] px-7 py-5">
-          <section className="rounded-lg border border-line bg-white p-4">
+          <section className="rounded-xl border border-line bg-white p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-[12px] font-semibold">自动同步财报日</h2>
-                <p className="mt-1 max-w-[660px] text-[10.5px] leading-4 text-faint">
+                <h2 className="text-[13px] font-semibold">自动同步财报日</h2>
+                <p className="mt-1 max-w-[660px] text-[11px] leading-4 text-faint">
                   从纳斯达克公开日历获取未来 60 天的已确认财报日，只保留持仓与自选标的。
                   手工条目不会被覆盖；删掉的财报条目在下次同步时也不会重新出现。
                 </p>
@@ -163,7 +163,7 @@ export default function Events() {
                   : "立即同步"}
               </button>
             </div>
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-faint">
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-faint">
               <span>标的 {targets.length} 个（持仓 + 自选，最多 24 个）</span>
               {syncState && <span>上次同步 {syncTime(syncState.at)}</span>}
               {syncState && !syncState.complete && (
@@ -180,54 +180,54 @@ export default function Events() {
               )}
             </div>
             {syncResult && syncResult.missing.length > 0 && (
-              <p className="mt-1 text-[10px] leading-4 text-faint">
+              <p className="mt-1 text-[11px] leading-4 text-faint">
                 未找到：{syncResult.missing.slice(0, 10).join("、")}
                 {syncResult.missing.length > 10 ? "…" : ""}
                 。ETF 或不发布财报的标的会出现在这里。
               </p>
             )}
-            {syncError && <p className="mt-1 text-[10.5px] text-loss">{syncError}</p>}
+            {syncError && <p className="mt-1 text-[11px] text-loss">{syncError}</p>}
             {targets.length === 0 && (
-              <p className="mt-1 text-[10.5px] text-faint">
+              <p className="mt-1 text-[11px] text-faint">
                 先在自选或持仓里添加标的，才能自动同步。
               </p>
             )}
           </section>
 
-          <section className="mt-3 rounded-lg border border-line bg-white p-4">
+          <section className="mt-3 rounded-xl border border-line bg-white p-4">
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="text-[12px] font-semibold">添加事件</h2>
-              <span className="text-[10px] text-faint">可手工补充宏观、分红或日历未收录的事件</span>
+              <h2 className="text-[13px] font-semibold">添加事件</h2>
+              <span className="text-[11px] text-faint">可手工补充宏观、分红或日历未收录的事件</span>
             </div>
             <div className="mt-3 flex flex-wrap items-end gap-2">
               <label className="block">
-                <span className="text-[10px] text-dim">标的</span>
+                <span className="text-[11px] text-dim">标的</span>
                 <input
                   value={symbol}
                   onChange={(event) => setSymbol(event.target.value.toUpperCase())}
                   placeholder="NVDA"
                   aria-label="事件标的"
-                  className="mt-0.5 block h-7 w-24 rounded border border-line bg-white px-2 text-[11.5px] uppercase outline-none focus:border-accent"
+                  className="mt-0.5 block h-7 w-24 rounded border border-line bg-white px-2 text-[12px] outline-none focus:border-accent"
                 />
               </label>
               <label className="block">
-                <span className="text-[10px] text-dim">日期</span>
+                <span className="text-[11px] text-dim">日期</span>
                 <input
                   type="date"
                   value={iso}
                   min={today}
                   onChange={(event) => setIso(event.target.value)}
                   aria-label="事件日期"
-                  className="mt-0.5 block h-7 rounded border border-line bg-white px-2 text-[11.5px] tnum outline-none focus:border-accent"
+                  className="mt-0.5 block h-7 rounded border border-line bg-white px-2 text-[12px] tnum outline-none focus:border-accent"
                 />
               </label>
               <label className="block">
-                <span className="text-[10px] text-dim">类型</span>
+                <span className="text-[11px] text-dim">类型</span>
                 <select
                   value={kind}
                   onChange={(event) => setKind(event.target.value as EventKind)}
                   aria-label="事件类型"
-                  className="mt-0.5 block h-7 rounded border border-line bg-white px-1.5 text-[11.5px] outline-none focus:border-accent"
+                  className="mt-0.5 block h-7 rounded border border-line bg-white px-1.5 text-[12px] outline-none focus:border-accent"
                 >
                   {KINDS.map((value) => (
                     <option key={value} value={value}>
@@ -237,32 +237,32 @@ export default function Events() {
                 </select>
               </label>
               <label className="block min-w-[180px] flex-1">
-                <span className="text-[10px] text-dim">备注（可选）</span>
+                <span className="text-[11px] text-dim">备注（可选）</span>
                 <input
                   value={note}
                   onChange={(event) => setNote(event.target.value)}
                   placeholder="盘后 / 预计波动 ±8%"
                   aria-label="事件备注"
-                  className="mt-0.5 block h-7 w-full rounded border border-line bg-white px-2 text-[11.5px] outline-none focus:border-accent"
+                  className="mt-0.5 block h-7 w-full rounded border border-line bg-white px-2 text-[12px] outline-none focus:border-accent"
                 />
               </label>
               <button type="button" onClick={submit} className="btn-primary h-7 px-3">
                 添加
               </button>
             </div>
-            {error && <p className="mt-2 text-[10.5px] text-loss">{error}</p>}
-            <p className="mt-2.5 text-[10px] leading-4 text-faint">
+            {error && <p className="mt-2 text-[11px] text-loss">{error}</p>}
+            <p className="mt-2.5 text-[11px] leading-4 text-faint">
               标的一栏填 <b className="font-medium text-dim">ALL</b> 可添加影响全市场的事件（如 FOMC、CPI）。
               构建器、持仓和情景分析都会读取这里的数据：到期日跨过事件时会提示，情景分析提供
               “财报后 IV −30%”预设。
             </p>
           </section>
 
-          <section className="mt-3 overflow-hidden rounded-lg border border-line bg-white">
+          <section className="mt-3 overflow-hidden rounded-xl border border-line bg-white">
             <div className="flex items-baseline justify-between gap-2 px-4 pb-2 pt-3">
-              <h2 className="text-[12px] font-semibold">未来事件</h2>
+              <h2 className="text-[13px] font-semibold">未来事件</h2>
               {pastCount > 0 && (
-                <span className="text-[10px] text-faint">
+                <span className="text-[11px] text-faint">
                   另有 {pastCount} 个已过去的事件
                 </span>
               )}
@@ -270,17 +270,17 @@ export default function Events() {
 
             {upcoming.length === 0 ? (
               <div className="px-4 py-10 text-center">
-                <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-[#fbfaf8] text-faint">
+                <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-[#fbfaf8] text-faint">
                   <Calendar size={16} />
                 </span>
-                <p className="mt-3 text-[11.5px] text-dim">还没有未来事件</p>
-                <p className="mt-1 text-[10.5px] leading-4 text-faint">
+                <p className="mt-3 text-[12px] text-dim">还没有未来事件</p>
+                <p className="mt-1 text-[11px] leading-4 text-faint">
                   先在上方添加一个财报日，跨事件的到期日会在构建器里标出来。
                 </p>
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-[92px_64px_minmax(0,1fr)_72px_minmax(0,1.3fr)_80px_36px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[9.5px] font-medium uppercase tracking-wide text-faint">
+                <div className="grid grid-cols-[92px_64px_minmax(0,1fr)_72px_minmax(0,1.3fr)_80px_36px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[11px] font-medium text-faint">
                   <span>日期</span>
                   <span className="text-right">剩余</span>
                   <span>标的</span>
@@ -295,7 +295,7 @@ export default function Events() {
                   return (
                     <div
                       key={event.id}
-                      className="grid grid-cols-[92px_64px_minmax(0,1fr)_72px_minmax(0,1.3fr)_80px_36px] items-center gap-2 border-b border-line-subtle px-4 py-2 text-[11px] last:border-0"
+                      className="grid grid-cols-[92px_64px_minmax(0,1fr)_72px_minmax(0,1.3fr)_80px_36px] items-center gap-2 border-b border-line-subtle px-4 py-2 text-[12px] last:border-0"
                     >
                       <span className="tnum text-muted">{event.iso}</span>
                       <span
@@ -310,7 +310,7 @@ export default function Events() {
                       <span className="flex min-w-0 items-center gap-1 text-dim">
                         <span className="truncate">{event.note || "—"}</span>
                         {event.source === "nasdaq" && (
-                          <span className="shrink-0 rounded border border-line bg-[#fbfaf8] px-1 text-[9px] text-faint">
+                          <span className="shrink-0 rounded border border-line bg-[#fbfaf8] px-1 text-[11px] text-faint">
                             自动
                           </span>
                         )}
@@ -335,7 +335,7 @@ export default function Events() {
             )}
           </section>
 
-          <p className="mt-4 border-t border-line-subtle pt-3 text-[10px] leading-4 text-faint">
+          <p className="mt-4 border-t border-line-subtle pt-3 text-[11px] leading-4 text-faint">
             自动条目来自纳斯达克公开财报日历，公司改期或日历滞后时可能不准确；手工条目只保存在本机。
             “影响持仓”统计到期日不早于该事件的未平仓策略。跨事件提醒只做提示，不会自动调整定价。
           </p>

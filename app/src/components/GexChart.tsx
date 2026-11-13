@@ -5,7 +5,7 @@ const COLORS = {
   positive: "#0b7a52",
   negative: "#bf3b2b",
   grid: "#eeebe5",
-  axis: "#9c978f",
+  axis: "#767169",
   spot: "#6f6a63",
   flip: "#0364d3",
 };
@@ -133,7 +133,7 @@ export function GexChart({
               x={width - 5}
               y={yAt(value) + 3.5}
               textAnchor="end"
-              fontSize="10"
+              fontSize="11"
               fill={COLORS.axis}
               className="tnum"
             >
@@ -175,7 +175,7 @@ export function GexChart({
             x={xAt(index)}
             y={height - 9}
             textAnchor="middle"
-            fontSize="10"
+            fontSize="11"
             fill={COLORS.axis}
             className="tnum"
           >
@@ -195,7 +195,7 @@ export function GexChart({
           x={Math.min(Math.max(padL, spotX - 30), padL + chartW - 60)}
           y={padT - 8}
           textAnchor="middle"
-          fontSize="10"
+          fontSize="11"
           fontWeight="600"
           fill={COLORS.spot}
           className="tnum"
@@ -218,7 +218,7 @@ export function GexChart({
               x={Math.min(Math.max(padL, flipX - 32), padL + chartW - 64)}
               y={Math.abs(flipX - spotX) < 76 ? padT + 11 : padT - 8}
               textAnchor="middle"
-              fontSize="10"
+              fontSize="11"
               fontWeight="600"
               fill={COLORS.flip}
               className="tnum"
@@ -242,7 +242,7 @@ export function GexChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[168px] rounded-lg border border-line bg-white/95 px-2.5 py-2 text-[11px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[168px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
           style={{ left: Math.min(Math.max(8, xAt(hover ?? 0) - 84), width - 180) }}
         >
           <div className="flex items-baseline justify-between gap-2">
@@ -263,7 +263,7 @@ export function GexChart({
             <span>看跌</span>
             <span className="tnum text-text">{gexLabel(hovered.put, { sign: true })}</span>
           </div>
-          <div className="mt-1 border-t border-line-subtle pt-1 text-[10px] text-faint tnum">
+          <div className="mt-1 border-t border-line-subtle pt-1 text-[11px] text-faint tnum">
             OI {hovered.callOi.toLocaleString("en-US")} 看涨 /{" "}
             {hovered.putOi.toLocaleString("en-US")} 看跌
           </div>

@@ -18,11 +18,11 @@
   --color-paper: #ffffff;
   --color-list: #fbfaf8;
 
-  /* ---- Text ---- */
+  /* ---- Text: three roles, all readable on paper ---- */
   --color-text: #1c1b19;
-  --color-muted: #5f5b55;
-  --color-dim: #77726b;
-  --color-faint: #9c978f;
+  --color-muted: #55504a;
+  --color-dim: #6b665f;
+  --color-faint: #767169;
 
   /* ---- Lines ---- */
   --color-line: #e3e0da;
@@ -49,8 +49,12 @@
   /* ---- Shell metrics ---- */
   --spacing-rail: 64px;
   --spacing-topbar: 52px;
-  --spacing-statusbar: 26px;
+  --spacing-statusbar: 28px;
   --spacing-tabbar: 60px;
+
+  /* ---- Motion: one curve, two speeds ---- */
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 
   --shadow-panel: 0 1px 2px #1c1b1908;
   --shadow-pop: 0 12px 32px #1c1b1926, 0 2px 6px #1c1b1912;
@@ -59,10 +63,11 @@
 }
 
 :root {
-  --sidebar-w: 236px;
+  --sidebar-w: 240px;
   --list-w: 300px;
   --titlebar-h: 44px;
-  --statusbar-h: 26px;
+  --statusbar-h: 28px;
+  --ease-quiet: cubic-bezier(0.22, 1, 0.36, 1);
   --list-bg: #fbfaf8;
   --list-selected: #eae7e1;
   --sidebar-bg: #f5f3ef;
@@ -151,7 +156,6 @@
   }
   .num {
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
   }
 }
 
@@ -179,13 +183,13 @@
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
-    border-radius: 6px;
+    border-radius: 8px;
     background: var(--color-accent);
     color: #fff;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
     box-shadow: inset 0 1px 0 #ffffff26, 0 1px 2px #1c1b1914;
-    transition: background-color 0.12s ease;
+    transition: background-color 160ms var(--ease-quiet);
   }
   .btn-primary:hover {
     background: var(--color-accent-hover);
@@ -198,14 +202,14 @@
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid var(--color-line);
     background: var(--color-paper);
     color: var(--color-text);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
     box-shadow: 0 1px 1px #1c1b1908;
-    transition: background-color 0.12s ease, border-color 0.12s ease;
+    transition: background-color 160ms var(--ease-quiet), border-color 160ms var(--ease-quiet);
   }
   .btn-secondary:hover {
     border-color: var(--color-line-strong);
@@ -216,12 +220,12 @@
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
-    border-radius: 6px;
+    border-radius: 8px;
     background: #e9f1fb;
     color: var(--color-accent);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
-    transition: background-color 0.12s ease;
+    transition: background-color 160ms var(--ease-quiet);
   }
   .btn-soft:hover {
     background: #dceafb;
@@ -231,10 +235,10 @@
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--color-muted);
-    font-size: 12.5px;
-    transition: background-color 0.12s ease, color 0.12s ease;
+    font-size: 13px;
+    transition: background-color 160ms var(--ease-quiet), color 160ms var(--ease-quiet);
   }
   .btn-ghost:hover {
     background: var(--color-hover);
@@ -244,9 +248,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--color-dim);
-    transition: background-color 0.12s ease, color 0.12s ease;
+    transition: background-color 160ms var(--ease-quiet), color 160ms var(--ease-quiet);
   }
   .icon-btn:hover {
     background: var(--color-hover);
@@ -257,7 +261,7 @@
     background: transparent;
   }
   .card {
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid var(--color-line);
     background: var(--color-panel);
   }
@@ -265,15 +269,16 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    border-radius: 9999px;
+    border-radius: 6px;
     border: 1px solid var(--color-line);
     background: var(--color-panel);
-    padding: 0.1875rem 0.5625rem;
-    font-size: 11.5px;
+    padding: 0.25rem 0.625rem;
+    font-size: 12px;
     font-weight: 500;
     color: var(--color-muted);
     white-space: nowrap;
-    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    transition: background-color 160ms var(--ease-quiet), border-color 160ms var(--ease-quiet),
+      color 160ms var(--ease-quiet);
   }
   .chip:hover {
     border-color: var(--color-line-strong);
@@ -285,16 +290,16 @@
     color: var(--color-accent);
   }
   .field {
-    height: 30px;
+    height: 32px;
     width: 100%;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid var(--color-line);
     background: var(--color-paper);
     padding: 0 0.625rem;
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--color-text);
     outline: none;
-    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    transition: border-color 160ms var(--ease-quiet), box-shadow 160ms var(--ease-quiet);
   }
   .field::placeholder {
     color: var(--color-faint);
@@ -305,15 +310,15 @@
   }
   .sidebar-item {
     display: flex;
-    height: 28px;
+    height: 32px;
     align-items: center;
     gap: 0.5rem;
-    border-radius: 6px;
-    padding: 0 0.5rem;
-    font-size: 12.5px;
-    font-weight: 450;
+    border-radius: 8px;
+    padding: 0 0.625rem;
+    font-size: 13px;
+    font-weight: 400;
     color: var(--color-muted);
-    transition: background-color 0.1s ease, color 0.1s ease;
+    transition: background-color 160ms var(--ease-quiet), color 160ms var(--ease-quiet);
   }
   .sidebar-item:hover {
     background: #00000008;
@@ -322,7 +327,7 @@
   .sidebar-item[aria-current="page"] {
     background: #e7e3dc;
     color: var(--color-text);
-    font-weight: 550;
+    font-weight: 500;
   }
   .list-row {
     display: flex;
@@ -384,12 +389,12 @@
     display: none;
   }
   .animate-rise {
-    animation: rise-in 0.18s ease both;
+    animation: rise-in 0.32s var(--ease-quiet) both;
   }
   .animate-pop {
-    animation: pop-in 0.14s ease both;
+    animation: pop-in 0.18s var(--ease-quiet) both;
   }
   .animate-fade {
-    animation: fade-in 0.12s ease both;
+    animation: fade-in 0.16s var(--ease-quiet) both;
   }
 }

@@ -8,7 +8,7 @@ const COLORS = {
   call: "#0b7a52",
   put: "#bf3b2b",
   grid: "#eeebe5",
-  axis: "#9c978f",
+  axis: "#767169",
 };
 
 export function VolSkewChart({
@@ -146,7 +146,7 @@ export function VolSkewChart({
               x={width - 5}
               y={yAt(value) + 3.5}
               textAnchor="end"
-              fontSize="10"
+              fontSize="11"
               fill={COLORS.axis}
               className="tnum"
             >
@@ -161,7 +161,7 @@ export function VolSkewChart({
             x={xAt(strike)}
             y={height - 9}
             textAnchor="middle"
-            fontSize="10"
+            fontSize="11"
             fill={COLORS.axis}
             className="tnum"
           >
@@ -181,7 +181,7 @@ export function VolSkewChart({
           x={Math.min(Math.max(padL, spotX - 24), padL + chartW - 48)}
           y={padT - 7}
           textAnchor="middle"
-          fontSize="10"
+          fontSize="11"
           fontWeight="600"
           fill={COLORS.spot}
           className="tnum"
@@ -239,7 +239,7 @@ export function VolSkewChart({
                 x={xAt(point.strike)}
                 y={yAt(point.iv) - 9}
                 textAnchor="middle"
-                fontSize="9.5"
+                fontSize="10.5"
                 fontWeight="650"
                 fill={color}
                 className="tnum"
@@ -264,7 +264,7 @@ export function VolSkewChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[156px] rounded-lg border border-line bg-white/95 px-2.5 py-2 text-[11px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[156px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
           style={{
             left: Math.min(
               Math.max(8, xAt(hovered.strike) - 78),

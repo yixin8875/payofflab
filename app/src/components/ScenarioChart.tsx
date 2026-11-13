@@ -7,7 +7,7 @@ const COLORS = {
   current: "#a39d94",
   scenario: "#0364d3",
   grid: "#eeebe5",
-  axis: "#9c978f",
+  axis: "#767169",
 };
 
 function moveLabel(v: number) {
@@ -121,7 +121,7 @@ export function ScenarioChart({
               x={width - 6}
               y={sy(value) + 3.5}
               textAnchor="end"
-              fontSize="10.5"
+              fontSize="11"
               fill={COLORS.axis}
               className="tnum"
             >
@@ -147,7 +147,7 @@ export function ScenarioChart({
             x={sx(value)}
             y={height - 11}
             textAnchor="middle"
-            fontSize="10.5"
+            fontSize="11"
             fill={COLORS.axis}
             className="tnum"
           >
@@ -189,7 +189,7 @@ export function ScenarioChart({
             x={Math.min(Math.max(padL, markerX - 30), padL + chartW - 60) + 30}
             y={padT - 3.5}
             textAnchor="middle"
-            fontSize="10"
+            fontSize="11"
             fontWeight="600"
             fill="#6f6a63"
             className="tnum"
@@ -226,7 +226,7 @@ export function ScenarioChart({
 
       {hoverPoint && (
         <div
-          className="pointer-events-none absolute top-1 z-10 rounded-lg border border-line bg-white/95 px-2.5 py-2 text-[11px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
           style={{ left: Math.min(Math.max(8, sx(hoverPoint.move) - 62), width - 150) }}
         >
           <div className="font-semibold text-text tnum">标的 {moveLabel(hoverPoint.move)}</div>

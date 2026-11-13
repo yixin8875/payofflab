@@ -44,16 +44,16 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[10.5px] text-dim">{label}</span>
-      <span className="mt-1 flex h-8 items-center gap-1 rounded-md border border-line bg-white px-2 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/15">
+      <span className="text-[11px] text-dim">{label}</span>
+      <span className="mt-1 flex h-8 items-center gap-1 rounded-lg border border-line bg-white px-2 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/15">
         <input
           type="number"
           step={step}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="min-w-0 flex-1 bg-transparent text-[12px] outline-none tnum"
+          className="min-w-0 flex-1 bg-transparent text-[13px] outline-none tnum"
         />
-        {suffix && <span className="text-[10px] text-dim">{suffix}</span>}
+        {suffix && <span className="text-[11px] text-dim">{suffix}</span>}
       </span>
     </label>
   );
@@ -69,8 +69,8 @@ function Out({
   tone?: "profit" | "loss";
 }) {
   return (
-    <div className="rounded-lg border border-line bg-white px-2.5 py-2">
-      <p className="text-[10px] text-faint">{label}</p>
+    <div className="rounded-xl border border-line bg-white px-2.5 py-2">
+      <p className="text-[11px] text-faint">{label}</p>
       <p
         className={`mt-0.5 text-[14px] font-semibold tnum ${
           tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : ""
@@ -152,17 +152,17 @@ export function ToolDetail({ mode }: { mode: ToolMode }) {
       </PaneHeader>
 
       <DetailScroll>
-        <p className="max-w-[640px] text-[12.5px] leading-5 text-muted">{copy.lead}</p>
+        <p className="max-w-[640px] text-[13px] leading-5 text-muted">{copy.lead}</p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-[260px_minmax(0,1fr)]">
-          <div className="space-y-3 rounded-lg border border-line bg-white p-3">
-            <div className="flex rounded-md border border-line bg-surface p-0.5">
+          <div className="space-y-3 rounded-xl border border-line bg-white p-3">
+            <div className="flex rounded-lg border border-line bg-surface p-0.5">
               {(["call", "put"] as const).map((k) => (
                 <button
                   key={k}
                   type="button"
                   onClick={() => setKind(k)}
-                  className={`flex-1 rounded px-2 py-1 text-[11.5px] font-medium transition-colors ${
+                  className={`flex-1 rounded px-2 py-1 text-[12px] font-medium transition-colors ${
                     kind === k ? "bg-white text-text shadow-sm" : "text-dim"
                   }`}
                 >
@@ -182,7 +182,7 @@ export function ToolDetail({ mode }: { mode: ToolMode }) {
             {mode === "breakeven" && (
               <Field label="每股权利金" value={premium} onChange={setPremium} suffix="$" step="0.01" />
             )}
-            <p className="text-[10px] leading-4 text-faint">{copy.note}</p>
+            <p className="text-[11px] leading-4 text-faint">{copy.note}</p>
           </div>
 
           <div>
@@ -215,12 +215,12 @@ export function ToolDetail({ mode }: { mode: ToolMode }) {
             )}
 
             {mode === "iv" && (
-              <div className="rounded-lg border border-line bg-white p-4">
-                <p className="text-[10.5px] text-dim">模型隐含波动率</p>
-                <p className="mt-1 text-[26px] font-semibold tracking-[-0.02em] tnum">
+              <div className="rounded-xl border border-line bg-white p-4">
+                <p className="text-[11px] text-dim">模型隐含波动率</p>
+                <p className="mt-1 text-[28px] font-semibold tnum">
                   {implied === null ? "超出范围" : `${(implied * 100).toFixed(2)}%`}
                 </p>
-                <p className="mt-1.5 text-[11.5px] leading-5 text-muted">
+                <p className="mt-1.5 text-[12px] leading-5 text-muted">
                   {implied === null
                     ? "这个价格在当前参数下无解：要么低于内在价值，要么高得模型无法解释。检查现价、行权价与期限。"
                     : `也就是说，市场为这个合约定价时，假设未来 ${days} 天的年化波动约为 ${(implied * 100).toFixed(1)}%。`}
@@ -236,12 +236,12 @@ export function ToolDetail({ mode }: { mode: ToolMode }) {
             )}
 
             {mode === "breakeven" && (
-              <div className="rounded-lg border border-line bg-white p-4">
-                <p className="text-[10.5px] text-dim">到期盈亏平衡点</p>
-                <p className="mt-1 text-[26px] font-semibold tracking-[-0.02em] tnum">
+              <div className="rounded-xl border border-line bg-white p-4">
+                <p className="text-[11px] text-dim">到期盈亏平衡点</p>
+                <p className="mt-1 text-[28px] font-semibold tnum">
                   ${Math.max(be, 0).toFixed(2)}
                 </p>
-                <p className="mt-1.5 text-[11.5px] leading-5 text-muted">
+                <p className="mt-1.5 text-[12px] leading-5 text-muted">
                   {kind === "call"
                     ? `标的价格高于 $${Math.max(be, 0).toFixed(2)} 时，这张看涨期权到期才赚钱；低于它则亏损全部已付权利金。`
                     : `标的价格低于 $${Math.max(be, 0).toFixed(2)} 时，这张看跌期权到期才赚钱；高于它则亏损全部已付权利金。`}
@@ -253,7 +253,7 @@ export function ToolDetail({ mode }: { mode: ToolMode }) {
               </div>
             )}
 
-            <p className="mt-3 text-[10px] text-faint">
+            <p className="mt-3 text-[11px] text-faint">
               模型输出 · 非投资建议 · 当前 IV {pct(sigma, 1)}
             </p>
           </div>

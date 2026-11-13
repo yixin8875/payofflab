@@ -41,7 +41,7 @@ export default function Tools() {
                   to={tool.to}
                   selected={active === tool.mode}
                   badge={
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] border border-line bg-white text-dim">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-dim">
                       <Icon size={14} />
                     </span>
                   }
@@ -53,7 +53,7 @@ export default function Tools() {
             <ListRow
               to="/tools/option-finder"
               badge={
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] border border-line bg-white text-dim">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-dim">
                   <Target size={14} />
                 </span>
               }
@@ -61,7 +61,7 @@ export default function Tools() {
               subtitle="按观点扫描实时期权链"
             />
           </ListGroup>
-          <div className="mx-3 mt-1 text-[10.5px] leading-4 text-faint">
+          <div className="mx-3 mt-1 text-[11px] leading-4 text-faint">
             所有工具共用同一套 Black-Scholes 假设；扫描器读取在线期权链。
           </div>
         </ListPane>

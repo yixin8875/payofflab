@@ -48,7 +48,7 @@ export function SymbolRail({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="搜索标的"
-            className="field h-7 pl-7 text-[12px]"
+            className="field h-7 pl-7 text-[13px]"
             aria-label="搜索标的"
           />
         </div>
@@ -56,14 +56,14 @@ export function SymbolRail({
 
       <section className="border-b border-line-subtle pb-1">
         <div className="flex items-baseline justify-between px-3 pb-1 pt-3">
-          <h3 className="text-[10.5px] font-semibold tracking-[0.02em] text-faint">自选</h3>
-          <Link to="/watchlist" className="text-[10px] font-medium text-accent hover:underline">
+          <h3 className="text-[11px] font-semibold text-faint">自选</h3>
+          <Link to="/watchlist" className="text-[11px] font-medium text-accent hover:underline">
             管理
           </Link>
         </div>
         {watchingGroups.map((group) => (
           <div key={group.id} className="pb-1">
-            <p className="flex items-baseline gap-1.5 px-3 pb-0.5 pt-1 text-[10px] text-dim">
+            <p className="flex items-baseline gap-1.5 px-3 pb-0.5 pt-1 text-[11px] text-dim">
               <span className="truncate">{group.name}</span>
               <span className="shrink-0 text-faint/80">{group.symbols.length}</span>
             </p>
@@ -82,7 +82,7 @@ export function SymbolRail({
           </div>
         ))}
         {watchingGroups.length === 0 && (
-          <p className="px-3 pb-1 text-[10.5px] text-faint">在标的页点「自选」即可收藏。</p>
+          <p className="px-3 pb-1 text-[11px] text-faint">在标的页点「自选」即可收藏。</p>
         )}
       </section>
 
@@ -119,7 +119,7 @@ export function SymbolRail({
       )}
 
       {visibleGroups.length === 0 && !extra && (
-        <p className="px-3 py-10 text-center text-[11.5px] text-dim">没有匹配的标的</p>
+        <p className="px-3 py-10 text-center text-[12px] text-dim">没有匹配的标的</p>
       )}
     </ListPane>
   );

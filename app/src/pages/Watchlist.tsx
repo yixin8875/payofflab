@@ -95,7 +95,7 @@ export default function Watchlist() {
                 onChange={(event) => setGroupName(event.target.value)}
                 placeholder="分组名称"
                 maxLength={20}
-                className="field h-7 flex-1 px-2 text-[11.5px]"
+                className="field h-7 flex-1 px-2 text-[12px]"
                 aria-label="分组名称"
               />
               <button type="submit" disabled={!groupName.trim()} className="btn-secondary h-7 px-2">
@@ -107,7 +107,7 @@ export default function Watchlist() {
           {groups.map((group) => (
             <section key={group.id} className="pb-1">
               <div className="flex items-center gap-1 px-3 pb-1 pt-3">
-                <h3 className="flex min-w-0 flex-1 items-baseline gap-1.5 text-[10.5px] font-semibold tracking-[0.02em] text-faint">
+                <h3 className="flex min-w-0 flex-1 items-baseline gap-1.5 text-[11px] font-semibold text-faint">
                   <span className="truncate">{group.name}</span>
                   <span className="shrink-0 font-normal text-faint/80">{group.symbols.length}</span>
                 </h3>
@@ -124,7 +124,7 @@ export default function Watchlist() {
                   <button
                     type="button"
                     onClick={() => promptRename(group)}
-                    className="rounded px-1 py-0.5 text-[9.5px] hover:bg-hover hover:text-text"
+                    className="rounded px-1 py-0.5 text-[11px] hover:bg-hover hover:text-text"
                     title="重命名分组"
                   >
                     改名
@@ -166,13 +166,13 @@ export default function Watchlist() {
                   );
                 })}
                 {group.symbols.length === 0 && (
-                  <li className="px-3 py-1.5 text-[10.5px] text-faint">还没有标的，点上方 + 添加</li>
+                  <li className="px-3 py-1.5 text-[11px] text-faint">还没有标的，点上方 + 添加</li>
                 )}
               </ul>
             </section>
           ))}
 
-          <div className="mx-3 mt-3 border-t border-line-subtle pt-2 text-[10px] leading-4 text-faint">
+          <div className="mx-3 mt-3 border-t border-line-subtle pt-2 text-[11px] leading-4 text-faint">
             自选只保存在本机。也可以在期权链页面点「自选」直接收藏。
           </div>
         </ListPane>
@@ -260,13 +260,13 @@ function WatchView({ symbol }: { symbol: string }) {
       <DetailScroll>
         <div className="flex flex-wrap items-end gap-x-5 gap-y-1">
           <div>
-            <p className="text-[10.5px] uppercase tracking-wide text-faint">参考价</p>
-            <p className="mt-0.5 text-[30px] font-semibold leading-9 tracking-[-0.03em] tnum">
+            <p className="text-[11px] text-faint">参考价</p>
+            <p className="mt-0.5 text-[32px] font-semibold leading-9 tnum">
               ${market.spot.toFixed(2)}
             </p>
           </div>
           <p
-            className={`pb-1 text-[13px] font-medium tnum ${
+            className={`pb-1 text-[14px] font-medium tnum ${
               market.change >= 0 ? "text-profit" : "text-loss"
             }`}
           >
@@ -274,7 +274,7 @@ function WatchView({ symbol }: { symbol: string }) {
             {market.change >= 0 ? "+" : "−"}
             {Math.abs(market.changePct * 100).toFixed(2)}%)
           </p>
-          <p className="pb-1 text-[11px] text-faint">
+          <p className="pb-1 text-[12px] text-faint">
             {online ? `CBOE 延迟 15 分钟 · ${chain?.asOf}` : "上一交易时段 · 模型合成"}
           </p>
         </div>
@@ -290,18 +290,18 @@ function WatchView({ symbol }: { symbol: string }) {
             ["行权价间距", `$${t.strikeStep}`, online ? "按挂牌合约对齐" : "合成链"],
             ["到期预期波动", `±${money(expectedMove)}`, `±${pct(expectedMove / market.spot)}`],
           ].map(([label, value, hint]) => (
-            <div key={label} className="rounded-lg border border-line bg-white px-3 py-2.5">
-              <p className="text-[10px] text-faint">{label}</p>
-              <p className="mt-0.5 text-[15px] font-semibold tnum">{value}</p>
-              <p className="mt-0.5 text-[9.5px] text-faint">{hint}</p>
+            <div key={label} className="rounded-xl border border-line bg-white px-3 py-2.5">
+              <p className="text-[11px] text-faint">{label}</p>
+              <p className="mt-0.5 text-[16px] font-semibold tnum">{value}</p>
+              <p className="mt-0.5 text-[11px] text-faint">{hint}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-4 rounded-lg border border-line bg-white p-3">
+        <div className="mt-4 rounded-xl border border-line bg-white p-3">
           <div className="flex items-baseline justify-between px-0.5">
-            <h2 className="text-[12px] font-semibold">示例 · 买入平值看涨</h2>
-            <span className="text-[10.5px] text-faint">
+            <h2 className="text-[13px] font-semibold">示例 · 买入平值看涨</h2>
+            <span className="text-[11px] text-faint">
               {expiry.label} · {expiry.dte} 天
             </span>
           </div>
@@ -318,7 +318,7 @@ function WatchView({ symbol }: { symbol: string }) {
         </div>
 
         <section className="mt-5">
-          <h2 className="text-[12px] font-semibold">用 {t.symbol} 做一笔</h2>
+          <h2 className="text-[13px] font-semibold">用 {t.symbol} 做一笔</h2>
           <div className="mt-2 grid gap-2 sm:grid-cols-3">
             {[
               ["long-call", "买入看涨", "押注上涨，亏损有限"],
@@ -328,16 +328,16 @@ function WatchView({ symbol }: { symbol: string }) {
               <Link
                 key={preset}
                 to={`/calculator?preset=${preset}&ticker=${t.symbol}&expiry=${expiry.iso}`}
-                className="group rounded-lg border border-line bg-white p-2.5 transition-colors hover:border-line-strong"
+                className="group rounded-xl border border-line bg-white p-2.5 transition-colors hover:border-line-strong"
               >
-                <p className="text-[12px] font-medium group-hover:text-accent">{name}</p>
-                <p className="mt-0.5 text-[10.5px] text-dim">{hint}</p>
+                <p className="text-[13px] font-medium group-hover:text-accent">{name}</p>
+                <p className="mt-0.5 text-[11px] text-dim">{hint}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        <p className="mt-5 text-[10.5px] leading-4 text-faint">
+        <p className="mt-5 text-[11px] leading-4 text-faint">
           {online
             ? "示例按 CBOE 延迟报价与 Black-Scholes 计算，不代表可成交价格。自选分组只保存在本机。"
             : "示例按合成报价与 Black-Scholes 计算，不代表可成交价格。自选分组只保存在本机。"}

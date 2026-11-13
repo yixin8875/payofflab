@@ -20,7 +20,7 @@ const COLORS = {
   profit: "#0b7a52",
   loss: "#bf3b2b",
   grid: "#eeebe5",
-  axis: "#9c978f",
+  axis: "#767169",
 };
 
 function niceTicks(lo: number, hi: number, count: number): number[] {
@@ -210,7 +210,7 @@ export function PayoffChart({
               x={width - 6}
               y={sy(t) + 3.5}
               textAnchor="end"
-              fontSize="10.5"
+              fontSize="11"
               fill={COLORS.axis}
               className="tnum"
             >
@@ -230,7 +230,7 @@ export function PayoffChart({
             x={sx(t)}
             y={height - 12}
             textAnchor="middle"
-            fontSize="10.5"
+            fontSize="11"
             fill={COLORS.axis}
             className="tnum"
           >
@@ -281,7 +281,7 @@ export function PayoffChart({
               x={sx(b) + (i % 2 === 0 ? 8 : -8)}
               y={sy(0) + 4}
               textAnchor={i % 2 === 0 ? "start" : "end"}
-              fontSize="10.5"
+              fontSize="11"
               fill={COLORS.axis}
               className="tnum"
             >
@@ -304,7 +304,7 @@ export function PayoffChart({
             x={sx(spot)}
             y={padT - 11}
             textAnchor="middle"
-            fontSize="10.5"
+            fontSize="11"
             fontWeight="600"
             fill="#6f6a63"
             className="tnum"
@@ -331,7 +331,7 @@ export function PayoffChart({
 
       {hoverPoint && interactive && (
         <div
-          className="pointer-events-none absolute top-1 z-10 rounded-lg border border-line bg-white/95 px-2.5 py-2 text-[11px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
           style={{
             left: Math.min(Math.max(8, sx(hoverPoint.p) - 62), width - 140),
           }}

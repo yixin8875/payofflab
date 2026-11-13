@@ -1,6 +1,15 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Book, Calendar, Chain as ChainIcon, ChartLine, Plus, Target } from "../components/Icons";
+import {
+  Book,
+  Calendar,
+  Chain as ChainIcon,
+  ChartLine,
+  ChevronRight,
+  Plus,
+  Target,
+} from "../components/Icons";
+import { PayoffChart } from "../components/PayoffChart";
 import { Sparkline } from "../components/Sparkline";
 import {
   Badge,
@@ -39,14 +48,6 @@ function dateLabel() {
   }).format(new Date());
 }
 
-function greeting() {
-  const hour = new Date().getHours();
-  if (hour < 5) return "夜深了";
-  if (hour < 12) return "早上好";
-  if (hour < 18) return "下午好";
-  return "晚上好";
-}
-
 function dayLabel(iso: string) {
   const date = new Date(iso);
   const today = new Date();
@@ -70,6 +71,9 @@ export default function Overview() {
     return [...map.entries()];
   }, [trades]);
 
+  const lead = STRATEGY_BY_SLUG[FEATURED[0]];
+  const leadLegs = lead ? legsFor(lead.preset ?? "iron-condor", SPY, EXPIRY.iso) : [];
+
   return (
     <Split
       list={
@@ -84,11 +88,11 @@ export default function Overview() {
         >
           {trades.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-faint">
+              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-white text-faint">
                 <Plus size={16} />
               </span>
-              <p className="mt-3 text-[11.5px] text-dim">还没有持仓</p>
-              <p className="mx-auto mt-1 max-w-[190px] text-[10.5px] leading-4 text-faint">
+              <p className="mt-3 text-[12px] text-dim">还没有持仓</p>
+              <p className="mx-auto mt-1 max-w-[190px] text-[11px] leading-4 text-faint">
                 在构建器里搭好一笔持仓，保存后会按真实行情跟踪盈亏。
               </p>
               <Link to="/calculator" className="btn-secondary mt-3 h-7 px-2.5">
@@ -111,14 +115,14 @@ export default function Overview() {
               </ListGroup>
             ))
           )}
-          <div className="mx-3 mt-2 rounded-md border border-line-subtle bg-white/60 px-2.5 py-2 text-[10.5px] leading-4 text-faint">
+          <div className="mx-3 mt-2 rounded-lg border border-line-subtle bg-white/60 px-2.5 py-2 text-[11px] leading-4 text-faint">
             持仓与平仓记录只留在本机，不会同步到任何账户。
           </div>
         </ListPane>
       }
     >
-      <PaneHeader title="概览" subtitle={`${dateLabel()} · 欢迎回来`}>
-        <Link to="/calculator" className="btn-primary h-7 px-2.5">
+      <PaneHeader title="概览" subtitle={dateLabel()}>
+        <Link to="/calculator" className="btn-primary h-8 px-3">
           <Plus size={12} />
           新建策略
         </Link>
@@ -128,80 +132,139 @@ export default function Overview() {
         <div className="mx-auto max-w-[980px]">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-[21px] font-semibold leading-7 tracking-[-0.025em]">{greeting()}</h2>
-              <p className="mt-1 text-[12.5px] text-dim">用一笔策略开始，或者接着上次的工作。</p>
+              <h2 className="text-[22px] font-semibold leading-7">交易台</h2>
+              <p className="mt-1 text-[14px] text-dim">先看市场结构，再决定今天做不做交易。</p>
             </div>
-            <div className="hidden items-center gap-1.5 text-[11px] text-faint md:flex">
+            <div className="hidden items-center gap-1.5 text-[13px] text-faint md:flex">
               <Calendar size={12} />
               延迟行情 · 上一交易时段
             </div>
           </div>
 
-          <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-            {QUICK.map((item) => {
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {QUICK.map((item, index) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="group flex items-start gap-2.5 rounded-lg border border-line bg-white p-3 transition-colors hover:border-line-strong"
+                  className="group flex items-start gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:border-line-strong"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent">
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
+                      index === 0 ? "bg-accent-soft text-accent" : "bg-surface text-dim"
+                    }`}
+                  >
                     <Icon size={16} />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-[12.5px] font-medium group-hover:text-accent">
+                    <span className="block text-[14px] font-medium group-hover:text-accent">
                       {item.title}
                     </span>
-                    <span className="mt-0.5 block text-[11px] leading-4 text-dim">{item.body}</span>
+                    <span className="mt-0.5 block text-[13px] leading-4 text-dim">{item.body}</span>
                   </span>
                 </Link>
               );
             })}
           </div>
 
-          <section className="mt-7">
-            <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-[12.5px] font-semibold">精选策略</h2>
-              <Link to="/strategies" className="text-[11px] text-accent hover:text-accent-hover">
+          <section className="mt-8">
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="text-[14px] font-semibold">精选策略</h2>
+              <Link
+                to="/strategies"
+                className="flex items-center gap-0.5 text-[13px] text-dim hover:text-text"
+              >
                 全部 {Object.keys(STRATEGY_BY_SLUG).length} 篇指南
+                <ChevronRight size={12} className="text-faint" />
               </Link>
             </div>
-            <div className="grid gap-2.5 md:grid-cols-3">
-              {FEATURED.map((slug) => {
-                const s = STRATEGY_BY_SLUG[slug];
-                if (!s) return null;
-                const legs = legsFor(s.preset ?? "iron-condor", SPY, EXPIRY.iso);
-                return (
-                  <Link
-                    key={slug}
-                    to={`/strategies/${slug}`}
-                    className="group overflow-hidden rounded-lg border border-line bg-white transition-colors hover:border-line-strong"
-                  >
-                    <div className="border-b border-line-subtle bg-[#fbfaf8] px-3 py-2">
-                      <Sparkline legs={legs} spot={SPY.spot} width={260} height={38} className="w-full" />
-                    </div>
-                    <div className="px-3 py-2.5">
-                      <p className="text-[12.5px] font-medium group-hover:text-accent">{s.name}</p>
-                      <p className="mt-0.5 truncate text-[11px] text-dim">
-                        {OUTLOOK_ZH[s.outlook]} · {s.desc}
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
+              {lead && (
+                <Link
+                  to={`/strategies/${FEATURED[0]}`}
+                  className="group flex flex-col overflow-hidden rounded-xl border border-line bg-white transition-colors hover:border-line-strong"
+                >
+                  <div className="flex items-start justify-between gap-4 px-4 pt-4">
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-medium group-hover:text-accent">{lead.name}</p>
+                      <p className="mt-0.5 truncate text-[13px] text-dim">
+                        {OUTLOOK_ZH[lead.outlook]} · {lead.desc}
                       </p>
                     </div>
-                  </Link>
-                );
-              })}
+                    <div className="flex shrink-0 items-center gap-3 pt-0.5 text-[12px] text-dim">
+                      <span className="flex items-center gap-1">
+                        <span className="h-0.5 w-3 rounded bg-accent" />
+                        今日
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="h-0.5 w-3 rounded bg-loss" />
+                        到期
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-1 min-w-0 flex-1 px-1 pb-1">
+                    <PayoffChart
+                      legs={leadLegs}
+                      spot={SPY.spot}
+                      iv={SPY.iv}
+                      dte={EXPIRY.dte}
+                      expiryLabel={EXPIRY.label}
+                      mode="pnl"
+                      envelope={0}
+                      height={230}
+                      interactive={false}
+                    />
+                  </div>
+                </Link>
+              )}
+              <div className="grid gap-3 xl:grid-rows-2">
+                {FEATURED.slice(1).map((slug) => {
+                  const s = STRATEGY_BY_SLUG[slug];
+                  if (!s) return null;
+                  const legs = legsFor(s.preset ?? "iron-condor", SPY, EXPIRY.iso);
+                  return (
+                    <Link
+                      key={slug}
+                      to={`/strategies/${slug}`}
+                      className="group flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 transition-colors hover:border-line-strong"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[14px] font-medium group-hover:text-accent">
+                          {s.name}
+                        </span>
+                        <span className="mt-0.5 block truncate text-[13px] text-dim">
+                          {OUTLOOK_ZH[s.outlook]} · {s.desc}
+                        </span>
+                      </span>
+                      <Sparkline
+                        legs={legs}
+                        spot={SPY.spot}
+                        width={92}
+                        height={44}
+                        muted
+                        className="shrink-0"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </section>
 
-          <section className="mt-7">
-            <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-[12.5px] font-semibold">市场</h2>
-              <Link to="/chain" className="text-[11px] text-accent hover:text-accent-hover">
+          <section className="mt-8">
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="text-[14px] font-semibold">市场</h2>
+              <Link
+                to="/chain"
+                className="flex items-center gap-0.5 text-[13px] text-dim hover:text-text"
+              >
                 打开期权链
+                <ChevronRight size={12} className="text-faint" />
               </Link>
             </div>
-            <div className="overflow-hidden rounded-lg border border-line bg-white">
-              <div className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] gap-2 border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide text-faint">
+            <div className="overflow-hidden rounded-xl border border-line bg-white">
+              <div className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] gap-2 border-b border-line-subtle bg-[#fbfaf8] px-4 py-2 text-[12px] font-medium text-faint">
                 <span>标的</span>
                 <span className="text-right">现价</span>
                 <span className="text-right">今日</span>
@@ -213,12 +276,12 @@ export default function Overview() {
                   <Link
                     key={symbol}
                     to={`/chain/${symbol.toLowerCase()}`}
-                    className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] items-center gap-2 border-b border-line-subtle px-3 py-2 text-[12px] last:border-0 hover:bg-hover"
+                    className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] items-center gap-2 border-b border-line-subtle px-4 py-2.5 text-[14px] last:border-0 hover:bg-hover"
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <Badge label={symbol.slice(0, 2)} seed={symbol} size={22} rounded="rounded-[6px]" />
                       <span className="font-medium">{symbol}</span>
-                      <span className="truncate text-[11px] text-dim">{t.name}</span>
+                      <span className="truncate text-[13px] text-dim">{t.name}</span>
                     </span>
                     <span className="text-right tnum">${t.spot.toFixed(2)}</span>
                     <span className={`text-right tnum ${t.change >= 0 ? "text-profit" : "text-loss"}`}>
@@ -232,7 +295,7 @@ export default function Overview() {
             </div>
           </section>
 
-          <p className="mt-6 text-[10.5px] leading-4 text-faint">
+          <p className="mt-6 text-[12px] leading-4 text-faint">
             行情为延迟数据，期权价格由 Black-Scholes 合成，仅供情景分析。所有计算都在本机完成。
           </p>
         </div>

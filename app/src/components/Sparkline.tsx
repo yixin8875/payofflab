@@ -9,10 +9,21 @@ type Props = {
   className?: string;
   sample?: boolean;
   strokeColor?: string;
+  /** Quiet version for secondary cards, so only the lead chart carries color. */
+  muted?: boolean;
 };
 
 /** A tiny payoff sketch for strategy cards and the hero preview. */
-export function Sparkline({ legs, spot, width = 140, height = 52, className, sample, strokeColor }: Props) {
+export function Sparkline({
+  legs,
+  spot,
+  width = 140,
+  height = 52,
+  className,
+  sample,
+  strokeColor,
+  muted,
+}: Props) {
   const clipId = useId();
   const { path, area, zeroY } = useMemo(() => {
     const strikes = legs.filter((l) => l.kind !== "stock").map((l) => l.strike);
@@ -41,7 +52,7 @@ export function Sparkline({ legs, spot, width = 140, height = 52, className, sam
     return { path: d, area: shape, zeroY: zero };
   }, [legs, spot, width, height]);
 
-  const stroke = strokeColor ?? "#007558";
+  const stroke = muted ? "#8a857c" : (strokeColor ?? "#007558");
   return (
     <svg
       width={width}
@@ -60,7 +71,7 @@ export function Sparkline({ legs, spot, width = 140, height = 52, className, sam
         x2={width - 2}
         y1={zeroY}
         y2={zeroY}
-        stroke="#c9d0d9"
+        stroke="#d2cec8"
         strokeDasharray="2 3"
       />
       <rect
@@ -68,8 +79,8 @@ export function Sparkline({ legs, spot, width = 140, height = 52, className, sam
         y="0"
         width={width}
         height={Math.max(zeroY, 0)}
-        fill="#007558"
-        fillOpacity="0.12"
+        fill={muted ? "#8a857c" : "#007558"}
+        fillOpacity={muted ? 0.06 : 0.12}
         clipPath={`url(#${clipId})`}
       />
       <rect
@@ -77,15 +88,15 @@ export function Sparkline({ legs, spot, width = 140, height = 52, className, sam
         y={zeroY}
         width={width}
         height={Math.max(height - zeroY, 0)}
-        fill="#bc3722"
-        fillOpacity="0.1"
+        fill={muted ? "#8a857c" : "#bc3722"}
+        fillOpacity={muted ? 0.06 : 0.1}
         clipPath={`url(#${clipId})`}
       />
       <path
         d={path}
         fill="none"
         stroke={stroke}
-        strokeOpacity={sample ? 0.5 : 0.8}
+        strokeOpacity={muted ? 0.6 : sample ? 0.5 : 0.8}
         strokeWidth="1.4"
       />
     </svg>

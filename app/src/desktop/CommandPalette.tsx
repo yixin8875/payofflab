@@ -142,24 +142,24 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               }
             }}
             placeholder="搜索页面、策略、标的或工具"
-            className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-faint"
+            className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-faint"
             aria-label="搜索"
           />
-          <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-[10px] text-faint">
+          <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-[11px] text-faint">
             Esc
           </kbd>
         </div>
 
         <div className="scroll-pane flex-1 py-1.5">
           {results.length === 0 && (
-            <p className="px-4 py-10 text-center text-[12.5px] text-dim">没有匹配的结果</p>
+            <p className="px-4 py-10 text-center text-[13px] text-dim">没有匹配的结果</p>
           )}
           {GROUP_ORDER.map((group) => {
             const items = results.filter((item) => item.group === group);
             if (!items.length) return null;
             return (
               <section key={group} className="pb-1">
-                <h3 className="px-3.5 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.06em] text-faint">
+                <h3 className="px-3.5 pb-1 pt-2 text-[11px] font-semibold text-faint">
                   {group}
                 </h3>
                 <ul>
@@ -184,9 +184,9 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                           ) : (
                             <span className="h-[22px] w-[22px] shrink-0" />
                           )}
-                          <span className="shrink-0 text-[12.5px] font-medium">{item.label}</span>
+                          <span className="shrink-0 text-[13px] font-medium">{item.label}</span>
                           {item.hint && (
-                            <span className="min-w-0 flex-1 truncate text-[11.5px] text-faint">
+                            <span className="min-w-0 flex-1 truncate text-[12px] text-faint">
                               {item.hint}
                             </span>
                           )}
@@ -203,7 +203,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
           })}
         </div>
 
-        <div className="flex h-8 shrink-0 items-center gap-4 border-t border-line bg-[#fbfaf8] px-3.5 text-[10.5px] text-faint">
+        <div className="flex h-8 shrink-0 items-center gap-4 border-t border-line bg-[#fbfaf8] px-3.5 text-[11px] text-faint">
           <span>
             <kbd className="rounded border border-line bg-white px-1">↑</kbd>{" "}
             <kbd className="rounded border border-line bg-white px-1">↓</kbd> 选择

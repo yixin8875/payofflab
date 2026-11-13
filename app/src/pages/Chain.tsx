@@ -104,7 +104,7 @@ function ChainView({ symbol }: { symbol: string }) {
 
       <DetailScroll wide>
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 flex items-center gap-1 text-[10.5px] text-faint">
+          <span className="mr-1 flex items-center gap-1 text-[11px] text-faint">
             <Calendar size={12} />
             到期日
           </span>
@@ -113,14 +113,14 @@ function ChainView({ symbol }: { symbol: string }) {
               key={e.iso}
               type="button"
               onClick={() => setExpiryIso(e.iso)}
-              className={`flex h-6 shrink-0 items-center gap-1 rounded-md border px-2 text-[11px] font-medium transition-colors ${
+              className={`flex h-6 shrink-0 items-center gap-1 rounded-lg border px-2 text-[12px] font-medium transition-colors ${
                 e.iso === expiry.iso
                   ? "border-accent-line bg-accent-soft text-accent"
                   : "border-line bg-white text-dim hover:text-text"
               }`}
             >
               {e.label}
-              <span className={`tnum text-[9.5px] ${e.iso === expiry.iso ? "text-accent/70" : "text-faint"}`}>
+              <span className={`tnum text-[11px] ${e.iso === expiry.iso ? "text-accent/70" : "text-faint"}`}>
                 {e.dte}天
               </span>
             </button>
@@ -130,7 +130,7 @@ function ChainView({ symbol }: { symbol: string }) {
               aria-label="更多到期日"
               value={moreExpiries.some((e) => e.iso === expiry.iso) ? expiry.iso : ""}
               onChange={(event) => event.target.value && setExpiryIso(event.target.value)}
-              className="h-6 shrink-0 rounded-md border border-line bg-white px-1.5 text-[11px] text-dim"
+              className="h-6 shrink-0 rounded-lg border border-line bg-white px-1.5 text-[12px] text-dim"
             >
               <option value="">更多到期日</option>
               {moreExpiries.map((e) => (
@@ -141,13 +141,13 @@ function ChainView({ symbol }: { symbol: string }) {
             </select>
           )}
           <div className="ml-auto flex items-center gap-2">
-            <div className="flex rounded-md border border-line bg-white p-0.5">
+            <div className="flex rounded-lg border border-line bg-white p-0.5">
               {(["live", "offline"] as const).map((value) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => setSource(value)}
-                  className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                  className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
                     source === value ? "bg-accent-soft text-accent" : "text-dim hover:text-text"
                   }`}
                 >
@@ -155,7 +155,7 @@ function ChainView({ symbol }: { symbol: string }) {
                 </button>
               ))}
             </div>
-            <span className="text-[10px] text-faint">
+            <span className="text-[11px] text-faint">
               {online
                 ? `CBOE 延迟 15 分钟 · ${chain?.asOf ?? ""}`
                 : source === "live" && live.loading
@@ -167,7 +167,7 @@ function ChainView({ symbol }: { symbol: string }) {
                 type="button"
                 onClick={live.reload}
                 disabled={live.loading}
-                className="text-[10px] font-medium text-accent disabled:text-faint"
+                className="text-[11px] font-medium text-accent disabled:text-faint"
               >
                 {live.loading ? "刷新中…" : "刷新"}
               </button>
@@ -176,7 +176,7 @@ function ChainView({ symbol }: { symbol: string }) {
         </div>
 
         {source === "live" && live.error && (
-          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-line bg-[#fbfaf8] px-2.5 py-1.5 text-[10.5px] text-dim">
+          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-[#fbfaf8] px-2.5 py-1.5 text-[11px] text-dim">
             <span>在线行情不可用（{live.error}），当前使用合成数据。</span>
             <button
               type="button"
@@ -188,16 +188,16 @@ function ChainView({ symbol }: { symbol: string }) {
           </div>
         )}
 
-        <div className="mt-3 overflow-hidden rounded-lg border border-line bg-white">
-          <div className="flex items-center justify-between border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[10.5px]">
+        <div className="mt-3 overflow-hidden rounded-xl border border-line bg-white">
+          <div className="flex items-center justify-between border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[11px]">
             <span className="font-semibold">看涨期权</span>
             <span className="text-faint">行权价居中</span>
             <span className="font-semibold">看跌期权</span>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px] border-collapse text-[11px] tnum">
+            <table className="w-full min-w-[820px] border-collapse text-[12px] tnum">
               <thead>
-                <tr className="border-b border-line-subtle text-[9.5px] uppercase tracking-wide text-faint">
+                <tr className="border-b border-line-subtle text-[11px] text-faint">
                   <th className="px-2.5 py-1.5 text-right font-medium">买价</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">卖价</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">成交量</th>
@@ -281,7 +281,7 @@ function ChainView({ symbol }: { symbol: string }) {
           >
             扫描 {t.symbol} 的价差
           </Link>
-          <span className="ml-auto text-[10.5px] text-faint">
+          <span className="ml-auto text-[11px] text-faint">
             {expiry.label} · {expiry.dte} 天 ·{" "}
             {online ? "CBOE 延迟行情，非投资建议" : "模型输出，非投资建议"}
           </span>

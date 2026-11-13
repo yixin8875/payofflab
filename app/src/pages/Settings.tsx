@@ -89,7 +89,7 @@ export default function Settings() {
                   onSelect={() => setActive(item.key)}
                   selected={active === item.key}
                   badge={
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] border border-line bg-white text-dim">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-dim">
                       <Icon size={14} />
                     </span>
                   }
@@ -99,7 +99,7 @@ export default function Settings() {
               );
             })}
           </ListGroup>
-          <div className="mx-3 mt-2 text-[10.5px] leading-4 text-faint">
+          <div className="mx-3 mt-2 text-[11px] leading-4 text-faint">
             设置保存在本机，不会同步到任何账户。
           </div>
         </ListPane>
@@ -109,11 +109,11 @@ export default function Settings() {
       <DetailScroll>
         <div className="max-w-[620px]">
           {active === "general" && (
-            <div className="overflow-hidden rounded-lg border border-line bg-white">
+            <div className="overflow-hidden rounded-xl border border-line bg-white">
               <div className="flex items-center justify-between gap-6 border-b border-line-subtle px-4 py-3">
                 <div>
-                  <p className="text-[12.5px] font-medium">记住窗口大小</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-dim">
+                  <p className="text-[13px] font-medium">记住窗口大小</p>
+                  <p className="mt-0.5 text-[12px] leading-4 text-dim">
                     下次启动时恢复上次的窗口尺寸与位置。重新启动后生效。
                   </p>
                 </div>
@@ -125,12 +125,12 @@ export default function Settings() {
               </div>
               <div className="flex items-center justify-between gap-6 border-b border-line-subtle px-4 py-3">
                 <div>
-                  <p className="text-[12.5px] font-medium">每张合约费用</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-dim">
+                  <p className="text-[13px] font-medium">每张合约费用</p>
+                  <p className="mt-0.5 text-[12px] leading-4 text-dim">
                     单边佣金加交易所费用，用于持仓页的往返费用与净盈亏估算。
                   </p>
                 </div>
-                <span className="flex shrink-0 items-center gap-1 text-[11.5px] text-dim">
+                <span className="flex shrink-0 items-center gap-1 text-[12px] text-dim">
                   $
                   <input
                     type="number"
@@ -146,7 +146,7 @@ export default function Settings() {
                       })
                     }
                     aria-label="每张合约费用"
-                    className="h-7 w-16 rounded border border-line bg-white px-1.5 text-right text-[11px] tnum outline-none focus:border-accent"
+                    className="h-7 w-16 rounded border border-line bg-white px-1.5 text-right text-[12px] tnum outline-none focus:border-accent"
                   />
                 </span>
               </div>
@@ -161,15 +161,15 @@ export default function Settings() {
           )}
 
           {active === "appearance" && (
-            <div className="overflow-hidden rounded-lg border border-line bg-white">
+            <div className="overflow-hidden rounded-xl border border-line bg-white">
               <div className="flex items-center justify-between gap-6 border-b border-line-subtle px-4 py-3">
                 <div>
-                  <p className="text-[12.5px] font-medium">列表密度</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-dim">
+                  <p className="text-[13px] font-medium">列表密度</p>
+                  <p className="mt-0.5 text-[12px] leading-4 text-dim">
                     紧凑模式会缩短列表行高，一屏看到更多策略与标的。
                   </p>
                 </div>
-                <div className="flex shrink-0 rounded-md border border-line bg-surface p-0.5">
+                <div className="flex shrink-0 rounded-lg border border-line bg-surface p-0.5">
                   {[
                     ["comfortable", "舒适"],
                     ["compact", "紧凑"],
@@ -178,7 +178,7 @@ export default function Settings() {
                       key={value}
                       type="button"
                       onClick={() => update({ density: value as AppSettings["density"] })}
-                      className={`rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      className={`rounded px-2.5 py-1 text-[12px] font-medium transition-colors ${
                         settings.density === value
                           ? "bg-white text-text shadow-sm"
                           : "text-dim hover:text-text"
@@ -191,14 +191,14 @@ export default function Settings() {
               </div>
               <div className="flex items-center justify-between gap-6 border-b border-line-subtle px-4 py-3">
                 <div>
-                  <p className="text-[12.5px] font-medium">主题</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-dim">
+                  <p className="text-[13px] font-medium">主题</p>
+                  <p className="mt-0.5 text-[12px] leading-4 text-dim">
                     浅色主题，暖灰侧边栏与白色详情面板。
                   </p>
                 </div>
-                <span className="flex items-center gap-2 text-[11.5px] text-dim">
+                <span className="flex items-center gap-2 text-[12px] text-dim">
                   浅色
-                  <span className="rounded-full border border-line bg-surface px-2 py-0.5 text-[9.5px] text-faint">
+                  <span className="rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] text-faint">
                     深色即将推出
                   </span>
                 </span>
@@ -209,7 +209,7 @@ export default function Settings() {
 
           {active === "data" && (
             <div className="space-y-3">
-              <div className="overflow-hidden rounded-lg border border-line bg-white">
+              <div className="overflow-hidden rounded-xl border border-line bg-white">
                 <InfoRow
                   title="持仓记录"
                   value={`${trades.length} 笔`}
@@ -226,9 +226,9 @@ export default function Settings() {
                   note={hasWindowSize ? "可在下方清除" : "调整窗口后自动记录"}
                 />
               </div>
-              <div className="rounded-lg border border-line bg-white p-4">
-                <p className="text-[12.5px] font-medium">本机数据</p>
-                <p className="mt-1 text-[11px] leading-4 text-dim">
+              <div className="rounded-xl border border-line bg-white p-4">
+                <p className="text-[13px] font-medium">本机数据</p>
+                <p className="mt-1 text-[12px] leading-4 text-dim">
                   所有持仓、自选与设置都留在你的设备上，不会上传。清除后无法恢复。
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -270,7 +270,7 @@ export default function Settings() {
           )}
 
           {active === "shortcuts" && (
-            <div className="overflow-hidden rounded-lg border border-line bg-white">
+            <div className="overflow-hidden rounded-xl border border-line bg-white">
               {[
                 ["Ctrl K", "全局搜索", "页面、策略、标的与工具"],
                 ["Ctrl B", "折叠侧边栏", "给内容区更多宽度"],
@@ -284,10 +284,10 @@ export default function Settings() {
                   className="flex items-center justify-between gap-6 border-b border-line-subtle px-4 py-2.5 last:border-0"
                 >
                   <div>
-                    <p className="text-[12px] font-medium">{title}</p>
-                    <p className="mt-0.5 text-[10.5px] text-dim">{note}</p>
+                    <p className="text-[13px] font-medium">{title}</p>
+                    <p className="mt-0.5 text-[11px] text-dim">{note}</p>
                   </div>
-                  <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 font-sans text-[10.5px] text-muted">
+                  <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 font-sans text-[11px] text-muted">
                     {keys}
                   </kbd>
                 </div>
@@ -297,26 +297,26 @@ export default function Settings() {
 
           {active === "about" && (
             <div className="space-y-3">
-              <div className="rounded-lg border border-line bg-white p-4">
+              <div className="rounded-xl border border-line bg-white p-4">
                 <div className="flex items-center gap-3">
                   <BrandMark size={40} />
                   <div>
                     <p className="text-[14px] font-semibold">PayoffLab</p>
-                    <p className="text-[11px] text-dim">中文期权策略工作台 · v{VERSION}</p>
+                    <p className="text-[12px] text-dim">中文期权策略工作台 · v{VERSION}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-[11.5px] leading-5 text-muted">
+                <p className="mt-3 text-[12px] leading-5 text-muted">
                   多腿期权构建器、盈亏图、盈利概率与净希腊值。在线行情为 CBOE 延迟 15 分钟
                   数据，离线时回退合成报价；所有结果仅用于情景分析，不构成投资建议。
                 </p>
               </div>
-              <div className="overflow-hidden rounded-lg border border-line bg-white">
+              <div className="overflow-hidden rounded-xl border border-line bg-white">
                 <LinkRow to="/changelog" title="更新日志" note="这个版本改了什么" />
                 <LinkRow to="/methodology" title="方法与假设" note="定价、概率与希腊值的算法" />
                 <LinkRow to="/terms" title="使用条款" note="教育工具，不是投资建议" />
                 <LinkRow to="/privacy" title="隐私" note="不收集数据，一切留在本机" />
               </div>
-              <p className="px-1 text-[10.5px] text-faint">© 2026 PayoffLab · Tauri 2 + React 19</p>
+              <p className="px-1 text-[11px] text-faint">© 2026 PayoffLab · Tauri 2 + React 19</p>
             </div>
           )}
         </div>
@@ -347,11 +347,11 @@ function UpdatePanel({
 
   return (
     <div className="space-y-3">
-      <div className="rounded-lg border border-line bg-white p-4">
+      <div className="rounded-xl border border-line bg-white p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-[12.5px] font-medium">当前版本 v{VERSION}</p>
-            <p className="mt-0.5 text-[11px] leading-4 text-dim">
+            <p className="text-[13px] font-medium">当前版本 v{VERSION}</p>
+            <p className="mt-0.5 text-[12px] leading-4 text-dim">
               从 GitHub Releases 获取更新，下载完成后会自动重启。
             </p>
           </div>
@@ -367,7 +367,7 @@ function UpdatePanel({
 
         {update.status !== "idle" && (
           <p
-            className={`mt-3 text-[11px] leading-4 ${
+            className={`mt-3 text-[12px] leading-4 ${
               update.status === "error" ? "text-loss" : "text-dim"
             }`}
           >
@@ -387,13 +387,13 @@ function UpdatePanel({
           </p>
         )}
         {checked && update.status !== "idle" && update.status !== "available" && (
-          <p className="mt-1 text-[9.5px] text-faint">上次检查 {checked}</p>
+          <p className="mt-1 text-[11px] text-faint">上次检查 {checked}</p>
         )}
 
         {update.status === "available" && (
-          <div className="mt-3 rounded-md border border-accent-line bg-accent-soft/50 p-2.5">
+          <div className="mt-3 rounded-lg border border-accent-line bg-accent-soft/50 p-2.5">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11.5px] font-medium text-accent">新版本 v{update.version}</p>
+              <p className="text-[12px] font-medium text-accent">新版本 v{update.version}</p>
               <button
                 type="button"
                 onClick={() => void update.install()}
@@ -403,7 +403,7 @@ function UpdatePanel({
               </button>
             </div>
             {update.notes && (
-              <p className="mt-1.5 whitespace-pre-line text-[10.5px] leading-4 text-dim">
+              <p className="mt-1.5 whitespace-pre-line text-[11px] leading-4 text-dim">
                 {update.notes}
               </p>
             )}
@@ -420,17 +420,17 @@ function UpdatePanel({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-6 rounded-lg border border-line bg-white px-4 py-3">
+      <div className="flex items-center justify-between gap-6 rounded-xl border border-line bg-white px-4 py-3">
         <div>
-          <p className="text-[12.5px] font-medium">启动时检查更新</p>
-          <p className="mt-0.5 text-[11px] leading-4 text-dim">
+          <p className="text-[13px] font-medium">启动时检查更新</p>
+          <p className="mt-0.5 text-[12px] leading-4 text-dim">
             每次打开 PayoffLab 时向 GitHub 检查一次，发现新版本会在右下角提示。
           </p>
         </div>
         <Toggle checked={autoCheck} onChange={onAutoCheck} label="启动时检查更新" />
       </div>
 
-      <div className="rounded-lg border border-line bg-white p-4 text-[10.5px] leading-4 text-faint">
+      <div className="rounded-xl border border-line bg-white p-4 text-[11px] leading-4 text-faint">
         更新包由 GitHub Actions 使用 minisign 私钥签名，客户端内置公钥校验；签名不匹配的包不会安装。
         <a
           href="https://github.com/yixin8875/payofflab/releases"
@@ -478,10 +478,10 @@ function InfoRow({ title, value, note }: { title: string; value: string; note: s
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-line-subtle px-4 py-2.5 last:border-0">
       <div>
-        <p className="text-[12px] font-medium">{title}</p>
-        <p className="mt-0.5 text-[10.5px] text-dim">{note}</p>
+        <p className="text-[13px] font-medium">{title}</p>
+        <p className="mt-0.5 text-[11px] text-dim">{note}</p>
       </div>
-      <span className="shrink-0 text-[11.5px] text-muted">{value}</span>
+      <span className="shrink-0 text-[12px] text-muted">{value}</span>
     </div>
   );
 }
@@ -493,10 +493,10 @@ function LinkRow({ to, title, note }: { to: string; title: string; note: string 
       className="flex items-baseline justify-between gap-6 border-b border-line-subtle px-4 py-2.5 last:border-0 hover:bg-hover"
     >
       <div>
-        <p className="text-[12px] font-medium">{title}</p>
-        <p className="mt-0.5 text-[10.5px] text-dim">{note}</p>
+        <p className="text-[13px] font-medium">{title}</p>
+        <p className="mt-0.5 text-[11px] text-dim">{note}</p>
       </div>
-      <span className="shrink-0 text-[11px] text-faint">打开</span>
+      <span className="shrink-0 text-[12px] text-faint">打开</span>
     </Link>
   );
 }

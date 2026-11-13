@@ -228,19 +228,19 @@ export default function Scenario() {
         <div className="mx-auto w-full max-w-[1180px] px-7 py-5">
           <div className="grid gap-3 lg:grid-cols-[268px_minmax(0,1fr)]">
             <aside className="space-y-3">
-              <section className="rounded-lg border border-line bg-white p-4">
+              <section className="rounded-xl border border-line bg-white p-4">
                 <div className="flex items-baseline justify-between">
-                  <h2 className="text-[12px] font-semibold">情景参数</h2>
-                  <span className="text-[10px] text-faint">全组合</span>
+                  <h2 className="text-[13px] font-semibold">情景参数</h2>
+                  <span className="text-[11px] text-faint">全组合</span>
                 </div>
 
-                <div className="mt-2.5 flex rounded-md border border-line bg-surface p-0.5">
+                <div className="mt-2.5 flex rounded-lg border border-line bg-surface p-0.5">
                   {MODES.map((item) => (
                     <button
                       key={item.value}
                       type="button"
                       onClick={() => apply({ mode: item.value })}
-                      className={`flex-1 rounded px-1 py-1 text-[10.5px] font-medium transition-colors ${
+                      className={`flex-1 rounded px-1 py-1 text-[11px] font-medium transition-colors ${
                         input.mode === item.value
                           ? "bg-white text-text shadow-sm"
                           : "text-dim hover:text-text"
@@ -250,7 +250,7 @@ export default function Scenario() {
                     </button>
                   ))}
                 </div>
-                <p className="mt-1.5 text-[10px] leading-4 text-faint">{mode.hint}</p>
+                <p className="mt-1.5 text-[11px] leading-4 text-faint">{mode.hint}</p>
 
                 <div className="mt-3.5 space-y-4">
                   <SliderRow
@@ -300,7 +300,7 @@ export default function Scenario() {
                 </div>
 
                 <div className="mt-4 border-t border-line-subtle pt-3">
-                  <p className="text-[9.5px] font-semibold uppercase tracking-[0.05em] text-faint">
+                  <p className="text-[11px] font-semibold text-faint">
                     快速情景
                   </p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -319,8 +319,8 @@ export default function Scenario() {
                 </div>
               </section>
 
-              <section className="rounded-lg border border-line bg-white p-4">
-                <h2 className="text-[12px] font-semibold">组合希腊值</h2>
+              <section className="rounded-xl border border-line bg-white p-4">
+                <h2 className="text-[13px] font-semibold">组合希腊值</h2>
                 <dl className="mt-1 divide-y divide-line-subtle">
                   {[
                     ["Delta", `${num(model.g.delta, 0)} 股`],
@@ -330,17 +330,17 @@ export default function Scenario() {
                     ["Vega", `${money(model.g.vega, { sign: true })} / 点`],
                   ].map(([label, value]) => (
                     <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
-                      <dt className="text-[11.5px] text-dim">{label}</dt>
-                      <dd className="tnum text-[11.5px] font-medium">{value}</dd>
+                      <dt className="text-[12px] text-dim">{label}</dt>
+                      <dd className="tnum text-[12px] font-medium">{value}</dd>
                     </div>
                   ))}
                 </dl>
-                <p className="mt-2 text-[10px] leading-4 text-faint">
+                <p className="mt-2 text-[11px] leading-4 text-faint">
                   Beta 加权按静态 beta 折算成 SPY 等值股数，用来比较不同标的的方向敞口。
                 </p>
               </section>
 
-              <p className="px-1 text-[10.5px] leading-4 text-faint">
+              <p className="px-1 text-[11px] leading-4 text-faint">
                 期权价格由 Black-Scholes 合成；beta 为近似值，不是回归结果。
                 持仓页按中间价估值，因此这里的「当前」可能与持仓页的未实现盈亏不同。
               </p>
@@ -372,23 +372,23 @@ export default function Scenario() {
                 />
               </div>
 
-              <section className="rounded-lg border border-line bg-white p-4">
+              <section className="rounded-xl border border-line bg-white p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <h2 className="text-[12px] font-semibold">组合盈亏 vs 大盘涨跌</h2>
-                    <p className="mt-0.5 text-[10.5px] text-dim">
+                    <h2 className="text-[13px] font-semibold">组合盈亏 vs 大盘涨跌</h2>
+                    <p className="mt-0.5 text-[11px] text-dim">
                       {input.mode === "uniform"
                         ? "横轴为所有标的的统一涨跌幅；虚线为当前，实线为情景。"
                         : "横轴为大盘涨跌幅，各标的按 beta 或自定义冲击跟随；虚线为当前，实线为情景。"}
                     </p>
                   </div>
-                  <p className="tnum text-[10.5px] text-faint">
+                  <p className="tnum text-[11px] text-faint">
                     大盘 {moveLabel(input.marketPct)} · IV {signed(input.ivPts, 1)} 点
                     {input.ivCrushPct > 0 ? ` · Crush −${input.ivCrushPct}%` : ""} · +{days} 天
                   </p>
                 </div>
                 <ScenarioChart points={model.points} spotPct={input.marketPct} height={300} />
-                <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-[10.5px] text-dim tnum">
+                <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-dim tnum">
                   <span>
                     ±20% 区间最好{" "}
                     <b className="font-medium text-profit">{money(model.best, { sign: true })}</b>
@@ -402,29 +402,29 @@ export default function Scenario() {
                 </div>
               </section>
 
-              <section className="rounded-lg border border-line bg-white p-4">
+              <section className="rounded-xl border border-line bg-white p-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div>
-                    <h2 className="text-[12px] font-semibold">压力矩阵</h2>
-                    <p className="mt-0.5 text-[10.5px] text-dim">
+                    <h2 className="text-[13px] font-semibold">压力矩阵</h2>
+                    <p className="mt-0.5 text-[11px] text-dim">
                       行：大盘涨跌 · 列：IV 变化（点）· 时间 +{days} 天
                     </p>
                   </div>
-                  <span className="text-[10px] text-faint">点击单元格套用</span>
+                  <span className="text-[11px] text-faint">点击单元格套用</span>
                 </div>
 
                 <div className="mt-3 grid grid-cols-[52px_repeat(5,minmax(0,1fr))] gap-1">
-                  <span className="flex items-end justify-end pb-1 pr-1 text-[9px] text-faint">
+                  <span className="flex items-end justify-end pb-1 pr-1 text-[11px] text-faint">
                     大盘 \ IV
                   </span>
                   {STRESS_IVS.map((iv) => (
-                    <span key={`h${iv}`} className="pb-1 text-center text-[9.5px] tnum text-faint">
+                    <span key={`h${iv}`} className="pb-1 text-center text-[11px] tnum text-faint">
                       {signed(iv)}
                     </span>
                   ))}
                   {STRESS_SPOTS.map((spot, row) => (
                     <Fragment key={spot}>
-                      <span className="flex items-center justify-end pr-1 text-[9.5px] tnum text-faint">
+                      <span className="flex items-center justify-end pr-1 text-[11px] tnum text-faint">
                         {moveLabel(spot)}
                       </span>
                       {STRESS_IVS.map((iv, col) => {
@@ -440,7 +440,7 @@ export default function Scenario() {
                             key={`${spot}-${iv}`}
                             type="button"
                             onClick={() => apply({ marketPct: spot, ivPts: iv })}
-                            className={`h-8 rounded-[5px] text-[10.5px] font-medium tnum transition-shadow hover:ring-1 hover:ring-line-strong ${
+                            className={`h-8 rounded-[5px] text-[11px] font-medium tnum transition-shadow hover:ring-1 hover:ring-line-strong ${
                               selected ? "ring-1 ring-accent" : ""
                             }`}
                             style={{ background }}
@@ -453,7 +453,7 @@ export default function Scenario() {
                   ))}
                 </div>
 
-                <div className="mt-2.5 flex items-center gap-3 text-[9.5px] text-faint">
+                <div className="mt-2.5 flex items-center gap-3 text-[11px] text-faint">
                   <span className="flex items-center gap-1">
                     <span className="h-2 w-2 rounded-[2px] bg-[#0b7a523d]" />
                     盈利
@@ -466,20 +466,20 @@ export default function Scenario() {
                 </div>
               </section>
 
-              <section className="overflow-hidden rounded-lg border border-line bg-white">
+              <section className="overflow-hidden rounded-xl border border-line bg-white">
                 <div className="flex items-baseline justify-between gap-2 px-4 pb-2 pt-3">
                   <div>
-                    <h2 className="text-[12px] font-semibold">按标的风险</h2>
-                    <p className="mt-0.5 text-[10.5px] text-dim">
+                    <h2 className="text-[13px] font-semibold">按标的风险</h2>
+                    <p className="mt-0.5 text-[11px] text-dim">
                       {input.mode === "custom"
                         ? "逐标的模式下可直接改「情景」列；改的是该标的的总涨跌幅。"
                         : "美元 Gamma 为标的每变动 1% 时 Delta 的变化。"}
                     </p>
                   </div>
-                  <span className="text-[10px] text-faint">Beta 为近似值</span>
+                  <span className="text-[11px] text-faint">Beta 为近似值</span>
                 </div>
                 <div className="overflow-x-auto">
-                  <div className="grid min-w-[720px] grid-cols-[minmax(0,1fr)_52px_92px_80px_68px_82px_74px_100px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[9.5px] font-medium uppercase tracking-wide text-faint">
+                  <div className="grid min-w-[720px] grid-cols-[minmax(0,1fr)_52px_92px_80px_68px_82px_74px_100px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[11px] font-medium text-faint">
                     <span>标的</span>
                     <span className="text-right">Beta</span>
                     <span className="text-right">情景</span>
@@ -494,7 +494,7 @@ export default function Scenario() {
                     return (
                       <div
                         key={risk.symbol}
-                        className="grid min-w-[720px] grid-cols-[minmax(0,1fr)_52px_92px_80px_68px_82px_74px_100px] items-center gap-2 border-b border-line-subtle px-4 py-2 text-[11px] last:border-0"
+                        className="grid min-w-[720px] grid-cols-[minmax(0,1fr)_52px_92px_80px_68px_82px_74px_100px] items-center gap-2 border-b border-line-subtle px-4 py-2 text-[12px] last:border-0"
                       >
                         <span className="flex min-w-0 items-center gap-2">
                           <Badge
@@ -505,12 +505,12 @@ export default function Scenario() {
                           />
                           <span className="min-w-0">
                             <span className="block truncate font-medium">{risk.symbol}</span>
-                            <span className="block truncate text-[9.5px] text-faint tnum">
+                            <span className="block truncate text-[11px] text-faint tnum">
                               ${num(risk.spot, 2)}
                             </span>
                           </span>
                         </span>
-                        <span className="text-right text-[10.5px] tnum text-dim">
+                        <span className="text-right text-[11px] tnum text-dim">
                           {num(risk.beta, 2)}
                         </span>
                         <span className="flex justify-end">
@@ -523,31 +523,31 @@ export default function Scenario() {
                                 setSymbolMove(risk.symbol, Number(event.target.value))
                               }
                               aria-label={`${risk.symbol} 情景涨跌`}
-                              className="h-6 w-[66px] rounded border border-line bg-white px-1 text-right text-[10.5px] tnum outline-none focus:border-accent"
+                              className="h-6 w-[66px] rounded border border-line bg-white px-1 text-right text-[11px] tnum outline-none focus:border-accent"
                             />
                           ) : (
-                            <span className="text-right text-[10.5px] tnum">
+                            <span className="text-right text-[11px] tnum">
                               {moveLabel(risk.movePct)}
                             </span>
                           )}
                         </span>
                         <span
-                          className={`text-right text-[11px] tnum ${
+                          className={`text-right text-[12px] tnum ${
                             risk.pnl >= 0 ? "text-profit" : "text-loss"
                           }`}
                         >
                           {money(risk.pnl, { sign: true })}
                         </span>
-                        <span className="text-right text-[10.5px] tnum text-dim">
+                        <span className="text-right text-[11px] tnum text-dim">
                           {num(risk.delta, 0)}
                         </span>
-                        <span className="text-right text-[10.5px] tnum text-dim">
+                        <span className="text-right text-[11px] tnum text-dim">
                           {money(risk.dollarGamma, { sign: true })}
                         </span>
-                        <span className="text-right text-[10.5px] tnum text-dim">
+                        <span className="text-right text-[11px] tnum text-dim">
                           {money(risk.vega, { sign: true })}
                         </span>
-                        <span className="truncate text-right text-[9.5px] text-faint">
+                        <span className="truncate text-right text-[11px] text-faint">
                           {event ? eventLabel(event) : "—"}
                         </span>
                       </div>
@@ -556,12 +556,12 @@ export default function Scenario() {
                 </div>
               </section>
 
-              <section className="overflow-hidden rounded-lg border border-line bg-white">
+              <section className="overflow-hidden rounded-xl border border-line bg-white">
                 <div className="flex items-baseline justify-between gap-2 px-4 pb-2 pt-3">
-                  <h2 className="text-[12px] font-semibold">持仓拆分</h2>
-                  <span className="text-[10px] text-faint">点击行打开持仓详情</span>
+                  <h2 className="text-[13px] font-semibold">持仓拆分</h2>
+                  <span className="text-[11px] text-faint">点击行打开持仓详情</span>
                 </div>
-                <div className="grid grid-cols-[minmax(0,1fr)_78px_78px_78px_62px_62px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[9.5px] font-medium uppercase tracking-wide text-faint">
+                <div className="grid grid-cols-[minmax(0,1fr)_78px_78px_78px_62px_62px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[11px] font-medium text-faint">
                   <span>持仓</span>
                   <span className="text-right">当前</span>
                   <span className="text-right">情景</span>
@@ -583,35 +583,35 @@ export default function Scenario() {
                         rounded="rounded-[6px]"
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-[12px] font-medium">
+                        <span className="block truncate text-[13px] font-medium">
                           {position.trade.name}
                         </span>
-                        <span className="block truncate text-[10px] text-faint">
+                        <span className="block truncate text-[11px] text-faint">
                           {position.trade.symbol} · {position.trade.legs.length} 条腿
                         </span>
                       </span>
                     </span>
-                    <span className="text-right text-[11px] tnum">
+                    <span className="text-right text-[12px] tnum">
                       {money(position.current, { sign: true })}
                     </span>
                     <span
-                      className={`text-right text-[11px] tnum ${
+                      className={`text-right text-[12px] tnum ${
                         position.scenario >= 0 ? "text-profit" : "text-loss"
                       }`}
                     >
                       {money(position.scenario, { sign: true })}
                     </span>
                     <span
-                      className={`text-right text-[11px] tnum ${
+                      className={`text-right text-[12px] tnum ${
                         position.change >= 0 ? "text-profit" : "text-loss"
                       }`}
                     >
                       {money(position.change, { sign: true })}
                     </span>
-                    <span className="text-right text-[11px] tnum text-dim">
+                    <span className="text-right text-[12px] tnum text-dim">
                       {num(position.delta, 0)}
                     </span>
-                    <span className="text-right text-[11px] tnum text-dim">
+                    <span className="text-right text-[12px] tnum text-dim">
                       {money(position.vega, { sign: true })}
                     </span>
                   </Link>
@@ -649,8 +649,8 @@ function SliderRow({
   return (
     <label className="block">
       <span className="flex items-baseline justify-between">
-        <span className="text-[11.5px] text-muted">{label}</span>
-        <span className="tnum text-[12px] font-semibold">{display}</span>
+        <span className="text-[12px] text-muted">{label}</span>
+        <span className="tnum text-[13px] font-semibold">{display}</span>
       </span>
       <input
         type="range"
@@ -663,7 +663,7 @@ function SliderRow({
         style={{ accentColor: "#0364d3" }}
         aria-label={label}
       />
-      <span className="mt-0.5 flex justify-between text-[9.5px] tnum text-faint">
+      <span className="mt-0.5 flex justify-between text-[11px] tnum text-faint">
         <span>{minLabel}</span>
         <span>{maxLabel}</span>
       </span>
@@ -684,12 +684,12 @@ function Stat({
 }) {
   const color = tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-text";
   return (
-    <div className="rounded-lg border border-line bg-white px-3.5 py-3">
-      <p className="text-[9.5px] font-semibold uppercase tracking-[0.05em] text-faint">{label}</p>
-      <p className={`mt-1 text-[18px] font-semibold leading-6 tracking-[-0.02em] tnum ${color}`}>
+    <div className="rounded-xl border border-line bg-white px-3.5 py-3">
+      <p className="text-[11px] font-semibold text-faint">{label}</p>
+      <p className={`mt-1 text-[18px] font-semibold leading-6 tnum ${color}`}>
         {value}
       </p>
-      <p className="mt-0.5 truncate text-[10px] text-dim tnum">{sub}</p>
+      <p className="mt-0.5 truncate text-[11px] text-dim tnum">{sub}</p>
     </div>
   );
 }

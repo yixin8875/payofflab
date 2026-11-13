@@ -15,7 +15,7 @@ function LegalPage({
       <PaneHeader title={title} subtitle="最后更新：2026 年 11 月 7 日" />
       <DetailScroll>
         <div className="max-w-[680px]">
-          <p className="text-[13px] leading-5 text-muted">{lead}</p>
+          <p className="text-[14px] leading-5 text-muted">{lead}</p>
           <div className="mt-6 space-y-5">{children}</div>
         </div>
       </DetailScroll>
@@ -26,8 +26,8 @@ function LegalPage({
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h2 className="text-[13px] font-semibold">{title}</h2>
-      <p className="mt-1.5 text-[12px] leading-5 text-muted">{children}</p>
+      <h2 className="text-[14px] font-semibold">{title}</h2>
+      <p className="mt-1.5 text-[13px] leading-5 text-muted">{children}</p>
     </section>
   );
 }

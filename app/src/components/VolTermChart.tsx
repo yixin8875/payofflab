@@ -7,7 +7,7 @@ const COLORS = {
   call: "#0b7a52",
   put: "#bf3b2b",
   grid: "#eeebe5",
-  axis: "#9c978f",
+  axis: "#767169",
 };
 
 const SERIES = [
@@ -131,7 +131,7 @@ export function VolTermChart({
               x={width - 5}
               y={yAt(value) + 3.5}
               textAnchor="end"
-              fontSize="10"
+              fontSize="11"
               fill={COLORS.axis}
               className="tnum"
             >
@@ -176,7 +176,7 @@ export function VolTermChart({
             x={xAt(index)}
             y={height - 9}
             textAnchor="middle"
-            fontSize="10"
+            fontSize="11"
             fill={COLORS.axis}
             className="tnum"
           >
@@ -198,7 +198,7 @@ export function VolTermChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[196px] rounded-lg border border-line bg-white/95 px-2.5 py-2 text-[11px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[196px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
           style={{ left: Math.min(Math.max(8, xAt(hover ?? 0) - 98), width - 204) }}
         >
           <div className="flex items-baseline justify-between gap-2">
@@ -222,7 +222,7 @@ export function VolTermChart({
               </span>
             </div>
           ))}
-          <div className="mt-1 border-t border-line-subtle pt-1 text-[10px] text-faint tnum">
+          <div className="mt-1 border-t border-line-subtle pt-1 text-[11px] text-faint tnum">
             25Δ RR {hovered.rr != null ? volPoints(hovered.rr) : "—"}
           </div>
         </div>

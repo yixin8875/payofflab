@@ -55,10 +55,7 @@ export function TitleBar({
           <PanelLeft size={15} />
         </button>
         <BrandMark size={20} />
-        <span className="truncate text-[12.5px] font-semibold tracking-[-0.01em]">PayoffLab</span>
-        <span className="ml-auto rounded border border-line bg-white/60 px-1 py-px text-[9px] font-medium tracking-wide text-dim">
-          桌面版
-        </span>
+        <span className="truncate text-[14px] font-semibold">PayoffLab</span>
       </div>
 
       {/* Navigation, search, actions, window controls */}
@@ -90,12 +87,12 @@ export function TitleBar({
           <button
             type="button"
             onClick={onOpenPalette}
-            className="flex h-[30px] w-full max-w-[420px] items-center gap-2 rounded-md border border-transparent bg-[#f2f0ec] px-2.5 text-left text-[12px] text-faint transition-colors hover:border-line hover:bg-[#f7f5f1]"
+            className="flex h-8 w-full max-w-[420px] items-center gap-2 rounded-xl border border-transparent bg-[#f2f0ec] px-2.5 text-left text-[14px] text-faint transition-colors hover:border-line hover:bg-[#f7f5f1]"
             aria-label="打开搜索"
           >
-            <Search size={14} className="shrink-0" />
-            <span className="truncate">在 PayoffLab 中搜索</span>
-            <kbd className="ml-auto shrink-0 rounded border border-line bg-white px-1 py-px font-sans text-[9.5px] text-faint">
+            <Search size={15} className="shrink-0" />
+            <span className="truncate">搜索页面与标的</span>
+            <kbd className="ml-auto shrink-0 rounded border border-line bg-white px-1 py-px font-sans text-[11px] text-faint">
               Ctrl K
             </kbd>
           </button>
@@ -106,7 +103,7 @@ export function TitleBar({
             <Help size={13} />
             帮助
           </Link>
-          <Link to="/calculator" className="btn-soft h-[26px] px-2.5">
+          <Link to="/calculator" className="btn-secondary h-7 px-2.5">
             <Plus size={12} />
             新建策略
           </Link>

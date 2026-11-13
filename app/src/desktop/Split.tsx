@@ -36,8 +36,8 @@ export function ListPane({
   return (
     <>
       <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-line px-3">
-        <h2 className="text-[13px] font-semibold tracking-[-0.01em]">{title}</h2>
-        {count !== undefined && <span className="tnum text-[11.5px] text-faint">{count}</span>}
+        <h2 className="text-[14px] font-semibold">{title}</h2>
+        {count !== undefined && <span className="tnum text-[12px] text-faint">{count}</span>}
         <div className="ml-auto flex items-center gap-1">{actions}</div>
       </div>
       <div className="scroll-pane flex-1">{children}</div>
@@ -57,7 +57,7 @@ export function ListGroup({
 }) {
   return (
     <section className="pb-1">
-      <h3 className="flex items-baseline gap-1.5 px-3 pb-1 pt-3 text-[10.5px] font-semibold tracking-[0.02em] text-faint">
+      <h3 className="flex items-baseline gap-1.5 px-3 pb-1.5 pt-4 text-[12px] font-medium text-faint">
         {label}
         {count !== undefined && <span className="font-normal text-faint/80">{count}</span>}
       </h3>
@@ -92,12 +92,12 @@ export function ListRow({
     <>
       {badge}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[12.5px] font-medium leading-[17px] text-text">{title}</span>
+        <span className="block truncate text-[13px] font-medium leading-[18px] text-text">{title}</span>
         {subtitle && (
-          <span className="block truncate text-[11px] leading-[15px] text-dim">{subtitle}</span>
+          <span className="block truncate text-[12px] leading-4 text-dim">{subtitle}</span>
         )}
       </span>
-      {meta !== undefined && <span className="shrink-0 tnum text-[10.5px] text-faint">{meta}</span>}
+      {meta !== undefined && <span className="shrink-0 tnum text-[11px] text-faint">{meta}</span>}
       {trailing}
     </>
   );
@@ -136,38 +136,20 @@ export function ListRow({
 
 /* ------------------------------------------------------------------ badge */
 
-const TONES = [
-  "bg-[#e7eef9] text-[#2e5f9e]",
-  "bg-[#efe9f7] text-[#6a4a9e]",
-  "bg-[#e5f1ec] text-[#2f6f57]",
-  "bg-[#f7edda] text-[#8a6220]",
-  "bg-[#f7e8e6] text-[#9c4a3e]",
-  "bg-[#e9ecef] text-[#566068]",
-  "bg-[#f2e9e2] text-[#7c5a41]",
-  "bg-[#e8f0e4] text-[#4a6b38]",
-];
-
-function hash(text: string) {
-  let h = 0;
-  for (let i = 0; i < text.length; i += 1) h = (h * 31 + text.charCodeAt(i)) >>> 0;
-  return h;
-}
-
 export function Badge({
   label,
-  seed,
+  seed: _seed,
   size = 28,
-  rounded = "rounded-[7px]",
+  rounded = "rounded-xl",
 }: {
   label: string;
   seed?: string;
   size?: number;
   rounded?: string;
 }) {
-  const tone = TONES[hash(seed ?? label) % TONES.length];
   return (
     <span
-      className={`flex shrink-0 items-center justify-center text-[10px] font-semibold uppercase tracking-[0.01em] ${tone} ${rounded}`}
+      className={`flex shrink-0 items-center justify-center bg-surface-strong text-[12px] font-medium text-dim ${rounded}`}
       style={{ width: size, height: size }}
       aria-hidden="true"
     >
@@ -193,8 +175,8 @@ export function PaneHeader({
     <div className="flex h-[52px] shrink-0 items-center gap-2.5 border-b border-line bg-chrome px-4">
       {leading}
       <div className="min-w-0">
-        <h1 className="truncate text-[13.5px] font-semibold leading-[18px] tracking-[-0.01em]">{title}</h1>
-        {subtitle && <p className="truncate text-[11px] leading-[14px] text-dim">{subtitle}</p>}
+        <h1 className="truncate text-[14px] font-semibold leading-5">{title}</h1>
+        {subtitle && <p className="truncate text-[12px] leading-4 text-dim">{subtitle}</p>}
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-1.5">{children}</div>
     </div>
@@ -213,7 +195,7 @@ export function DetailScroll({
   return (
     <div className="scroll-pane flex-1">
       <div
-        className={`mx-auto w-full ${wide ? "max-w-none" : "max-w-[900px]"} px-7 py-6 ${className}`}
+        className={`mx-auto w-full ${wide ? "max-w-none" : "max-w-[900px]"} px-8 py-6 ${className}`}
       >
         {children}
       </div>
@@ -233,8 +215,8 @@ export function EmptyDetail({
   return (
     <div className="flex h-full flex-1 flex-col items-center justify-center px-8 pb-10 text-center">
       <EmptyIllustration />
-      <h2 className="mt-7 text-[13.5px] font-semibold tracking-[-0.01em]">{title}</h2>
-      <p className="mt-1.5 max-w-[320px] text-[12px] leading-[18px] text-dim">{body}</p>
+      <h2 className="mt-7 text-[14px] font-semibold">{title}</h2>
+      <p className="mt-1.5 max-w-[320px] text-[13px] leading-5 text-dim">{body}</p>
       {action && <div className="mt-5">{action}</div>}
     </div>
   );

@@ -53,22 +53,22 @@ export default function Methodology() {
       <PaneHeader title="方法与假设" subtitle="每个数字都说得出出处" />
       <DetailScroll>
         <div className="max-w-[700px]">
-          <p className="text-[13px] leading-5 text-muted">
+          <p className="text-[14px] leading-5 text-muted">
             这里写下报价时点、模型假设，以及概率与希腊值是怎么算出来的——你可以照着复核。
           </p>
           <div className="mt-6 space-y-6">
             {SECTIONS.map((section) => (
               <section key={section.title}>
-                <h2 className="text-[13px] font-semibold">{section.title}</h2>
+                <h2 className="text-[14px] font-semibold">{section.title}</h2>
                 {section.body && (
-                  <p className="mt-1.5 text-[12px] leading-5 text-muted">{section.body}</p>
+                  <p className="mt-1.5 text-[13px] leading-5 text-muted">{section.body}</p>
                 )}
                 {section.code && (
-                  <div className="mt-2 rounded-lg border border-line bg-[#fbfaf8] px-3 py-2.5">
+                  <div className="mt-2 rounded-xl border border-line bg-[#fbfaf8] px-3 py-2.5">
                     {section.code.map((line) => (
                       <p
                         key={line}
-                        className="overflow-x-auto whitespace-nowrap font-code text-[11.5px] leading-6 text-text"
+                        className="overflow-x-auto whitespace-nowrap font-code text-[12px] leading-6 text-text"
                       >
                         {line}
                       </p>
@@ -78,7 +78,7 @@ export default function Methodology() {
                 {section.list && (
                   <ul className="mt-1.5 space-y-1">
                     {section.list.map((item) => (
-                      <li key={item} className="flex gap-2 text-[12px] leading-5 text-muted">
+                      <li key={item} className="flex gap-2 text-[13px] leading-5 text-muted">
                         <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-line-strong" />
                         <span>{item}</span>
                       </li>
@@ -88,7 +88,7 @@ export default function Methodology() {
               </section>
             ))}
           </div>
-          <p className="mt-8 border-t border-line-subtle pt-4 text-[10.5px] text-faint">
+          <p className="mt-8 border-t border-line-subtle pt-4 text-[11px] text-faint">
             在线数据来自 CBOE 延迟行情 · 离线为合成报价 · 仅供情景分析 · 非投资建议
           </p>
         </div>

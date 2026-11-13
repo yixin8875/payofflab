@@ -25,20 +25,20 @@ export function UpdateToast() {
   return (
     <aside
       aria-live="polite"
-      className="fixed bottom-[34px] right-4 z-[80] w-[340px] rounded-lg border border-line bg-white p-3 shadow-[0_14px_40px_rgba(30,25,18,0.18)]"
+      className="fixed bottom-[34px] right-4 z-[80] w-[340px] rounded-xl border border-line bg-white p-3 shadow-[0_14px_40px_rgba(30,25,18,0.18)]"
     >
       <div className="flex items-start gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
           <Download size={16} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold">
+          <p className="text-[13px] font-semibold">
             {update.status === "available" && `发现新版本 v${update.version}`}
             {update.status === "downloading" && `正在下载 v${update.version}`}
             {update.status === "ready" && `v${update.version} 已安装`}
             {update.status === "error" && `更新 v${update.version} 未完成`}
           </p>
-          <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-[10.5px] leading-4 text-dim">
+          <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-[11px] leading-4 text-dim">
             {update.status === "available" &&
               (update.notes?.trim() || "包含最新修复与改进。")}
             {update.status === "downloading" &&
@@ -87,7 +87,7 @@ export function UpdateToast() {
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="ml-auto text-[10.5px] text-faint hover:text-text"
+          className="ml-auto text-[11px] text-faint hover:text-text"
         >
           {update.status === "ready" ? "关闭" : "稍后"}
         </button>

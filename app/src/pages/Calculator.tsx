@@ -50,15 +50,15 @@ function TickerPicker({
       ? query.toUpperCase()
       : "";
   return (
-    <div className="absolute left-2 top-[50px] z-50 w-[320px] rounded-lg border border-line bg-white p-1.5 shadow-pop">
-      <div className="flex items-center gap-1.5 rounded-md border border-line bg-white px-2">
+    <div className="absolute left-2 top-[50px] z-50 w-[320px] rounded-xl border border-line bg-white p-1.5 shadow-pop">
+      <div className="flex items-center gap-1.5 rounded-lg border border-line bg-white px-2">
         <Search size={13} className="text-faint" />
         <input
           autoFocus
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="搜索代码或名称"
-          className="h-7 w-full bg-transparent text-[12px] outline-none placeholder:text-faint"
+          className="h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-faint"
         />
         <button onClick={onClose} aria-label="关闭" className="text-faint hover:text-text">
           <X size={12} />
@@ -76,9 +76,9 @@ function TickerPicker({
                 t.symbol === symbol ? "bg-accent-soft" : ""
               }`}
             >
-              <span className="w-11 text-[12px] font-semibold">{t.symbol}</span>
-              <span className="min-w-0 flex-1 truncate text-[11.5px] text-dim">{t.name}</span>
-              <span className="text-[11.5px] tnum">${t.spot.toFixed(2)}</span>
+              <span className="w-11 text-[13px] font-semibold">{t.symbol}</span>
+              <span className="min-w-0 flex-1 truncate text-[12px] text-dim">{t.name}</span>
+              <span className="text-[12px] tnum">${t.spot.toFixed(2)}</span>
             </button>
           </li>
         ))}
@@ -91,15 +91,15 @@ function TickerPicker({
               }}
               className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-hover"
             >
-              <span className="w-11 text-[12px] font-semibold">{custom}</span>
-              <span className="min-w-0 flex-1 truncate text-[11.5px] text-dim">
+              <span className="w-11 text-[13px] font-semibold">{custom}</span>
+              <span className="min-w-0 flex-1 truncate text-[12px] text-dim">
                 在线查询 · CBOE 延迟行情
               </span>
             </button>
           </li>
         )}
         {list.length === 0 && !custom && (
-          <li className="px-2 py-4 text-center text-[11.5px] text-dim">没有匹配的标的</li>
+          <li className="px-2 py-4 text-center text-[12px] text-dim">没有匹配的标的</li>
         )}
       </ul>
     </div>
@@ -120,9 +120,9 @@ function GreekList({ analysis }: { analysis: Analysis }) {
     <div className="grid grid-cols-2 gap-x-3">
       {rows.map(([label, value, fmt, hint]) => (
         <div key={label} className="border-b border-line-subtle py-1.5">
-          <p className="text-[10px] text-dim">{label}</p>
-          <p className="text-[12px] font-medium tnum">{fmt(value)}</p>
-          <p className="text-[9px] text-faint">{hint}</p>
+          <p className="text-[11px] text-dim">{label}</p>
+          <p className="text-[13px] font-medium tnum">{fmt(value)}</p>
+          <p className="text-[11px] text-faint">{hint}</p>
         </div>
       ))}
     </div>
@@ -138,7 +138,7 @@ function SideToggle({ side, onChange }: { side: 1 | -1; onChange: (s: 1 | -1) =>
         <button
           key={s}
           onClick={() => onChange(s)}
-          className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+          className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
             side === s
               ? s === 1
                 ? "bg-white text-profit shadow-sm"
@@ -163,7 +163,7 @@ function QtyStepper({ qty, onChange }: { qty: number; onChange: (q: number) => v
       >
         <Minus size={9} />
       </button>
-      <span className="w-4 text-center text-[10.5px] tnum">{qty}</span>
+      <span className="w-4 text-center text-[11px] tnum">{qty}</span>
       <button
         onClick={() => onChange(Math.min(99, qty + 1))}
         className="flex h-[22px] w-5 items-center justify-center text-dim hover:text-text"
@@ -197,7 +197,7 @@ function LegRow({
     onPatch({ strike: Math.max(step, next) });
   };
   return (
-    <div className="rounded-md border border-line bg-white px-2 py-1.5">
+    <div className="rounded-lg border border-line bg-white px-2 py-1.5">
       <div className="flex items-center gap-1">
         <SideToggle side={leg.side} onChange={(s) => onPatch({ side: s })} />
         <QtyStepper qty={leg.qty} onChange={(q) => onPatch({ qty: q })} />
@@ -206,7 +206,7 @@ function LegRow({
             <button
               key={k}
               onClick={() => onPatch({ kind: k, strike: k === "stock" ? spot : leg.strike })}
-              className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+              className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
                 leg.kind === k ? "bg-white text-text shadow-sm" : "text-dim"
               }`}
             >
@@ -222,7 +222,7 @@ function LegRow({
           <X size={12} />
         </button>
       </div>
-      <div className="mt-1.5 flex items-center gap-1.5 text-[10.5px]">
+      <div className="mt-1.5 flex items-center gap-1.5 text-[11px]">
         {leg.kind === "stock" ? (
           <span className="flex h-6 flex-1 items-center justify-between rounded border border-line bg-white px-1.5 tnum">
             <span className="text-dim">现价</span>
@@ -240,7 +240,7 @@ function LegRow({
             <input
               value={leg.strike}
               onChange={(e) => onPatch({ strike: Number(e.target.value) || 0 })}
-              className="w-11 bg-transparent text-center text-[10.5px] outline-none tnum"
+              className="w-11 bg-transparent text-center text-[11px] outline-none tnum"
             />
             <button
               onClick={() => bump(1)}
@@ -251,13 +251,13 @@ function LegRow({
             </button>
           </div>
         )}
-        <span className="flex h-6 flex-1 items-center justify-center rounded border border-line bg-surface px-1 text-[10px] text-dim">
+        <span className="flex h-6 flex-1 items-center justify-center rounded border border-line bg-surface px-1 text-[11px] text-dim">
           {expiryLabel}
         </span>
         <span className="flex h-6 w-[46px] items-center justify-end rounded border border-line bg-white px-1 tnum">
           {price(leg.fill)}
         </span>
-        <span className="w-3 text-center text-[9px] font-medium text-faint">{kindLabel}</span>
+        <span className="w-3 text-center text-[11px] font-medium text-faint">{kindLabel}</span>
       </div>
     </div>
   );
@@ -311,10 +311,10 @@ function EmptyChart({ symbol, onPick }: { symbol: string; onPick: (key: string) 
         />
       </svg>
       <div className="relative max-w-[470px] px-5 text-center">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-text">
+        <h2 className="text-[16px] font-semibold text-text">
           你觉得 {symbol} 会怎么走？
         </h2>
-        <p className="mx-auto mt-1 max-w-[360px] text-[11.5px] leading-4 text-muted">
+        <p className="mx-auto mt-1 max-w-[360px] text-[12px] leading-4 text-muted">
           选一个观点，我们会搭一笔起步交易，盈亏图立刻画出来。
         </p>
         <div className="mx-auto mt-4 grid max-w-[430px] grid-cols-2 gap-1.5">
@@ -324,30 +324,28 @@ function EmptyChart({ symbol, onPick }: { symbol: string; onPick: (key: string) 
               <button
                 key={s.key}
                 onClick={() => onPick(s.key)}
-                className="group flex items-center gap-2 rounded-md border border-line bg-white px-2.5 py-2 text-left transition-colors hover:border-line-strong"
+                className="group flex items-center gap-2 rounded-lg border border-line bg-white px-2.5 py-2 text-left transition-colors hover:border-line-strong"
               >
                 <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-surface ${
                     s.tone === "profit"
-                      ? "bg-profit-soft text-profit"
+                      ? "text-profit"
                       : s.tone === "loss"
-                        ? "bg-loss-soft text-loss"
-                        : s.tone === "neutral"
-                          ? "bg-surface text-muted"
-                          : "bg-accent-soft text-accent"
+                        ? "text-loss"
+                        : "text-dim"
                   }`}
                 >
                   <Icon size={15} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-[12px] font-semibold text-text">{s.mood}</span>
-                  <span className="block truncate text-[10.5px] text-dim">{s.title}</span>
+                  <span className="block text-[13px] font-semibold text-text">{s.mood}</span>
+                  <span className="block truncate text-[11px] text-dim">{s.title}</span>
                 </span>
               </button>
             );
           })}
         </div>
-        <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-muted">
+        <div className="mt-3 flex items-center justify-center gap-2 text-[12px] text-muted">
           <Link to="/strategies" className="hover:text-accent">
             查看全部策略
           </Link>
@@ -376,7 +374,7 @@ function Metric({
 }) {
   return (
     <div className="border-b border-line-subtle py-2 last:border-0">
-      <p className="text-[10.5px] text-dim">{label}</p>
+      <p className="text-[11px] text-dim">{label}</p>
       <p
         className={`mt-0.5 text-[14px] font-semibold tnum ${
           tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-text"
@@ -384,7 +382,7 @@ function Metric({
       >
         {value}
       </p>
-      {hint && <p className="mt-0.5 text-[9.5px] leading-snug text-faint">{hint}</p>}
+      {hint && <p className="mt-0.5 text-[11px] leading-snug text-faint">{hint}</p>}
     </div>
   );
 }
@@ -413,19 +411,19 @@ function PresetChips({
       <div className="relative shrink-0">
         <button
           onClick={onToggleExpiry}
-          className="inline-flex h-6 shrink-0 items-center gap-1 rounded border border-line bg-white px-2 text-[11px] font-medium"
+          className="inline-flex h-7 shrink-0 items-center gap-1 rounded-lg border border-line bg-white px-2 text-[13px] font-medium"
         >
           <Calendar size={11} className="text-dim" />
           {expiry.label} · {expiry.dte}天
           <ChevronDown size={11} className="text-faint" />
         </button>
         {expiryOpen && (
-          <ul className="absolute left-0 top-7 z-40 max-h-[264px] w-[160px] overflow-y-auto rounded-lg border border-line bg-white p-1 shadow-pop">
+          <ul className="absolute left-0 top-7 z-40 max-h-[264px] w-[160px] overflow-y-auto rounded-xl border border-line bg-white p-1 shadow-pop">
             {expiries.map((e) => (
               <li key={e.iso}>
                 <button
                   onClick={() => onPickExpiry(e.iso)}
-                  className="flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-[11.5px] hover:bg-hover"
+                  className="flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-hover"
                 >
                   <span>{e.label}</span>
                   <span className="text-dim tnum">{e.dte}天</span>
@@ -439,7 +437,7 @@ function PresetChips({
       <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
         {CHIP_GROUPS.filter((g) => g.outlook === "bullish" || g.outlook === "bearish").map((g) => (
           <div key={g.outlook} className="flex shrink-0 items-center gap-1">
-            <span className="px-0.5 text-[10px] text-faint">{OUTLOOK_LABEL[g.outlook]}</span>
+            <span className="px-0.5 text-[11px] text-faint">{OUTLOOK_LABEL[g.outlook]}</span>
             {g.keys.map((key) => {
               const p = PRESET_BY_KEY[key];
               const selected = presetKey === key;
@@ -447,7 +445,7 @@ function PresetChips({
                 <button
                   key={key}
                   onClick={() => onApply(key)}
-                  className={`h-6 shrink-0 rounded border px-2 text-[10.5px] font-medium transition-colors ${
+                  className={`h-7 shrink-0 rounded-lg border px-2 text-[13px] font-medium transition-colors ${
                     selected
                       ? "border-accent-line bg-accent-soft text-accent"
                       : "border-line bg-white text-muted hover:text-text"
@@ -461,7 +459,7 @@ function PresetChips({
         ))}
         <Link
           to="/strategies"
-          className="ml-1 flex h-6 shrink-0 items-center gap-1 rounded border border-line bg-white px-2 text-[10.5px] font-medium text-muted hover:text-text"
+          className="ml-1 flex h-7 shrink-0 items-center gap-1 rounded-lg border border-line bg-white px-2 text-[13px] font-medium text-muted hover:text-text"
         >
           全部策略
           <ChevronRight size={11} className="text-faint" />
@@ -649,16 +647,16 @@ export default function Calculator() {
       <div className="relative flex h-[52px] shrink-0 items-center gap-2 border-b border-line bg-chrome px-3">
         <button
           onClick={() => setPicker((v) => !v)}
-          className="group flex h-8 min-w-0 shrink items-center gap-1.5 rounded-md px-1 text-left transition-colors hover:bg-hover"
+          className="group flex h-8 min-w-0 shrink items-center gap-1.5 rounded-lg px-1 text-left transition-colors hover:bg-hover"
           aria-label={`${t.symbol} ${t.name}，切换标的`}
         >
-          <span className="text-[13px] font-semibold tracking-[0.01em]">{t.symbol}</span>
-          <span className="hidden min-w-0 truncate text-[11.5px] text-dim lg:inline">{t.name}</span>
-          <span className="ml-1.5 text-[16px] font-semibold tracking-[-0.02em] tnum">
+          <span className="text-[14px] font-semibold">{t.symbol}</span>
+          <span className="hidden min-w-0 truncate text-[12px] text-dim lg:inline">{t.name}</span>
+          <span className="ml-1.5 text-[18px] font-semibold tnum">
             ${market.spot.toFixed(2)}
           </span>
           <span
-            className={`flex items-center gap-0.5 text-[11px] font-medium tnum ${
+            className={`flex items-center gap-0.5 text-[12px] font-medium tnum ${
               market.change >= 0 ? "text-profit" : "text-loss"
             }`}
           >
@@ -671,18 +669,18 @@ export default function Calculator() {
 
         <div className="ml-auto flex items-center gap-1.5">
           <span
-            className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[10px] text-dim tnum xl:flex"
+            className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[11px] text-dim tnum xl:flex"
             title="按 IV 估算的到期一个标准差区间"
           >
             EM ±{money(analysis?.expectedMove ?? market.spot * market.iv * Math.sqrt(expiry.dte / 365))}
           </span>
           <span
-            className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[10px] text-dim tnum 2xl:flex"
+            className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[11px] text-dim tnum 2xl:flex"
             title={chain ? "CBOE 30 天隐含波动率" : "隐含波动率在过去一年区间中的排名"}
           >
             {chain ? `IV30 ${pct(chain.iv30, 1)}` : `IVR ${t.ivRank}`}
           </span>
-          <span className="hidden h-6 items-center gap-1.5 px-1 text-[10.5px] text-dim lg:flex">
+          <span className="hidden h-6 items-center gap-1.5 px-1 text-[11px] text-dim lg:flex">
             <span
               className={`h-1.5 w-1.5 rounded-full ${chain ? "bg-profit" : "bg-dim"}`}
             />
@@ -691,7 +689,7 @@ export default function Calculator() {
           <button
             onClick={save}
             disabled={!legs.length}
-            className="btn-primary h-7 px-2.5 disabled:opacity-40"
+            className="btn-primary h-8 px-3 disabled:opacity-40"
           >
             {saved ? <Check size={12} /> : <Bookmark size={12} />}
             {saved ? "已保存" : "保存策略"}
@@ -716,7 +714,7 @@ export default function Calculator() {
       </div>
 
       {expiryEvents.length > 0 && (
-        <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line bg-[#fbfaf8] px-3 py-1 text-[10px]">
+        <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line bg-[#fbfaf8] px-3 py-1 text-[11px]">
           <span className="font-medium text-loss">事件提醒</span>
           <span className="text-dim">
             {expiry.label} 到期跨过 {expiryEvents.map(eventLabel).join("、")}；
@@ -729,15 +727,15 @@ export default function Calculator() {
       )}
 
       <div className="grid min-h-0 flex-1 grid-cols-[290px_minmax(0,1fr)_300px] gap-2 p-2">
-        <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-white">
+        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-white">
           <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line-subtle px-3">
-            <h2 className="text-[12px] font-semibold">持仓</h2>
-            <span className="text-[10.5px] text-faint tnum">
+            <h2 className="text-[13px] font-semibold">持仓</h2>
+            <span className="text-[11px] text-faint tnum">
               {legs.length} 条腿 · ×{legs.reduce((n, l) => Math.max(n, l.qty), 0) || 1}
             </span>
             <button
               onClick={addLeg}
-              className="ml-auto flex h-6 items-center gap-0.5 rounded px-1.5 text-[10.5px] font-medium text-muted hover:bg-hover hover:text-text"
+              className="ml-auto flex h-6 items-center gap-0.5 rounded px-1.5 text-[11px] font-medium text-muted hover:bg-hover hover:text-text"
             >
               <Plus size={11} /> 加腿
             </button>
@@ -746,7 +744,7 @@ export default function Calculator() {
           <div className="scroll-pane flex-1 p-2">
             {legs.length === 0 ? (
               <div className="px-2 py-6">
-                <p className="text-[11.5px] leading-4 text-muted">
+                <p className="text-[12px] leading-4 text-muted">
                   还没有腿。添加后会出现在这里，盈亏图也跟着更新。
                 </p>
                 <button onClick={addLeg} className="btn-secondary mt-3 h-7 px-2.5">
@@ -778,7 +776,7 @@ export default function Calculator() {
                 </div>
               </div>
             )}
-            <p className="mt-3 border-t border-line-subtle pt-2 text-[9.5px] leading-4 text-faint">
+            <p className="mt-3 border-t border-line-subtle pt-2 text-[11px] leading-4 text-faint">
               {chain
                 ? "成交价来自 CBOE 延迟行情：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。"
                 : "成交价来自合成链：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。"}
@@ -786,7 +784,7 @@ export default function Calculator() {
           </div>
         </section>
 
-        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border border-line bg-white">
+        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-white">
           {legs.length === 0 ? (
             <EmptyChart symbol={t.symbol} onPick={apply} />
           ) : (
@@ -802,7 +800,7 @@ export default function Calculator() {
                     <button
                       key={m}
                       onClick={() => setMode(m)}
-                      className={`rounded px-1.5 py-0.5 text-[10.5px] font-medium ${
+                      className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
                         mode === m ? "bg-white text-text shadow-sm" : "text-dim"
                       }`}
                     >
@@ -819,7 +817,7 @@ export default function Calculator() {
                     <button
                       key={String(v)}
                       onClick={() => setEnvelope(Number(v))}
-                      className={`rounded px-1.5 py-0.5 text-[10.5px] font-medium ${
+                      className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
                         envelope === v ? "bg-white text-text shadow-sm" : "text-dim"
                       }`}
                     >
@@ -827,7 +825,7 @@ export default function Calculator() {
                     </button>
                   ))}
                 </div>
-                <span className="ml-auto flex items-center gap-2.5 text-[10px] text-dim">
+                <span className="ml-auto flex items-center gap-2.5 text-[11px] text-dim">
                   <span className="flex items-center gap-1">
                     <span className="h-0.5 w-3 rounded bg-accent" /> 今日
                   </span>
@@ -849,7 +847,7 @@ export default function Calculator() {
                 />
               </div>
               {analysis && (
-                <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-line-subtle px-2.5 py-1.5 text-[10px] text-dim">
+                <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-line-subtle px-2.5 py-1.5 text-[11px] text-dim">
                   <span className="font-medium text-text">
                     {t.symbol} · {analysis.isCredit ? "净收入" : "净支出"}{" "}
                     {money(Math.abs(analysis.premium))}
@@ -874,9 +872,9 @@ export default function Calculator() {
           )}
         </section>
 
-        <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-line bg-white">
+        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-white">
           <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line-subtle px-3">
-            <h2 className="text-[12px] font-semibold">分析</h2>
+            <h2 className="text-[13px] font-semibold">分析</h2>
             <div className="ml-auto flex rounded border border-line bg-surface p-0.5">
               {[
                 [false, "简单"],
@@ -885,7 +883,7 @@ export default function Calculator() {
                 <button
                   key={String(v)}
                   onClick={() => setPro(Boolean(v))}
-                  className={`rounded px-1.5 py-0.5 text-[10.5px] font-medium ${
+                  className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
                     pro === v ? "bg-white text-text shadow-sm" : "text-dim"
                   }`}
                 >
@@ -897,16 +895,16 @@ export default function Calculator() {
 
           <div className="scroll-pane flex-1 p-2.5">
             {!analysis ? (
-              <p className="py-4 text-[11.5px] leading-4 text-muted">
+              <p className="py-4 text-[12px] leading-4 text-muted">
                 构建一个持仓，看看它怎么付钱、在哪里赚钱，以及概率有多大。
               </p>
             ) : (
               <>
-                <div className="rounded-md border border-line bg-[#fbfaf8] px-2.5 py-2">
-                  <p className="text-[11.5px] font-semibold">
+                <div className="rounded-lg border border-line bg-[#fbfaf8] px-2.5 py-2">
+                  <p className="text-[12px] font-semibold">
                     {analysis.isCredit ? "你收到" : "你付出"} {money(Math.abs(analysis.premium))}。
                   </p>
-                  <p className="mt-0.5 text-[10.5px] leading-4 text-muted">{analysis.sentence}</p>
+                  <p className="mt-0.5 text-[11px] leading-4 text-muted">{analysis.sentence}</p>
                 </div>
                 <div className="mt-1">
                   <Metric
@@ -944,7 +942,7 @@ export default function Calculator() {
                 </div>
                 {pro && (
                   <div className="mt-2">
-                    <p className="mb-1 text-[9.5px] font-medium uppercase tracking-wide text-faint">
+                    <p className="mb-1 text-[11px] font-medium text-faint">
                       净希腊值（美元）
                     </p>
                     <GreekList analysis={analysis} />
