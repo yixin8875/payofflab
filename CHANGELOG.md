@@ -3,6 +3,31 @@
 本项目所有值得记录的改动都写在这里。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循[语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.7.0] - 2026-11-15
+
+Gamma 敞口的深度分析、二阶敞口与 IV 冲击，以及覆盖全库的单元测试。
+
+### 新增
+
+- Gamma 敞口新增「行权价 × 到期日」热力图：按二维净 Gamma 显示持仓集中区，支持 ±5% / ±10% / ±20% 行权价窗口、悬停明细，点击到期日列头可切换上方统计范围。
+- Gamma 敞口新增「现价移动后的 Gamma Profile」：按每条腿的 IV 用 Black-Scholes 重算现价上下 10% 的净 Gamma，标出现价与零 Gamma 穿越点，悬停可看假设价位下的明细。
+- Gamma 敞口新增「Gamma 期限结构」：按到期日展示净 Gamma 柱状图，并给出 0DTE、7 天内与 30 天内的 Gamma 占比。
+- Gamma 敞口新增口径开关：未平仓量 / 成交量权重、平值 ±20% 行权价过滤、每 1% / 每 1 点单位；热力图、Profile 与柱状图同步跟随。
+- Gamma 敞口新增墙稳健性指标：Call/Put Wall 的 ±2 档厚度、多穿越时的 Gamma Flip 区间、前 5 档集中度与 Call/Put Gamma 比。
+- Gamma 敞口支持 1 分钟 / 5 分钟自动刷新（页面不在前台时暂停），并在总 GEX 下显示相对上次刷新的变化。
+- Gamma 敞口新增「Vanna / Charm」二阶敞口：按各腿 IV 用 Black-Scholes 计算 delta 对 IV 与时间的敏感度，可按行权价切换查看并给出净敞口。
+- Gamma 敞口新增「IV 冲击下的结构」：以 0.7× / 1.3× IV 重算 gamma，对比总 GEX、Gamma Flip、Call/Put Wall 位置与强度、前 5 档集中度的变化。
+
+### 修复
+
+- 看跌腿的 Charm 补上 q·e<sup>−qT</sup> 项，不再与看涨腿共用同一条时间衰减。
+- Gamma Profile 在范围内没有带 IV 的合约时返回空态，而不是画一条贴合零轴的假曲线。
+
+### 构建
+
+- 引入 Vitest 与 `npm test`：136 个用例覆盖 Black-Scholes 定价与 Gamma/Vanna/Charm 数值校验、GEX 口径（权重、范围、墙、Flip、热力图、IV 冲击）、CBOE 链解析与缓存、期权链与成交成本、持仓/组合估值、情景分析、扫描器、自选、事件日历与本地存储。
+- 新增 `npm run test:coverage`，`src/lib` 语句覆盖率约 85%（未覆盖部分为 React 数据钩子与 Tauri 更新流程）。
+
 ## [1.6.1] - 2026-11-13
 
 界面打磨与真实市场时钟。

@@ -32,6 +32,14 @@
 
 - 「Gamma 敞口」按 CBOE 延迟链中的 gamma 与未平仓量，计算每个行权价的美元 gamma（标的每变动 1% 的美元敞口）。
 - 展示总 GEX、Gamma 状态、Gamma Flip、Call Wall 与 Put Wall，以及按行权价展开的柱状图。
+- 「行权价 × 到期日」热力图把净 Gamma 拆成二维矩阵，绿正红负，支持 ±5% / ±10% / ±20% 行权价窗口；悬停看明细，点击到期日列头可直接切换到该到期日的统计。
+- 「现价移动后的 Gamma Profile」用 Black-Scholes 把每条腿重算到现价上下各 10% 的 33 个假设价位，标出现价与零 Gamma 穿越点，用来推算墙与 Flip 在标的移动后会偏移到哪里。
+- 「Gamma 期限结构」按到期日显示净 Gamma 柱状图，并给出 0DTE、7 天内与 30 天内的 Gamma 占比，区分“今天到期”与“远月沉淀”的结构差异。
+- 口径开关：权重可在未平仓量与成交量之间切换，行权价可只看平值 ±20%，单位可在每 1% 与每 1 点之间切换；热力图、Profile 与柱状图会同步跟随。
+- 墙的稳健性：Call Wall / Put Wall 附带 ±2 档厚度，多穿越时 Gamma Flip 显示为区间而非单点，并给出前 5 档集中度与 Call/Put Gamma 比。
+- 「二阶敞口」用各腿 IV 计算 Vanna（delta 对 IV 的敏感度，按每 1 个波动点）与 Charm（delta 每天的时间衰减），可按行权价查看分布并给出净敞口。
+- 「IV 冲击下的结构」把每条腿的 IV 同比例缩放 0.7× / 1.3× 后重算 gamma，对比总 GEX、Gamma Flip、两侧墙的位置与强度以及集中度，用来判断财报后墙是否还站得住。
+- 可开启 1 分钟或 5 分钟自动刷新（页面不在前台时暂停），并在总 GEX 下方显示相对上次刷新的变化。
 - 统计范围支持全部到期、7 天内与指定到期日，并可按到期日拆解贡献。
 - 采用 naive GEX 口径（看涨为正、看跌为负）；未平仓量为上一交易日收盘值，仅供市场结构参考。
 - 实战读法、盘前流程与案例见 [GEX 实战教学](docs/GEX-实战指南.md)。
@@ -66,8 +74,8 @@
 发布新版本时，先同步修改 `app/package.json`、`app/src-tauri/Cargo.toml`、`app/src-tauri/tauri.conf.json` 与 `app/src/desktop/nav.ts` 中的版本号，提交后执行：
 
 ```bash
-git tag v1.6.1
-git push origin v1.6.1
+git tag v1.7.0
+git push origin v1.7.0
 ```
 
 ## 技术栈
@@ -83,6 +91,8 @@ cd app
 npm install
 npm run dev          # 浏览器预览 http://localhost:1420
 npm run tauri dev    # 带桌面窗口的开发模式
+npm test             # 单元测试（136 个用例）
+npm run test:coverage # 语句覆盖率报告（src/lib）
 ```
 
 ## 构建
@@ -96,8 +106,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.6.1_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.6.1_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.7.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.7.0_x64_zh-CN.msi`
 - 更新包：安装包同目录的 `.sig` 签名文件，由发布流程上传。
 
 ## 目录

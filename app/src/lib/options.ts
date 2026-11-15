@@ -60,6 +60,44 @@ export function bsPrice(kind: "call" | "put", S: number, K: number, T: number, s
   return Math.max(K * disc * normCdf(-d2) - S * div * normCdf(-d1), 0);
 }
 
+/** Black-Scholes gamma, per 1 unit of the underlying. */
+export function bsGamma(S: number, K: number, T: number, sigma: number): number {
+  if (!(S > 0) || !(K > 0) || !(T > 0) || !(sigma > 0)) return 0;
+  const { d1, sqrtT } = d1d2(S, K, Math.max(T, 1e-6), sigma);
+  return (Math.exp(-q * T) * normPdf(d1)) / (S * sigma * sqrtT);
+}
+
+/**
+ * Change in delta per 1.00 change in implied vol — identical for calls and puts.
+ * Divide by 100 to read it per volatility point.
+ */
+export function bsVanna(S: number, K: number, T: number, sigma: number): number {
+  if (!(S > 0) || !(K > 0) || !(T > 0) || !(sigma > 0)) return 0;
+  const { d1, d2 } = d1d2(S, K, Math.max(T, 1e-6), sigma);
+  return (-Math.exp(-q * T) * normPdf(d1) * d2) / sigma;
+}
+
+/**
+ * Change in delta per year of time passing (delta decay), per 1 unit of S.
+ * A put's delta is the call's minus e^{−qT}, so its charm carries an extra
+ * q·e^{−qT} term.
+ */
+export function bsCharm(
+  S: number,
+  K: number,
+  T: number,
+  sigma: number,
+  kind: "call" | "put" = "call",
+): number {
+  if (!(S > 0) || !(K > 0) || !(T > 0) || !(sigma > 0)) return 0;
+  const { d1, d2, sqrtT } = d1d2(S, K, Math.max(T, 1e-6), sigma);
+  const div = Math.exp(-q * T);
+  const call =
+    q * div * normCdf(d1) -
+    div * normPdf(d1) * ((r - q) / (sigma * sqrtT) - d2 / (2 * Math.max(T, 1e-6)));
+  return kind === "put" ? call - q * div : call;
+}
+
 export function ivFor(kind: LegKind, K: number, S: number, baseIv: number): number {
   if (kind === "stock") return baseIv;
   const m = Math.log(Math.max(K, 1) / S);

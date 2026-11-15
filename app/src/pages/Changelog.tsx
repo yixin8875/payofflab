@@ -3,10 +3,42 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.7.0",
+    date: "2026-11-15",
+    title: "Gamma 深度分析与全线单元测试",
+    latest: true,
+    groups: [
+      {
+        label: "新增",
+        items: [
+          "Gamma 敞口新增「行权价 × 到期日」热力图、现价移动后的 Gamma Profile、Gamma 期限结构与 0DTE/7 天/30 天占比。",
+          "新增口径开关（未平仓量/成交量、平值 ±20%、每 1%/每 1 点），热力图、Profile 与柱状图同步跟随。",
+          "新增墙稳健性指标：Call/Put Wall 的 ±2 档厚度、Gamma Flip 区间与前 5 档集中度。",
+          "新增「Vanna / Charm」二阶敞口与「IV 冲击下的结构」，对比 0.7×/1.3× IV 下的总 GEX、Flip、墙与集中度。",
+          "Gamma 敞口支持 1 分钟 / 5 分钟自动刷新，并显示相对上次刷新的变化。",
+        ],
+      },
+      {
+        label: "修复",
+        items: [
+          "看跌腿的 Charm 补上 q·e<sup>−qT</sup> 项，不再与看涨腿共用同一条时间衰减。",
+          "Gamma Profile 在范围内没有带 IV 的合约时返回空态，而不是画一条贴合零轴的假曲线。",
+        ],
+      },
+      {
+        label: "构建",
+        items: [
+          "引入 Vitest：136 个用例覆盖定价与希腊值、GEX 口径、行情解析、持仓估值、情景分析、扫描器与本地存储；新增 npm run test:coverage。",
+          "版本号提升到 1.7.0。",
+        ],
+      },
+    ],
+  },
+  {
     version: "1.6.1",
     date: "2026-11-13",
     title: "界面打磨与真实市场时钟",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "变更",

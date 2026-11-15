@@ -25,6 +25,10 @@ investigation.cany/
 *.key
 *.key.pub
 
+# Test and design tooling output
+coverage/
+.unslop/
+
 # OS / editor noise
 .DS_Store
 Thumbs.db

@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import { gexAxisLabel, gexLabel, strikeLabel, type GexStrike } from "../lib/gex";
+import {
+  gexAxisLabel,
+  gexLabel,
+  strikeLabel,
+  type GexStrike,
+  type GexWeight,
+} from "../lib/gex";
 
 const COLORS = {
   positive: "#0b7a52",
@@ -15,11 +21,13 @@ export function GexChart({
   spot,
   flip,
   height = 300,
+  weight = "oi",
 }: {
   strikes: GexStrike[];
   spot: number;
   flip: number | null;
   height?: number;
+  weight?: GexWeight;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(760);
@@ -264,8 +272,8 @@ export function GexChart({
             <span className="tnum text-text">{gexLabel(hovered.put, { sign: true })}</span>
           </div>
           <div className="mt-1 border-t border-line-subtle pt-1 text-[11px] text-faint tnum">
-            OI {hovered.callOi.toLocaleString("en-US")} 看涨 /{" "}
-            {hovered.putOi.toLocaleString("en-US")} 看跌
+            {weight === "volume" ? "成交量" : "OI"} {hovered.callWeight.toLocaleString("en-US")}{" "}
+            看涨 / {hovered.putWeight.toLocaleString("en-US")} 看跌
           </div>
         </div>
       )}
