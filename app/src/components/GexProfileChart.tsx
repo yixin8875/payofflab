@@ -2,12 +2,12 @@ import { useEffect, useId, useMemo, useRef, useState, type MouseEvent } from "re
 import { gexAxisLabel, gexLabel, strikeLabel, type GexProfile } from "../lib/gex";
 
 const COLORS = {
-  positive: "#0b7a52",
-  negative: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
-  spot: "#6f6a63",
-  zero: "#0364d3",
+  positive: "#059669",
+  negative: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
+  spot: "#737373",
+  zero: "#2563eb",
 };
 
 /**
@@ -66,7 +66,7 @@ export function GexProfileChart({
 
   if (!points.length) {
     return (
-      <div className="flex h-[180px] items-center justify-center rounded-lg border border-line-subtle bg-[#fbfaf8] text-[12px] text-dim">
+      <div className="flex h-[180px] items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-[12px] text-muted-foreground">
         当前范围没有可用于 Profile 的 IV 数据。
       </div>
     );
@@ -166,7 +166,7 @@ export function GexProfileChart({
         <path d={areaPath} fill={COLORS.positive} opacity="0.14" clipPath={`url(#${aboveId})`} />
         <path d={areaPath} fill={COLORS.negative} opacity="0.13" clipPath={`url(#${belowId})`} />
         <line x1={padL} x2={padL + chartW} y1={zeroY} y2={zeroY} stroke="#d2cec8" />
-        <path d={linePath} fill="none" stroke="#1c1b19" strokeWidth="1.4" strokeOpacity="0.78" />
+        <path d={linePath} fill="none" stroke="#171717" strokeWidth="1.4" strokeOpacity="0.78" />
 
         {profile.crossings.map((crossing) => {
           if (crossing < profile.low || crossing > profile.high) return null;
@@ -264,7 +264,7 @@ export function GexProfileChart({
               x2={xAt(hover ?? 0)}
               y1={padT}
               y2={padT + chartH}
-              stroke="#1c1b19"
+              stroke="#171717"
               strokeOpacity="0.16"
             />
             <circle
@@ -279,11 +279,11 @@ export function GexProfileChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[190px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[190px] rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{ left: Math.min(Math.max(8, xAt(hover ?? 0) - 95), width - 198) }}
         >
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-semibold text-text tnum">
+            <span className="font-semibold text-foreground tnum">
               假设 ${strikeLabel(hovered.price)}
             </span>
             <span
@@ -292,15 +292,15 @@ export function GexProfileChart({
               {gexLabel(hovered.net, { sign: true })}
             </span>
           </div>
-          <div className="mt-0.5 flex items-center justify-between text-dim">
+          <div className="mt-0.5 flex items-center justify-between text-muted-foreground">
             <span>较现价</span>
-            <span className="tnum text-text">
+            <span className="tnum text-foreground">
               {((hovered.price / profile.current.price - 1) * 100).toFixed(1)}%
             </span>
           </div>
-          <div className="mt-1 flex items-center justify-between text-dim">
+          <div className="mt-1 flex items-center justify-between text-muted-foreground">
             <span>看涨 / 看跌</span>
-            <span className="tnum text-text">
+            <span className="tnum text-foreground">
               {gexLabel(hovered.call)} / {gexLabel(hovered.put)}
             </span>
           </div>

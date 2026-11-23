@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { gexAxisLabel, gexLabel, strikeLabel, type GexStrike } from "../lib/gex";
 
 const COLORS = {
-  positive: "#0b7a52",
-  negative: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
-  spot: "#6f6a63",
+  positive: "#059669",
+  negative: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
+  spot: "#737373",
 };
 
 export type GexGreek = "vanna" | "charm";
@@ -185,11 +185,11 @@ export function GexGreekChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[178px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[178px] rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{ left: Math.min(Math.max(8, xAt(hover ?? 0) - 89), width - 190) }}
         >
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-semibold text-text tnum">
+            <span className="font-semibold text-foreground tnum">
               行权价 {strikeLabel(hovered.strike)}
             </span>
             <span
@@ -198,7 +198,7 @@ export function GexGreekChart({
               {gexLabel(hovered[metric], { sign: true })}
             </span>
           </div>
-          <div className="mt-1 text-[11px] text-faint">{unit}</div>
+          <div className="mt-1 text-[11px] text-muted-foreground">{unit}</div>
         </div>
       )}
     </div>

@@ -1,21 +1,33 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { Inbox } from "lucide-react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ layout */
 
 export function Split({ list, children }: { list: ReactNode; children: ReactNode }) {
   return (
     <div className="flex h-full min-h-0 w-full">
-      <aside className="flex w-[var(--list-w)] shrink-0 flex-col border-r border-line bg-[var(--list-bg)]">
+      <aside className="flex w-[var(--list-w)] shrink-0 flex-col border-r bg-muted/30">
         {list}
       </aside>
-      <section className="flex min-w-0 flex-1 flex-col bg-chrome">{children}</section>
+      <section className="flex min-w-0 flex-1 flex-col bg-background">{children}</section>
     </div>
   );
 }
 
 export function Workspace({ children }: { children: ReactNode }) {
-  return <div className="flex h-full min-h-0 w-full flex-col bg-[var(--list-bg)]">{children}</div>;
+  return (
+    <div className="flex h-full min-h-0 w-full flex-col bg-muted/30">{children}</div>
+  );
 }
 
 /* -------------------------------------------------------------- list pane */
@@ -35,9 +47,11 @@ export function ListPane({
 }) {
   return (
     <>
-      <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-line px-3">
-        <h2 className="text-[14px] font-semibold">{title}</h2>
-        {count !== undefined && <span className="tnum text-[12px] text-faint">{count}</span>}
+      <div className="flex h-[52px] shrink-0 items-center gap-2 border-b px-3">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        {count !== undefined && (
+          <span className="tnum text-xs text-muted-foreground">{count}</span>
+        )}
         <div className="ml-auto flex items-center gap-1">{actions}</div>
       </div>
       <div className="scroll-pane flex-1">{children}</div>
@@ -57,9 +71,11 @@ export function ListGroup({
 }) {
   return (
     <section className="pb-1">
-      <h3 className="flex items-baseline gap-1.5 px-3 pb-1.5 pt-4 text-[12px] font-medium text-faint">
+      <h3 className="flex items-baseline gap-1.5 px-3 pb-1.5 pt-4 text-xs font-medium text-muted-foreground">
         {label}
-        {count !== undefined && <span className="font-normal text-faint/80">{count}</span>}
+        {count !== undefined && (
+          <span className="font-normal text-muted-foreground/70">{count}</span>
+        )}
       </h3>
       <ul>{children}</ul>
     </section>
@@ -92,12 +108,18 @@ export function ListRow({
     <>
       {badge}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-medium leading-[18px] text-text">{title}</span>
+        <span className="block truncate text-[13px] font-medium leading-[18px] text-foreground">
+          {title}
+        </span>
         {subtitle && (
-          <span className="block truncate text-[12px] leading-4 text-dim">{subtitle}</span>
+          <span className="block truncate text-xs leading-4 text-muted-foreground">
+            {subtitle}
+          </span>
         )}
       </span>
-      {meta !== undefined && <span className="shrink-0 tnum text-[11px] text-faint">{meta}</span>}
+      {meta !== undefined && (
+        <span className="shrink-0 tnum text-xs text-muted-foreground">{meta}</span>
+      )}
       {trailing}
     </>
   );
@@ -107,7 +129,7 @@ export function ListRow({
       <li className="relative">
         <Link
           to={to}
-          className={`list-row ${action ? "pr-9" : ""}`}
+          className={cn("list-row", action && "pr-9")}
           data-selected={selected ? "true" : undefined}
         >
           {body}
@@ -124,7 +146,7 @@ export function ListRow({
       <button
         type="button"
         onClick={onSelect}
-        className={`list-row ${action ? "pr-9" : ""}`}
+        className={cn("list-row", action && "pr-9")}
         data-selected={selected ? "true" : undefined}
       >
         {body}
@@ -134,13 +156,13 @@ export function ListRow({
   );
 }
 
-/* ------------------------------------------------------------------ badge */
+/* --------------------------------------------------------------- monogram */
 
-export function Badge({
+/** Square letter mark used in lists — distinct from coss status <Badge>. */
+export function Monogram({
   label,
-  seed: _seed,
   size = 28,
-  rounded = "rounded-xl",
+  rounded = "rounded-lg",
 }: {
   label: string;
   seed?: string;
@@ -149,7 +171,10 @@ export function Badge({
 }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center bg-surface-strong text-[12px] font-medium text-dim ${rounded}`}
+      className={cn(
+        "flex shrink-0 items-center justify-center bg-secondary text-xs font-medium text-muted-foreground",
+        rounded,
+      )}
       style={{ width: size, height: size }}
       aria-hidden="true"
     >
@@ -172,11 +197,13 @@ export function PaneHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="flex h-[52px] shrink-0 items-center gap-2.5 border-b border-line bg-chrome px-4">
+    <div className="flex h-[52px] shrink-0 items-center gap-2.5 border-b bg-background px-4">
       {leading}
       <div className="min-w-0">
-        <h1 className="truncate text-[14px] font-semibold leading-5">{title}</h1>
-        {subtitle && <p className="truncate text-[12px] leading-4 text-dim">{subtitle}</p>}
+        <h1 className="truncate text-sm font-semibold leading-5">{title}</h1>
+        {subtitle && (
+          <p className="truncate text-xs leading-4 text-muted-foreground">{subtitle}</p>
+        )}
       </div>
       <div className="ml-auto flex shrink-0 items-center gap-1.5">{children}</div>
     </div>
@@ -195,7 +222,11 @@ export function DetailScroll({
   return (
     <div className="scroll-pane flex-1">
       <div
-        className={`mx-auto w-full ${wide ? "max-w-none" : "max-w-[900px]"} px-8 py-6 ${className}`}
+        className={cn(
+          "mx-auto w-full px-8 py-6",
+          wide ? "max-w-none" : "max-w-[900px]",
+          className,
+        )}
       >
         {children}
       </div>
@@ -213,42 +244,15 @@ export function EmptyDetail({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex h-full flex-1 flex-col items-center justify-center px-8 pb-10 text-center">
-      <EmptyIllustration />
-      <h2 className="mt-7 text-[14px] font-semibold">{title}</h2>
-      <p className="mt-1.5 max-w-[320px] text-[13px] leading-5 text-dim">{body}</p>
-      {action && <div className="mt-5">{action}</div>}
-    </div>
-  );
-}
-
-export function EmptyIllustration() {
-  return (
-    <svg width="220" height="176" viewBox="0 0 220 176" fill="none" aria-hidden="true">
-      <g stroke="#e4e0d9" strokeWidth="1.3">
-        <rect x="44" y="34" width="118" height="104" rx="9" transform="rotate(-7 103 86)" fill="#fbfaf8" />
-        <rect x="58" y="26" width="118" height="104" rx="9" transform="rotate(4 117 78)" fill="#fdfcfb" />
-      </g>
-      <rect x="50" y="46" width="126" height="92" rx="8" fill="#ffffff" stroke="#e4e0d9" strokeWidth="1.3" />
-      <g stroke="#eeebe5" strokeWidth="1">
-        <path d="M60 118h106M60 96h106M60 74h106" strokeDasharray="2 5" />
-        <path d="M78 56v72M104 56v72M130 56v72M156 56v72" strokeOpacity="0.55" />
-      </g>
-      <path
-        d="M60 124h36c14 0 20-7 28-24 8-18 15-30 42-34"
-        stroke="#cdc7be"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-      <path d="M60 124h106" stroke="#d9d4cc" strokeWidth="1" />
-      <circle cx="124" cy="100" r="2.6" fill="#d3cdc4" />
-      <g stroke="#e4e0d9" strokeWidth="1.2" strokeLinecap="round">
-        <path d="M188 38v8M184 42h8" />
-        <path d="M30 96v6M27 99h6" />
-        <path d="M178 148v6M175 151h6" />
-      </g>
-      <circle cx="172" cy="66" r="1.6" fill="#e0dbd3" />
-      <circle cx="38" cy="58" r="1.6" fill="#e0dbd3" />
-    </svg>
+    <Empty className="h-full flex-1 py-10">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Inbox />
+        </EmptyMedia>
+        <EmptyTitle className="text-base">{title}</EmptyTitle>
+        <EmptyDescription className="max-w-[320px]">{body}</EmptyDescription>
+      </EmptyHeader>
+      {action && <EmptyContent>{action}</EmptyContent>}
+    </Empty>
   );
 }

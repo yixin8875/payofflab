@@ -11,13 +11,24 @@ import {
   ChevronRight,
   Minus,
   Plus,
-  Search,
   Target,
   TrendDown,
   TrendUp,
   X,
 } from "../components/Icons";
 import { Workspace } from "../desktop/Split";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Toggle } from "@/components/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { decodeDraft } from "../lib/draft";
 import { eventLabel, eventsUntil, useEvents } from "../lib/events";
 import { analyse, type Analysis, type Instrument, type Leg } from "../lib/options";
@@ -50,19 +61,26 @@ function TickerPicker({
       ? query.toUpperCase()
       : "";
   return (
-    <div className="absolute left-2 top-[50px] z-50 w-[320px] rounded-xl border border-line bg-white p-1.5 shadow-pop">
-      <div className="flex items-center gap-1.5 rounded-lg border border-line bg-white px-2">
-        <Search size={13} className="text-faint" />
-        <input
+    <Card className="absolute left-2 top-[50px] z-50 w-[320px] gap-0 p-1.5 shadow-lg">
+      <div className="relative">
+        <Input
           autoFocus
+          size="sm"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="搜索代码或名称"
-          className="h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-faint"
+          className="[&_input]:pr-8"
         />
-        <button onClick={onClose} aria-label="关闭" className="text-faint hover:text-text">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-xs"
+          onClick={onClose}
+          aria-label="关闭"
+          className="absolute right-0.5 top-1/2 -translate-y-1/2"
+        >
           <X size={12} />
-        </button>
+        </Button>
       </div>
       <ul className="mt-1 max-h-[290px] overflow-y-auto">
         {list.map((t) => (
@@ -72,12 +90,12 @@ function TickerPicker({
                 onPick(t.symbol);
                 onClose();
               }}
-              className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-hover ${
-                t.symbol === symbol ? "bg-accent-soft" : ""
+              className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-accent ${
+                t.symbol === symbol ? "bg-brand/10" : ""
               }`}
             >
               <span className="w-11 text-[13px] font-semibold">{t.symbol}</span>
-              <span className="min-w-0 flex-1 truncate text-[12px] text-dim">{t.name}</span>
+              <span className="min-w-0 flex-1 truncate text-[12px] text-muted-foreground">{t.name}</span>
               <span className="text-[12px] tnum">${t.spot.toFixed(2)}</span>
             </button>
           </li>
@@ -89,20 +107,20 @@ function TickerPicker({
                 onPick(custom);
                 onClose();
               }}
-              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-hover"
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-accent"
             >
               <span className="w-11 text-[13px] font-semibold">{custom}</span>
-              <span className="min-w-0 flex-1 truncate text-[12px] text-dim">
+              <span className="min-w-0 flex-1 truncate text-[12px] text-muted-foreground">
                 在线查询 · CBOE 延迟行情
               </span>
             </button>
           </li>
         )}
         {list.length === 0 && !custom && (
-          <li className="px-2 py-4 text-center text-[12px] text-dim">没有匹配的标的</li>
+          <li className="px-2 py-4 text-center text-[12px] text-muted-foreground">没有匹配的标的</li>
         )}
       </ul>
-    </div>
+    </Card>
   );
 }
 
@@ -119,10 +137,10 @@ function GreekList({ analysis }: { analysis: Analysis }) {
   return (
     <div className="grid grid-cols-2 gap-x-3">
       {rows.map(([label, value, fmt, hint]) => (
-        <div key={label} className="border-b border-line-subtle py-1.5">
-          <p className="text-[11px] text-dim">{label}</p>
+        <div key={label} className="border-b border-border/60 py-1.5">
+          <p className="text-[11px] text-muted-foreground">{label}</p>
           <p className="text-[13px] font-medium tnum">{fmt(value)}</p>
-          <p className="text-[11px] text-faint">{hint}</p>
+          <p className="text-[11px] text-muted-foreground">{hint}</p>
         </div>
       ))}
     </div>
@@ -133,32 +151,36 @@ function GreekList({ analysis }: { analysis: Analysis }) {
 
 function SideToggle({ side, onChange }: { side: 1 | -1; onChange: (s: 1 | -1) => void }) {
   return (
-    <div className="flex rounded border border-line bg-surface p-0.5">
-      {([1, -1] as const).map((s) => (
-        <button
-          key={s}
-          onClick={() => onChange(s)}
-          className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-            side === s
-              ? s === 1
-                ? "bg-white text-profit shadow-sm"
-                : "bg-white text-loss shadow-sm"
-              : "text-dim"
-          }`}
-        >
-          {s === 1 ? "买入" : "卖出"}
-        </button>
-      ))}
-    </div>
+    <ToggleGroup
+      size="sm"
+      value={[side === 1 ? "buy" : "sell"]}
+      onValueChange={(value) => {
+        const next = value[0];
+        if (next) onChange(next === "buy" ? 1 : -1);
+      }}
+    >
+      <ToggleGroupItem
+        value="buy"
+        className="h-6 min-w-0 px-1.5 text-[11px] data-pressed:text-profit sm:h-6"
+      >
+        买入
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="sell"
+        className="h-6 min-w-0 px-1.5 text-[11px] data-pressed:text-loss sm:h-6"
+      >
+        卖出
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 }
 
 function QtyStepper({ qty, onChange }: { qty: number; onChange: (q: number) => void }) {
   return (
-    <div className="flex items-center rounded border border-line bg-white">
+    <div className="flex items-center rounded border border-border bg-card">
       <button
         onClick={() => onChange(Math.max(1, qty - 1))}
-        className="flex h-[22px] w-5 items-center justify-center text-dim hover:text-text"
+        className="flex h-[22px] w-5 items-center justify-center text-muted-foreground hover:text-foreground"
         aria-label="减少数量"
       >
         <Minus size={9} />
@@ -166,7 +188,7 @@ function QtyStepper({ qty, onChange }: { qty: number; onChange: (q: number) => v
       <span className="w-4 text-center text-[11px] tnum">{qty}</span>
       <button
         onClick={() => onChange(Math.min(99, qty + 1))}
-        className="flex h-[22px] w-5 items-center justify-center text-dim hover:text-text"
+        className="flex h-[22px] w-5 items-center justify-center text-muted-foreground hover:text-foreground"
         aria-label="增加数量"
       >
         <Plus size={9} />
@@ -197,43 +219,54 @@ function LegRow({
     onPatch({ strike: Math.max(step, next) });
   };
   return (
-    <div className="rounded-lg border border-line bg-white px-2 py-1.5">
+    <div className="rounded-lg border border-border bg-card px-2 py-1.5">
       <div className="flex items-center gap-1">
         <SideToggle side={leg.side} onChange={(s) => onPatch({ side: s })} />
         <QtyStepper qty={leg.qty} onChange={(q) => onPatch({ qty: q })} />
-        <div className="flex rounded border border-line bg-surface p-0.5">
+        <ToggleGroup
+          size="sm"
+          value={[leg.kind]}
+          onValueChange={(value) => {
+            const next = value[0];
+            if (!next) return;
+            onPatch({
+              kind: next as Leg["kind"],
+              strike: next === "stock" ? spot : leg.strike,
+            });
+          }}
+        >
           {(["call", "put", "stock"] as const).map((k) => (
-            <button
+            <ToggleGroupItem
               key={k}
-              onClick={() => onPatch({ kind: k, strike: k === "stock" ? spot : leg.strike })}
-              className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                leg.kind === k ? "bg-white text-text shadow-sm" : "text-dim"
-              }`}
+              value={k}
+              className="h-6 min-w-0 px-1.5 text-[11px] sm:h-6"
             >
               {k === "call" ? "看涨" : k === "put" ? "看跌" : "股票"}
-            </button>
+            </ToggleGroupItem>
           ))}
-        </div>
-        <button
+        </ToggleGroup>
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={onRemove}
           aria-label="删除这条腿"
-          className="ml-auto text-faint hover:text-loss"
+          className="ml-auto hover:text-loss"
         >
           <X size={12} />
-        </button>
+        </Button>
       </div>
       <div className="mt-1.5 flex items-center gap-1.5 text-[11px]">
         {leg.kind === "stock" ? (
-          <span className="flex h-6 flex-1 items-center justify-between rounded border border-line bg-white px-1.5 tnum">
-            <span className="text-dim">现价</span>
+          <span className="flex h-6 flex-1 items-center justify-between rounded border border-border bg-card px-1.5 tnum">
+            <span className="text-muted-foreground">现价</span>
             <span>${spot.toFixed(2)}</span>
           </span>
         ) : (
-          <div className="flex h-6 items-center rounded border border-line bg-white">
+          <div className="flex h-6 items-center rounded border border-border bg-card">
             <button
               onClick={() => bump(-1)}
               aria-label="下调行权价"
-              className="flex h-full w-5 items-center justify-center text-dim hover:text-text"
+              className="flex h-full w-5 items-center justify-center text-muted-foreground hover:text-foreground"
             >
               <ChevronLeft size={9} />
             </button>
@@ -245,19 +278,19 @@ function LegRow({
             <button
               onClick={() => bump(1)}
               aria-label="上调行权价"
-              className="flex h-full w-5 items-center justify-center text-dim hover:text-text"
+              className="flex h-full w-5 items-center justify-center text-muted-foreground hover:text-foreground"
             >
               <ChevronRight size={9} />
             </button>
           </div>
         )}
-        <span className="flex h-6 flex-1 items-center justify-center rounded border border-line bg-surface px-1 text-[11px] text-dim">
+        <span className="flex h-6 flex-1 items-center justify-center rounded border border-border bg-muted px-1 text-[11px] text-muted-foreground">
           {expiryLabel}
         </span>
-        <span className="flex h-6 w-[46px] items-center justify-end rounded border border-line bg-white px-1 tnum">
+        <span className="flex h-6 w-[46px] items-center justify-end rounded border border-border bg-card px-1 tnum">
           {price(leg.fill)}
         </span>
-        <span className="w-3 text-center text-[11px] font-medium text-faint">{kindLabel}</span>
+        <span className="w-3 text-center text-[11px] font-medium text-muted-foreground">{kindLabel}</span>
       </div>
     </div>
   );
@@ -288,7 +321,7 @@ function EmptyChart({ symbol, onPick }: { symbol: string; onPick: (key: string) 
             x2="684"
             y1={60 + i * 92}
             y2={60 + i * 92}
-            stroke="#eeebe5"
+            stroke="#f0f0f0"
             strokeDasharray="2 5"
           />
         ))}
@@ -311,10 +344,10 @@ function EmptyChart({ symbol, onPick }: { symbol: string; onPick: (key: string) 
         />
       </svg>
       <div className="relative max-w-[470px] px-5 text-center">
-        <h2 className="text-[16px] font-semibold text-text">
+        <h2 className="text-[16px] font-semibold text-foreground">
           你觉得 {symbol} 会怎么走？
         </h2>
-        <p className="mx-auto mt-1 max-w-[360px] text-[12px] leading-4 text-muted">
+        <p className="mx-auto mt-1 max-w-[360px] text-[12px] leading-4 text-muted-foreground">
           选一个观点，我们会搭一笔起步交易，盈亏图立刻画出来。
         </p>
         <div className="mx-auto mt-4 grid max-w-[430px] grid-cols-2 gap-1.5">
@@ -324,33 +357,33 @@ function EmptyChart({ symbol, onPick }: { symbol: string; onPick: (key: string) 
               <button
                 key={s.key}
                 onClick={() => onPick(s.key)}
-                className="group flex items-center gap-2 rounded-lg border border-line bg-white px-2.5 py-2 text-left transition-colors hover:border-line-strong"
+                className="group flex items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-2 text-left transition-colors hover:border-input"
               >
                 <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-surface ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-muted ${
                     s.tone === "profit"
                       ? "text-profit"
                       : s.tone === "loss"
                         ? "text-loss"
-                        : "text-dim"
+                        : "text-muted-foreground"
                   }`}
                 >
                   <Icon size={15} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-[13px] font-semibold text-text">{s.mood}</span>
-                  <span className="block truncate text-[11px] text-dim">{s.title}</span>
+                  <span className="block text-[13px] font-semibold text-foreground">{s.mood}</span>
+                  <span className="block truncate text-[11px] text-muted-foreground">{s.title}</span>
                 </span>
               </button>
             );
           })}
         </div>
-        <div className="mt-3 flex items-center justify-center gap-2 text-[12px] text-muted">
-          <Link to="/strategies" className="hover:text-accent">
+        <div className="mt-3 flex items-center justify-center gap-2 text-[12px] text-muted-foreground">
+          <Link to="/strategies" className="hover:text-brand">
             查看全部策略
           </Link>
-          <span className="text-faint">·</span>
-          <button onClick={() => onPick("long-straddle")} className="hover:text-accent">
+          <span className="text-muted-foreground">·</span>
+          <button onClick={() => onPick("long-straddle")} className="hover:text-brand">
             我懂期权，跳过提示
           </button>
         </div>
@@ -373,16 +406,16 @@ function Metric({
   tone?: "profit" | "loss";
 }) {
   return (
-    <div className="border-b border-line-subtle py-2 last:border-0">
-      <p className="text-[11px] text-dim">{label}</p>
+    <div className="border-b border-border/60 py-2 last:border-0">
+      <p className="text-[11px] text-muted-foreground">{label}</p>
       <p
         className={`mt-0.5 text-[14px] font-semibold tnum ${
-          tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-text"
+          tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-foreground"
         }`}
       >
         {value}
       </p>
-      {hint && <p className="mt-0.5 text-[11px] leading-snug text-faint">{hint}</p>}
+      {hint && <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -392,78 +425,74 @@ function Metric({
 function PresetChips({
   expiry,
   expiries,
-  expiryOpen,
-  onToggleExpiry,
   onPickExpiry,
   presetKey,
   onApply,
 }: {
   expiry: Expiry;
   expiries: Expiry[];
-  expiryOpen: boolean;
-  onToggleExpiry: () => void;
   onPickExpiry: (iso: string) => void;
   presetKey: string;
   onApply: (key: string) => void;
 }) {
   return (
     <>
-      <div className="relative shrink-0">
-        <button
-          onClick={onToggleExpiry}
-          className="inline-flex h-7 shrink-0 items-center gap-1 rounded-lg border border-line bg-white px-2 text-[13px] font-medium"
-        >
-          <Calendar size={11} className="text-dim" />
-          {expiry.label} · {expiry.dte}天
-          <ChevronDown size={11} className="text-faint" />
-        </button>
-        {expiryOpen && (
-          <ul className="absolute left-0 top-7 z-40 max-h-[264px] w-[160px] overflow-y-auto rounded-xl border border-line bg-white p-1 shadow-pop">
-            {expiries.map((e) => (
-              <li key={e.iso}>
-                <button
-                  onClick={() => onPickExpiry(e.iso)}
-                  className="flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-[12px] hover:bg-hover"
-                >
-                  <span>{e.label}</span>
-                  <span className="text-dim tnum">{e.dte}天</span>
-                  {e.iso === expiry.iso && <Check size={11} className="text-accent" />}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Select
+        value={expiry.iso}
+        items={expiries.map((e) => ({
+          value: e.iso,
+          label: `${e.label} · ${e.dte}天`,
+        }))}
+        onValueChange={(value) => {
+          if (value) onPickExpiry(String(value));
+        }}
+      >
+        <SelectTrigger size="sm" className="w-[178px] shrink-0">
+          <Calendar size={11} className="opacity-70" />
+          <SelectValue />
+        </SelectTrigger>
+        <SelectPopup alignItemWithTrigger={false}>
+          {expiries.map((e) => (
+            <SelectItem key={e.iso} value={e.iso}>
+              <span className="flex w-full items-center justify-between gap-4">
+                <span>{e.label}</span>
+                <span className="tnum text-xs text-muted-foreground">{e.dte}天</span>
+              </span>
+            </SelectItem>
+          ))}
+        </SelectPopup>
+      </Select>
+
       <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
         {CHIP_GROUPS.filter((g) => g.outlook === "bullish" || g.outlook === "bearish").map((g) => (
           <div key={g.outlook} className="flex shrink-0 items-center gap-1">
-            <span className="px-0.5 text-[11px] text-faint">{OUTLOOK_LABEL[g.outlook]}</span>
+            <span className="px-0.5 text-[11px] text-muted-foreground">{OUTLOOK_LABEL[g.outlook]}</span>
             {g.keys.map((key) => {
               const p = PRESET_BY_KEY[key];
-              const selected = presetKey === key;
               return (
-                <button
+                <Toggle
                   key={key}
-                  onClick={() => onApply(key)}
-                  className={`h-7 shrink-0 rounded-lg border px-2 text-[13px] font-medium transition-colors ${
-                    selected
-                      ? "border-accent-line bg-accent-soft text-accent"
-                      : "border-line bg-white text-muted hover:text-text"
-                  }`}
+                  size="sm"
+                  variant="outline"
+                  pressed={presetKey === key}
+                  onPressedChange={() => onApply(key)}
+                  className="h-7 shrink-0 px-2 text-[13px] data-pressed:border-brand-line data-pressed:bg-brand-soft data-pressed:text-brand"
                 >
                   {p?.name ?? key}
-                </button>
+                </Toggle>
               );
             })}
           </div>
         ))}
-        <Link
-          to="/strategies"
-          className="ml-1 flex h-7 shrink-0 items-center gap-1 rounded-lg border border-line bg-white px-2 text-[13px] font-medium text-muted hover:text-text"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ml-1 shrink-0 gap-1 text-muted-foreground"
+          render={<Link to="/strategies" />}
         >
           全部策略
-          <ChevronRight size={11} className="text-faint" />
-        </Link>
+          <ChevronRight size={11} />
+        </Button>
       </div>
     </>
   );
@@ -515,7 +544,6 @@ export default function Calculator() {
   const [envelope, setEnvelope] = useState(0);
   const [pro, setPro] = useState(false);
   const [picker, setPicker] = useState(false);
-  const [expiryOpen, setExpiryOpen] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const analysis = useMemo(
@@ -567,7 +595,6 @@ export default function Calculator() {
   };
 
   const pickExpiry = (iso: string) => {
-    setExpiryOpen(false);
     setParams({ ticker: t.symbol, expiry: iso, ...(presetKey ? { preset: presetKey } : {}) });
     if (presetKey) {
       setPristine(true);
@@ -644,14 +671,14 @@ export default function Calculator() {
 
   return (
     <Workspace>
-      <div className="relative flex h-[52px] shrink-0 items-center gap-2 border-b border-line bg-chrome px-3">
+      <div className="relative flex h-[52px] shrink-0 items-center gap-2 border-b border-border bg-background px-3">
         <button
           onClick={() => setPicker((v) => !v)}
-          className="group flex h-8 min-w-0 shrink items-center gap-1.5 rounded-lg px-1 text-left transition-colors hover:bg-hover"
+          className="group flex h-8 min-w-0 shrink items-center gap-1.5 rounded-lg px-1 text-left transition-colors hover:bg-accent"
           aria-label={`${t.symbol} ${t.name}，切换标的`}
         >
           <span className="text-[14px] font-semibold">{t.symbol}</span>
-          <span className="hidden min-w-0 truncate text-[12px] text-dim lg:inline">{t.name}</span>
+          <span className="hidden min-w-0 truncate text-[12px] text-muted-foreground lg:inline">{t.name}</span>
           <span className="ml-1.5 text-[18px] font-semibold tnum">
             ${market.spot.toFixed(2)}
           </span>
@@ -664,36 +691,36 @@ export default function Calculator() {
             {money(Math.abs(market.change))} ({market.changePct >= 0 ? "+" : "−"}
             {Math.abs(market.changePct * 100).toFixed(2)}%)
           </span>
-          <ChevronDown size={12} className="text-faint" />
+          <ChevronDown size={12} className="text-muted-foreground" />
         </button>
 
         <div className="ml-auto flex items-center gap-1.5">
           <span
-            className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[11px] text-dim tnum xl:flex"
+            className="hidden h-6 items-center rounded border border-border bg-muted/40 px-2 text-[11px] text-muted-foreground tnum xl:flex"
             title="按 IV 估算的到期一个标准差区间"
           >
             EM ±{money(analysis?.expectedMove ?? market.spot * market.iv * Math.sqrt(expiry.dte / 365))}
           </span>
           <span
-            className="hidden h-6 items-center rounded border border-line bg-[#fbfaf8] px-2 text-[11px] text-dim tnum 2xl:flex"
+            className="hidden h-6 items-center rounded border border-border bg-muted/40 px-2 text-[11px] text-muted-foreground tnum 2xl:flex"
             title={chain ? "CBOE 30 天隐含波动率" : "隐含波动率在过去一年区间中的排名"}
           >
             {chain ? `IV30 ${pct(chain.iv30, 1)}` : `IVR ${t.ivRank}`}
           </span>
-          <span className="hidden h-6 items-center gap-1.5 px-1 text-[11px] text-dim lg:flex">
+          <span className="hidden h-6 items-center gap-1.5 px-1 text-[11px] text-muted-foreground lg:flex">
             <span
-              className={`h-1.5 w-1.5 rounded-full ${chain ? "bg-profit" : "bg-dim"}`}
+              className={`h-1.5 w-1.5 rounded-full ${chain ? "bg-profit" : "bg-muted-foreground"}`}
             />
             {chain ? "在线 · 延迟" : "已收盘"}
           </span>
-          <button
+          <Button
+            size="sm"
             onClick={save}
             disabled={!legs.length}
-            className="btn-primary h-8 px-3 disabled:opacity-40"
           >
             {saved ? <Check size={12} /> : <Bookmark size={12} />}
             {saved ? "已保存" : "保存策略"}
-          </button>
+          </Button>
         </div>
 
         {picker && (
@@ -701,12 +728,10 @@ export default function Calculator() {
         )}
       </div>
 
-      <div className="relative z-30 flex h-[38px] shrink-0 items-center gap-1.5 border-b border-line bg-chrome px-3">
+      <div className="relative z-30 flex h-[38px] shrink-0 items-center gap-1.5 border-b border-border bg-background px-3">
         <PresetChips
           expiry={expiry}
           expiries={expiries}
-          expiryOpen={expiryOpen}
-          onToggleExpiry={() => setExpiryOpen((v) => !v)}
           onPickExpiry={pickExpiry}
           presetKey={presetKey}
           onApply={apply}
@@ -714,43 +739,45 @@ export default function Calculator() {
       </div>
 
       {expiryEvents.length > 0 && (
-        <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-line bg-[#fbfaf8] px-3 py-1 text-[11px]">
+        <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-border bg-muted/40 px-3 py-1 text-[11px]">
           <span className="font-medium text-loss">事件提醒</span>
-          <span className="text-dim">
+          <span className="text-muted-foreground">
             {expiry.label} 到期跨过 {expiryEvents.map(eventLabel).join("、")}；
             持有跨事件头寸要单独考虑 IV crush。
           </span>
-          <Link to="/events" className="ml-auto text-accent hover:underline">
+          <Link to="/events" className="ml-auto text-brand hover:underline">
             事件日历
           </Link>
         </div>
       )}
 
       <div className="grid min-h-0 flex-1 grid-cols-[290px_minmax(0,1fr)_300px] gap-2 p-2">
-        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-white">
-          <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line-subtle px-3">
+        <Card className="min-h-0 gap-0 overflow-hidden">
+          <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border/60 px-3">
             <h2 className="text-[13px] font-semibold">持仓</h2>
-            <span className="text-[11px] text-faint tnum">
+            <span className="text-[11px] text-muted-foreground tnum">
               {legs.length} 条腿 · ×{legs.reduce((n, l) => Math.max(n, l.qty), 0) || 1}
             </span>
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={addLeg}
-              className="ml-auto flex h-6 items-center gap-0.5 rounded px-1.5 text-[11px] font-medium text-muted hover:bg-hover hover:text-text"
+              className="ml-auto gap-0.5 text-muted-foreground"
             >
               <Plus size={11} /> 加腿
-            </button>
+            </Button>
           </div>
 
           <div className="scroll-pane flex-1 p-2">
             {legs.length === 0 ? (
               <div className="px-2 py-6">
-                <p className="text-[12px] leading-4 text-muted">
+                <p className="text-[12px] leading-4 text-muted-foreground">
                   还没有腿。添加后会出现在这里，盈亏图也跟着更新。
                 </p>
-                <button onClick={addLeg} className="btn-secondary mt-3 h-7 px-2.5">
+                <Button variant="outline" size="sm" className="mt-3" onClick={addLeg}>
                   <Plus size={12} />
                   加一条腿
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="space-y-1.5">
@@ -766,68 +793,80 @@ export default function Calculator() {
                   />
                 ))}
                 <div className="flex items-center gap-1.5 pt-1">
-                  <button onClick={addLeg} className="btn-secondary h-7 flex-1 justify-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={addLeg}
+                  >
                     <Plus size={12} />
                     加一条腿
-                  </button>
-                  <button onClick={reset} className="btn-ghost h-7 px-2 text-dim">
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={reset}
+                    className="text-muted-foreground"
+                  >
                     清空
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
-            <p className="mt-3 border-t border-line-subtle pt-2 text-[11px] leading-4 text-faint">
+            <p className="mt-3 border-t border-border/60 pt-2 text-[11px] leading-4 text-muted-foreground">
               {chain
                 ? "成交价来自 CBOE 延迟行情：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。"
                 : "成交价来自合成链：买入按卖价、卖出按买价。箭头会把行权价调到下一个挂牌合约。"}
             </p>
           </div>
-        </section>
+        </Card>
 
-        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-white">
+        <Card className="min-h-0 min-w-0 gap-0 overflow-hidden">
           {legs.length === 0 ? (
             <EmptyChart symbol={t.symbol} onPick={apply} />
           ) : (
             <>
-              <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line-subtle px-2.5">
-                <div className="flex rounded border border-line bg-surface p-0.5">
-                  {(
-                    [
-                      ["pnl", "盈亏"],
-                      ["pct", "百分比"],
-                    ] as const
-                  ).map(([m, label]) => (
-                    <button
-                      key={m}
-                      onClick={() => setMode(m)}
-                      className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                        mode === m ? "bg-white text-text shadow-sm" : "text-dim"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex rounded border border-line bg-surface p-0.5">
+              <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border/60 px-2.5">
+                <ToggleGroup
+                  size="sm"
+                  value={[mode]}
+                  onValueChange={(value) => {
+                    const next = value[0];
+                    if (next === "pnl" || next === "pct") setMode(next);
+                  }}
+                >
+                  <ToggleGroupItem value="pnl" className="h-6 min-w-0 px-1.5 text-[11px] sm:h-6">
+                    盈亏
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="pct" className="h-6 min-w-0 px-1.5 text-[11px] sm:h-6">
+                    百分比
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                <ToggleGroup
+                  size="sm"
+                  value={[String(envelope)]}
+                  onValueChange={(value) => {
+                    const next = Number(value[0]);
+                    if (next === 0 || next === 1 || next === 2) setEnvelope(next);
+                  }}
+                >
                   {[
-                    [0, "无"],
-                    [1, "1σ"],
-                    [2, "2σ"],
+                    ["0", "无"],
+                    ["1", "1σ"],
+                    ["2", "2σ"],
                   ].map(([v, label]) => (
-                    <button
-                      key={String(v)}
-                      onClick={() => setEnvelope(Number(v))}
-                      className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                        envelope === v ? "bg-white text-text shadow-sm" : "text-dim"
-                      }`}
+                    <ToggleGroupItem
+                      key={v}
+                      value={v}
+                      className="h-6 min-w-0 px-1.5 text-[11px] sm:h-6"
                     >
                       {label}
-                    </button>
+                    </ToggleGroupItem>
                   ))}
-                </div>
-                <span className="ml-auto flex items-center gap-2.5 text-[11px] text-dim">
+                </ToggleGroup>
+                <span className="ml-auto flex items-center gap-2.5 text-[11px] text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <span className="h-0.5 w-3 rounded bg-accent" /> 今日
+                    <span className="h-0.5 w-3 rounded bg-brand" /> 今日
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="h-0.5 w-3 rounded bg-loss" /> 到期
@@ -847,8 +886,8 @@ export default function Calculator() {
                 />
               </div>
               {analysis && (
-                <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-line-subtle px-2.5 py-1.5 text-[11px] text-dim">
-                  <span className="font-medium text-text">
+                <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-border/60 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                  <span className="font-medium text-foreground">
                     {t.symbol} · {analysis.isCredit ? "净收入" : "净支出"}{" "}
                     {money(Math.abs(analysis.premium))}
                   </span>
@@ -870,41 +909,44 @@ export default function Calculator() {
               )}
             </>
           )}
-        </section>
+        </Card>
 
-        <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-white">
-          <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line-subtle px-3">
+        <Card className="min-h-0 gap-0 overflow-hidden">
+          <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border/60 px-3">
             <h2 className="text-[13px] font-semibold">分析</h2>
-            <div className="ml-auto flex rounded border border-line bg-surface p-0.5">
-              {[
-                [false, "简单"],
-                [true, "专业"],
-              ].map(([v, label]) => (
-                <button
-                  key={String(v)}
-                  onClick={() => setPro(Boolean(v))}
-                  className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                    pro === v ? "bg-white text-text shadow-sm" : "text-dim"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <ToggleGroup
+              size="sm"
+              value={[pro ? "pro" : "simple"]}
+              onValueChange={(value) => {
+                const next = value[0];
+                if (next) setPro(next === "pro");
+              }}
+              className="ml-auto"
+            >
+              <ToggleGroupItem
+                value="simple"
+                className="h-6 min-w-0 px-1.5 text-[11px] sm:h-6"
+              >
+                简单
+              </ToggleGroupItem>
+              <ToggleGroupItem value="pro" className="h-6 min-w-0 px-1.5 text-[11px] sm:h-6">
+                专业
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
 
           <div className="scroll-pane flex-1 p-2.5">
             {!analysis ? (
-              <p className="py-4 text-[12px] leading-4 text-muted">
+              <p className="py-4 text-[12px] leading-4 text-muted-foreground">
                 构建一个持仓，看看它怎么付钱、在哪里赚钱，以及概率有多大。
               </p>
             ) : (
               <>
-                <div className="rounded-lg border border-line bg-[#fbfaf8] px-2.5 py-2">
+                <div className="rounded-lg border border-border bg-muted/40 px-2.5 py-2">
                   <p className="text-[12px] font-semibold">
                     {analysis.isCredit ? "你收到" : "你付出"} {money(Math.abs(analysis.premium))}。
                   </p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-muted">{analysis.sentence}</p>
+                  <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{analysis.sentence}</p>
                 </div>
                 <div className="mt-1">
                   <Metric
@@ -942,7 +984,7 @@ export default function Calculator() {
                 </div>
                 {pro && (
                   <div className="mt-2">
-                    <p className="mb-1 text-[11px] font-medium text-faint">
+                    <p className="mb-1 text-[11px] font-medium text-muted-foreground">
                       净希腊值（美元）
                     </p>
                     <GreekList analysis={analysis} />
@@ -951,7 +993,7 @@ export default function Calculator() {
               </>
             )}
           </div>
-        </section>
+        </Card>
       </div>
     </Workspace>
   );

@@ -8,12 +8,12 @@ import {
 } from "../lib/gex";
 
 const COLORS = {
-  positive: "#0b7a52",
-  negative: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
-  spot: "#6f6a63",
-  flip: "#0364d3",
+  positive: "#059669",
+  negative: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
+  spot: "#737373",
+  flip: "#2563eb",
 };
 
 export function GexChart({
@@ -242,7 +242,7 @@ export function GexChart({
             x2={xAt(hover ?? 0)}
             y1={padT}
             y2={padT + chartH}
-            stroke="#1c1b19"
+            stroke="#171717"
             strokeOpacity="0.16"
           />
         )}
@@ -250,11 +250,11 @@ export function GexChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[168px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[168px] rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{ left: Math.min(Math.max(8, xAt(hover ?? 0) - 84), width - 180) }}
         >
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-semibold text-text tnum">
+            <span className="font-semibold text-foreground tnum">
               行权价 {strikeLabel(hovered.strike)}
             </span>
             <span
@@ -263,15 +263,15 @@ export function GexChart({
               {gexLabel(hovered.net, { sign: true })}
             </span>
           </div>
-          <div className="mt-1 flex items-center justify-between text-dim">
+          <div className="mt-1 flex items-center justify-between text-muted-foreground">
             <span>看涨</span>
-            <span className="tnum text-text">{gexLabel(hovered.call, { sign: true })}</span>
+            <span className="tnum text-foreground">{gexLabel(hovered.call, { sign: true })}</span>
           </div>
-          <div className="mt-0.5 flex items-center justify-between text-dim">
+          <div className="mt-0.5 flex items-center justify-between text-muted-foreground">
             <span>看跌</span>
-            <span className="tnum text-text">{gexLabel(hovered.put, { sign: true })}</span>
+            <span className="tnum text-foreground">{gexLabel(hovered.put, { sign: true })}</span>
           </div>
-          <div className="mt-1 border-t border-line-subtle pt-1 text-[11px] text-faint tnum">
+          <div className="mt-1 border-t border-border/60 pt-1 text-[11px] text-muted-foreground tnum">
             {weight === "volume" ? "成交量" : "OI"} {hovered.callWeight.toLocaleString("en-US")}{" "}
             看涨 / {hovered.putWeight.toLocaleString("en-US")} 看跌
           </div>

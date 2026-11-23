@@ -9,6 +9,7 @@ import {
   Split,
 } from "../desktop/Split";
 import { ToolDetail, type ToolMode } from "./ToolPage";
+import { buttonVariants } from "@/components/ui/button";
 
 const MODE_BY_PATH: Record<string, ToolMode> = {
   "black-scholes": "bs",
@@ -41,7 +42,7 @@ export default function Tools() {
                   to={tool.to}
                   selected={active === tool.mode}
                   badge={
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-dim">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
                       <Icon size={14} />
                     </span>
                   }
@@ -53,7 +54,7 @@ export default function Tools() {
             <ListRow
               to="/tools/option-finder"
               badge={
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-dim">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
                   <Target size={14} />
                 </span>
               }
@@ -61,7 +62,7 @@ export default function Tools() {
               subtitle="按观点扫描实时期权链"
             />
           </ListGroup>
-          <div className="mx-3 mt-1 text-[11px] leading-4 text-faint">
+          <div className="mx-3 mt-1 text-[11px] leading-4 text-muted-foreground">
             所有工具共用同一套 Black-Scholes 假设；扫描器读取在线期权链。
           </div>
         </ListPane>
@@ -76,7 +77,7 @@ export default function Tools() {
             title="选择一个工具"
             body="每个计算器都可以单独使用；也可以从构建器里带着持仓过来对照。"
             action={
-              <Link to="/calculator" className="btn-secondary h-8 px-3">
+              <Link to="/calculator" className={buttonVariants({ variant: "outline", size: "default" })}>
                 打开构建器
               </Link>
             }

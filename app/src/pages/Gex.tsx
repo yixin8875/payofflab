@@ -22,6 +22,7 @@ import {
   type GexWeight,
 } from "../lib/gex";
 import { useLiveChain } from "../lib/useLiveChain";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function Gex() {
   const { symbol } = useParams<{ symbol?: string }>();
@@ -47,7 +48,7 @@ export default function Gex() {
             title="选择一个标的"
             body="查看按行权价展开的美元 gamma、Gamma Flip 水平与看涨/看跌行权价墙。指数 ETF 的读数通常比个股更有参考意义。"
             action={
-              <Link to="/gex/spy" className="btn-secondary h-8 px-3">
+              <Link to="/gex/spy" className={buttonVariants({ variant: "outline", size: "default" })}>
                 查看 SPY
                 <ArrowRight size={12} />
               </Link>
@@ -259,12 +260,12 @@ function GexView({ symbol }: { symbol: string }) {
           type="button"
           onClick={live.reload}
           disabled={live.loading}
-          className="btn-secondary h-7 px-2.5 disabled:opacity-40"
+          className={buttonVariants({ variant: "outline", size: "sm" })}
         >
           <Repeat size={12} />
           {live.loading ? "刷新中" : "刷新"}
         </button>
-        <Link to={`/chain/${symbol.toLowerCase()}`} className="btn-primary h-7 px-2.5">
+        <Link to={`/chain/${symbol.toLowerCase()}`} className={buttonVariants({ size: "sm" })}>
           期权链
           <ArrowRight size={12} />
         </Link>
@@ -275,10 +276,10 @@ function GexView({ symbol }: { symbol: string }) {
           {!chain && live.loading && <LoadingState />}
 
           {!chain && !live.loading && live.error && (
-            <div className="rounded-xl border border-line bg-white p-6 text-center">
+            <div className="rounded-2xl border bg-card shadow-xs/5 p-6 text-center">
               <p className="text-[13px] font-medium">在线行情不可用</p>
-              <p className="mt-1 text-[12px] text-dim">{live.error}</p>
-              <button type="button" onClick={live.reload} className="btn-secondary mt-3 h-7 px-2.5">
+              <p className="mt-1 text-[12px] text-muted-foreground">{live.error}</p>
+              <button type="button" onClick={live.reload} className={buttonVariants({ variant: "outline", size: "sm", className: "mt-3" })}>
                 重试
               </button>
             </div>
@@ -287,7 +288,7 @@ function GexView({ symbol }: { symbol: string }) {
           {chain && gex && (
             <>
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="mr-1 flex items-center gap-1 text-[11px] text-faint">
+                <span className="mr-1 flex items-center gap-1 text-[11px] text-muted-foreground">
                   <Calendar size={12} />
                   范围
                 </span>
@@ -317,7 +318,7 @@ function GexView({ symbol }: { symbol: string }) {
                       ? setRange({ kind: "expiry", iso: event.target.value })
                       : setRange({ kind: "all" })
                   }
-                  className="h-6 rounded-lg border border-line bg-white px-1.5 text-[12px] text-dim"
+                  className="h-6 rounded-lg border border-border bg-card px-1.5 text-[12px] text-muted-foreground"
                 >
                   <option value="">指定到期日</option>
                   {chain.expiries.map((expiry) => (
@@ -326,7 +327,7 @@ function GexView({ symbol }: { symbol: string }) {
                     </option>
                   ))}
                 </select>
-                <span className="ml-auto text-[11px] text-faint tnum">
+                <span className="ml-auto text-[11px] text-muted-foreground tnum">
                   {gex.includedExpiries} 个到期日 · 按{weightText}加权
                 </span>
               </div>
@@ -357,12 +358,12 @@ function GexView({ symbol }: { symbol: string }) {
                   </RangePill>
                 </ControlGroup>
                 <div className="ml-auto flex items-center gap-1.5">
-                  <span className="text-[11px] text-faint">自动刷新</span>
+                  <span className="text-[11px] text-muted-foreground">自动刷新</span>
                   <select
                     aria-label="自动刷新间隔"
                     value={refreshSec}
                     onChange={(event) => setRefreshSec(Number(event.target.value))}
-                    className="h-6 rounded-lg border border-line bg-white px-1.5 text-[12px] text-dim"
+                    className="h-6 rounded-lg border border-border bg-card px-1.5 text-[12px] text-muted-foreground"
                   >
                     <option value={0}>关闭</option>
                     <option value={60}>1 分钟</option>
@@ -372,12 +373,12 @@ function GexView({ symbol }: { symbol: string }) {
               </div>
 
               {live.error && (
-                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-[#fbfaf8] px-2.5 py-1.5 text-[11px] text-dim">
+                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
                   <span>刷新失败（{live.error}），正在显示上次的行情。</span>
                   <button
                     type="button"
                     onClick={live.reload}
-                    className="font-medium text-accent hover:underline"
+                    className="font-medium text-brand hover:underline"
                   >
                     重试
                   </button>
@@ -385,9 +386,9 @@ function GexView({ symbol }: { symbol: string }) {
               )}
 
               {gex.strikes.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-line bg-white p-8 text-center">
+                <div className="mt-4 rounded-2xl border bg-card shadow-xs/5 p-8 text-center">
                   <p className="text-[13px] font-medium">该范围没有可用的未平仓数据</p>
-                  <p className="mt-1 text-[12px] text-dim">
+                  <p className="mt-1 text-[12px] text-muted-foreground">
                     试试「全部到期」，或刷新在线行情。
                   </p>
                 </div>
@@ -450,7 +451,7 @@ function GexView({ symbol }: { symbol: string }) {
                     />
                   </div>
 
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-line bg-[#fbfaf8] px-3 py-1.5 text-[11px]">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-[11px]">
                     <InlineMetric
                       label="Call/Put Gamma"
                       value={
@@ -461,20 +462,20 @@ function GexView({ symbol }: { symbol: string }) {
                       label="前 5 档集中度"
                       value={`${Math.round(gex.concentration * 100)}%`}
                     />
-                    <span className="ml-auto text-faint">
+                    <span className="ml-auto text-muted-foreground">
                       {weightText} · {moneyness != null ? "平值 ±20%" : "全部行权价"}
                     </span>
                   </div>
 
-                  <section className="mt-3 rounded-xl border border-line bg-white p-4">
+                  <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <h2 className="text-[13px] font-semibold">按行权价的 Gamma 敞口</h2>
-                        <p className="mt-0.5 text-[11px] text-dim">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
                           绿柱为看涨正 gamma，红柱为看跌负 gamma；虚线为现价与 Gamma Flip。
                         </p>
                       </div>
-                      <span className="text-[11px] text-faint tnum">
+                      <span className="text-[11px] text-muted-foreground tnum">
                         {unitText} · 最近 {gex.chartStrikes.length} 个行权价
                       </span>
                     </div>
@@ -485,51 +486,51 @@ function GexView({ symbol }: { symbol: string }) {
                       height={320}
                       weight={weight}
                     />
-                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-dim">
-                      <Legend color="#0b7a52" label="正 GEX（看涨）" />
-                      <Legend color="#bf3b2b" label="负 GEX（看跌）" />
-                      <Legend color="#6f6a63" label="现价" dashed />
-                      <Legend color="#0364d3" label="Gamma Flip" dashed />
-                      <span className="ml-auto text-faint">悬浮柱体查看该行权价明细</span>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                      <Legend color="#059669" label="正 GEX（看涨）" />
+                      <Legend color="#dc2626" label="负 GEX（看跌）" />
+                      <Legend color="#737373" label="现价" dashed />
+                      <Legend color="#2563eb" label="Gamma Flip" dashed />
+                      <span className="ml-auto text-muted-foreground">悬浮柱体查看该行权价明细</span>
                     </div>
                   </section>
 
                   {profile && (
-                    <section className="mt-3 rounded-xl border border-line bg-white p-4">
+                    <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
                           <h2 className="text-[13px] font-semibold">现价移动后的 Gamma Profile</h2>
-                          <p className="mt-0.5 text-[11px] text-dim">
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">
                             固定当前持仓与各腿 IV，假设标的移动到不同价位时用 Black-Scholes
                             重算 gamma；蓝色虚线为该假设价格下净 Gamma 归零的价位。
                           </p>
                         </div>
-                        <span className="text-[11px] text-faint tnum">±10% · {unitText}</span>
+                        <span className="text-[11px] text-muted-foreground tnum">±10% · {unitText}</span>
                       </div>
                       <GexProfileChart profile={profile} height={240} />
-                      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-dim">
-                        <Legend color="#0b7a52" label="正 GEX 区域" />
-                        <Legend color="#bf3b2b" label="负 GEX 区域" />
-                        <Legend color="#6f6a63" label="现价" dashed />
-                        <Legend color="#0364d3" label="零 Gamma" dashed />
-                        <span className="ml-auto text-faint">悬浮曲线查看该价位的分解</span>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                        <Legend color="#059669" label="正 GEX 区域" />
+                        <Legend color="#dc2626" label="负 GEX 区域" />
+                        <Legend color="#737373" label="现价" dashed />
+                        <Legend color="#2563eb" label="零 Gamma" dashed />
+                        <span className="ml-auto text-muted-foreground">悬浮曲线查看该价位的分解</span>
                       </div>
                     </section>
                   )}
 
-                  <section className="mt-3 rounded-xl border border-line bg-white p-4">
+                  <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <h2 className="text-[13px] font-semibold">IV 冲击下的结构</h2>
-                        <p className="mt-0.5 text-[11px] text-dim">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
                           把每条腿的 IV 同比例缩放后用 Black-Scholes 重算 gamma：财报后 IV
                           压缩时，墙与 Flip 通常一起向现价靠拢，膨胀时则向外散开。
                         </p>
                       </div>
-                      <span className="text-[11px] text-faint tnum">{unitText}</span>
+                      <span className="text-[11px] text-muted-foreground tnum">{unitText}</span>
                     </div>
-                    <div className="mt-2 overflow-hidden rounded-lg border border-line-subtle">
-                      <div className="grid grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,1fr))] gap-2 border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[11px] font-medium text-faint">
+                    <div className="mt-2 overflow-hidden rounded-lg border border-border/60">
+                      <div className="grid grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,1fr))] gap-2 border-b border-border/60 bg-muted/40 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
                         <span>指标</span>
                         <span className="text-right">当前 IV</span>
                         <span className="text-right">IV −30%</span>
@@ -538,14 +539,14 @@ function GexView({ symbol }: { symbol: string }) {
                       {shockRows.map((row) => (
                         <div
                           key={row.label}
-                          className="grid grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,1fr))] gap-2 border-b border-line-subtle px-3 py-1.5 text-[12px] last:border-0"
+                          className="grid grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,1fr))] gap-2 border-b border-border/60 px-3 py-1.5 text-[12px] last:border-0"
                         >
-                          <span className="text-dim">{row.label}</span>
+                          <span className="text-muted-foreground">{row.label}</span>
                           {row.cells.map((cell, index) => (
                             <span
                               key={index}
                               className={`text-right tnum ${
-                                index > 0 ? "text-muted" : "text-text"
+                                index > 0 ? "text-muted-foreground" : "text-foreground"
                               } ${
                                 cell.tone > 0
                                   ? "text-profit"
@@ -560,7 +561,7 @@ function GexView({ symbol }: { symbol: string }) {
                         </div>
                       ))}
                     </div>
-                    <p className="mt-1.5 text-[11px] text-faint">
+                    <p className="mt-1.5 text-[11px] text-muted-foreground">
                       三列都由各腿 IV 经 Black-Scholes 重算 gamma，只比较 IV 的影响；因此中间列可能与上方按交易所 gamma 的统计略有出入。
                     </p>
                   </section>
@@ -571,11 +572,11 @@ function GexView({ symbol }: { symbol: string }) {
                     onSelectExpiry={(iso) => setRange({ kind: "expiry", iso })}
                   />
 
-                  <section className="mt-3 rounded-xl border border-line bg-white p-4">
+                  <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <h2 className="text-[13px] font-semibold">Gamma 期限结构</h2>
-                        <p className="mt-0.5 text-[11px] text-dim">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
                           净 Gamma 按到期日展开；指数上近月与 0DTE 的占比通常比总量更有解释力。
                         </p>
                       </div>
@@ -595,21 +596,21 @@ function GexView({ symbol }: { symbol: string }) {
                       </div>
                     </div>
                     <GexTermChart rows={gex.byExpiry} height={180} />
-                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-dim">
-                      <Legend color="#0b7a52" label="正 GEX" />
-                      <Legend color="#bf3b2b" label="负 GEX" />
-                      <span className="ml-auto text-faint">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                      <Legend color="#059669" label="正 GEX" />
+                      <Legend color="#dc2626" label="负 GEX" />
+                      <span className="ml-auto text-muted-foreground">
                         共 {gex.byExpiry.length} 个到期日，显示最近{" "}
                         {Math.min(16, gex.byExpiry.length)} 个
                       </span>
                     </div>
                   </section>
 
-                  <section className="mt-3 rounded-xl border border-line bg-white p-4">
+                  <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <h2 className="text-[13px] font-semibold">二阶敞口：Vanna 与 Charm</h2>
-                        <p className="mt-0.5 text-[11px] text-dim">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
                           Vanna 是 delta 对 IV 的敏感度，Charm 是 delta 每天的时间衰减；两者按各腿
                           IV 用 Black-Scholes 计算，方向沿用 naive 口径（做市商持有相反方向）。
                         </p>
@@ -634,12 +635,12 @@ function GexView({ symbol }: { symbol: string }) {
                           Charm
                         </RangePill>
                       </ControlGroup>
-                      <span className="text-[11px] text-faint">
+                      <span className="text-[11px] text-muted-foreground">
                         {greek === "vanna"
                           ? "标的每变动 1 个波动点时，delta 敞口的美元变化"
                           : "每过一天，delta 敞口的美元变化"}
                       </span>
-                      <span className="ml-auto text-[11px] text-faint tnum">
+                      <span className="ml-auto text-[11px] text-muted-foreground tnum">
                         最近 {gex.chartStrikes.length} 个行权价
                       </span>
                     </div>
@@ -649,26 +650,26 @@ function GexView({ symbol }: { symbol: string }) {
                       metric={greek}
                       height={170}
                     />
-                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-dim">
-                      <Legend color="#0b7a52" label="正敞口" />
-                      <Legend color="#bf3b2b" label="负敞口" />
-                      <Legend color="#6f6a63" label="现价" dashed />
-                      <span className="ml-auto text-faint">悬浮柱体查看数值</span>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                      <Legend color="#059669" label="正敞口" />
+                      <Legend color="#dc2626" label="负敞口" />
+                      <Legend color="#737373" label="现价" dashed />
+                      <span className="ml-auto text-muted-foreground">悬浮柱体查看数值</span>
                     </div>
                   </section>
 
                   <div className="mt-3 grid gap-3 xl:grid-cols-2">
-                    <section className="overflow-hidden rounded-xl border border-line bg-white">
+                    <section className="overflow-hidden rounded-2xl border bg-card shadow-xs/5">
                       <div className="flex items-baseline justify-between gap-2 px-4 pb-2 pt-3">
                         <div>
                           <h2 className="text-[13px] font-semibold">到期日贡献</h2>
-                          <p className="mt-0.5 text-[11px] text-dim">点击切换上方统计范围</p>
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">点击切换上方统计范围</p>
                         </div>
-                        <span className="shrink-0 whitespace-nowrap text-[11px] text-faint">
+                        <span className="shrink-0 whitespace-nowrap text-[11px] text-muted-foreground">
                           {gex.byExpiry.length} 个到期日
                         </span>
                       </div>
-                      <div className="grid grid-cols-[minmax(0,1fr)_44px_78px_52px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[11px] font-medium text-faint">
+                      <div className="grid grid-cols-[minmax(0,1fr)_44px_78px_52px] gap-2 border-y border-border/60 bg-muted/40 px-4 py-1.5 text-[11px] font-medium text-muted-foreground">
                         <span>到期日</span>
                         <span className="text-right">DTE</span>
                         <span className="text-right">净 GEX</span>
@@ -683,18 +684,18 @@ function GexView({ symbol }: { symbol: string }) {
                               key={row.iso}
                               type="button"
                               onClick={() => setRange({ kind: "expiry", iso: row.iso })}
-                              className={`grid w-full grid-cols-[minmax(0,1fr)_44px_78px_52px] items-center gap-2 border-b border-line-subtle px-4 py-1.5 text-left last:border-0 hover:bg-hover ${
-                                active ? "bg-accent-soft/60" : ""
+                              className={`grid w-full grid-cols-[minmax(0,1fr)_44px_78px_52px] items-center gap-2 border-b border-border/60 px-4 py-1.5 text-left last:border-0 hover:bg-accent ${
+                                active ? "bg-brand/60" : ""
                               }`}
                             >
                               <span
                                 className={`truncate text-[12px] ${
-                                  active ? "font-medium text-accent" : "text-text"
+                                  active ? "font-medium text-brand" : "text-foreground"
                                 }`}
                               >
                                 {row.label}
                               </span>
-                              <span className="text-right text-[12px] text-dim tnum">{row.dte}</span>
+                              <span className="text-right text-[12px] text-muted-foreground tnum">{row.dte}</span>
                               <span
                                 className={`text-right text-[12px] tnum ${
                                   row.net >= 0 ? "text-profit" : "text-loss"
@@ -703,7 +704,7 @@ function GexView({ symbol }: { symbol: string }) {
                                 {gexLabel(row.net, { sign: true })}
                               </span>
                               <span className="flex justify-end">
-                                <span className="h-1 w-10 overflow-hidden rounded-full bg-[#eeebe5]">
+                                <span className="h-1 w-10 overflow-hidden rounded-full bg-border/60">
                                   <span
                                     className={`block h-full rounded-full ${
                                       row.net >= 0 ? "bg-profit" : "bg-loss"
@@ -722,23 +723,23 @@ function GexView({ symbol }: { symbol: string }) {
                         })}
                       </div>
                       {gex.byExpiry.length > 12 && (
-                        <p className="px-4 pb-2 pt-1 text-[11px] text-faint">
+                        <p className="px-4 pb-2 pt-1 text-[11px] text-muted-foreground">
                           仅显示最近 12 个到期日；其余已计入统计。
                         </p>
                       )}
                     </section>
 
-                    <section className="overflow-hidden rounded-xl border border-line bg-white">
+                    <section className="overflow-hidden rounded-2xl border bg-card shadow-xs/5">
                       <div className="flex items-baseline justify-between gap-2 px-4 pb-2 pt-3">
                         <div>
                           <h2 className="text-[13px] font-semibold">Gamma 集中的行权价</h2>
-                          <p className="mt-0.5 text-[11px] text-dim">按净 GEX 绝对值排序</p>
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">按净 GEX 绝对值排序</p>
                         </div>
-                        <span className="shrink-0 whitespace-nowrap text-[11px] text-faint">
+                        <span className="shrink-0 whitespace-nowrap text-[11px] text-muted-foreground">
                           前 8 个
                         </span>
                       </div>
-                      <div className="grid grid-cols-[minmax(0,1fr)_80px_64px_64px] gap-2 border-y border-line-subtle bg-[#fbfaf8] px-4 py-1.5 text-[11px] font-medium text-faint">
+                      <div className="grid grid-cols-[minmax(0,1fr)_80px_64px_64px] gap-2 border-y border-border/60 bg-muted/40 px-4 py-1.5 text-[11px] font-medium text-muted-foreground">
                         <span>行权价</span>
                         <span className="text-right">净 GEX</span>
                         <span className="text-right">
@@ -751,11 +752,11 @@ function GexView({ symbol }: { symbol: string }) {
                       {topStrikes.map((row) => (
                         <div
                           key={row.strike}
-                          className="grid grid-cols-[minmax(0,1fr)_80px_64px_64px] items-center gap-2 border-b border-line-subtle px-4 py-1.5 last:border-0"
+                          className="grid grid-cols-[minmax(0,1fr)_80px_64px_64px] items-center gap-2 border-b border-border/60 px-4 py-1.5 last:border-0"
                         >
                           <span className="flex items-baseline gap-1.5 text-[12px] tnum">
                             <b className="font-medium">{strikeLabel(row.strike)}</b>
-                            <span className="text-[11px] text-faint">
+                            <span className="text-[11px] text-muted-foreground">
                               {distanceText(row.strike)}
                             </span>
                           </span>
@@ -766,10 +767,10 @@ function GexView({ symbol }: { symbol: string }) {
                           >
                             {gexLabel(row.net, { sign: true })}
                           </span>
-                          <span className="text-right text-[11px] text-dim tnum">
+                          <span className="text-right text-[11px] text-muted-foreground tnum">
                             {row.callWeight.toLocaleString("en-US")}
                           </span>
-                          <span className="text-right text-[11px] text-dim tnum">
+                          <span className="text-right text-[11px] text-muted-foreground tnum">
                             {row.putWeight.toLocaleString("en-US")}
                           </span>
                         </div>
@@ -777,9 +778,9 @@ function GexView({ symbol }: { symbol: string }) {
                     </section>
                   </div>
 
-                  <section className="mt-3 rounded-xl border border-line bg-[#fbfaf8] px-4 py-3 text-[11px] leading-4 text-dim">
+                  <section className="mt-3 rounded-xl border border-border bg-muted/40 px-4 py-3 text-[11px] leading-4 text-muted-foreground">
                     <p>
-                      <b className="font-medium text-muted">口径：</b>采用常见的 naive GEX——看涨记为正
+                      <b className="font-medium text-muted-foreground">口径：</b>采用常见的 naive GEX——看涨记为正
                       gamma、看跌记为负，假设做市商持有相反方向。美元 gamma ={" "}
                       <span className="tnum">
                         {unit === "pct"
@@ -827,8 +828,8 @@ function RangePill({
       onClick={onClick}
       className={`h-6 rounded-lg border px-2 text-[12px] font-medium transition-colors ${
         active
-          ? "border-accent-line bg-accent-soft text-accent"
-          : "border-line bg-white text-dim hover:text-text"
+          ? "border-brand/40 bg-brand/10 text-brand"
+          : "border-border bg-card text-muted-foreground hover:text-foreground"
       }`}
     >
       {children}
@@ -851,7 +852,7 @@ function Legend({ color, label, dashed = false }: { color: string; label: string
 function ControlGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex items-center gap-1">
-      <span className="mr-0.5 text-[11px] text-faint">{label}</span>
+      <span className="mr-0.5 text-[11px] text-muted-foreground">{label}</span>
       {children}
     </div>
   );
@@ -860,8 +861,8 @@ function ControlGroup({ label, children }: { label: string; children: ReactNode 
 function InlineMetric({ label, value }: { label: string; value: string }) {
   return (
     <span className="flex items-baseline gap-1.5">
-      <span className="text-faint">{label}</span>
-      <b className="font-semibold text-text tnum">{value}</b>
+      <span className="text-muted-foreground">{label}</span>
+      <b className="font-semibold text-foreground tnum">{value}</b>
     </span>
   );
 }
@@ -877,14 +878,14 @@ function Stat({
   sub: ReactNode;
   tone?: "profit" | "loss" | "neutral";
 }) {
-  const color = tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-text";
+  const color = tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-foreground";
   return (
-    <div className="rounded-xl border border-line bg-white px-3.5 py-3">
-      <p className="text-[11px] font-semibold text-faint">{label}</p>
+    <div className="rounded-2xl border bg-card shadow-xs/5 px-3.5 py-3">
+      <p className="text-[11px] font-semibold text-muted-foreground">{label}</p>
       <p className={`mt-1 text-[18px] font-semibold leading-6 tnum ${color}`}>
         {value}
       </p>
-      <p className="mt-0.5 truncate text-[11px] text-dim tnum">{sub}</p>
+      <p className="mt-0.5 truncate text-[11px] text-muted-foreground tnum">{sub}</p>
     </div>
   );
 }
@@ -894,13 +895,13 @@ function LoadingState() {
     <div className="animate-pulse space-y-3" aria-label="正在载入 Gamma 敞口">
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         {Array.from({ length: 5 }, (_, index) => (
-          <div key={index} className="h-[82px] rounded-xl border border-line bg-white" />
+          <div key={index} className="h-[82px] rounded-2xl border bg-card shadow-xs/5" />
         ))}
       </div>
-      <div className="h-[380px] rounded-xl border border-line bg-white" />
+      <div className="h-[380px] rounded-2xl border bg-card shadow-xs/5" />
       <div className="grid gap-3 lg:grid-cols-2">
-        <div className="h-[260px] rounded-xl border border-line bg-white" />
-        <div className="h-[260px] rounded-xl border border-line bg-white" />
+        <div className="h-[260px] rounded-2xl border bg-card shadow-xs/5" />
+        <div className="h-[260px] rounded-2xl border bg-card shadow-xs/5" />
       </div>
     </div>
   );

@@ -10,7 +10,10 @@ import {
 } from "../components/Icons";
 import { OUTLOOK_ZH, STRATEGIES } from "../data/strategies";
 import { TICKERS } from "../data/tickers";
-import { Badge } from "./Split";
+import { Dialog, DialogPopup, DialogTitle } from "@/components/ui/dialog";
+import { Kbd } from "@/components/ui/kbd";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Monogram } from "./Split";
 import { NAV_FOOTER, NAV_GROUPS } from "./nav";
 
 type PaletteItem = {
@@ -96,8 +99,6 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
     setActive((current) => Math.min(current, Math.max(results.length - 1, 0)));
   }, [results.length]);
 
-  if (!open) return null;
-
   const choose = (item: PaletteItem | undefined) => {
     if (!item) return;
     navigate(item.to);
@@ -105,21 +106,20 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   };
 
   return (
-    <div
-      className="animate-fade fixed inset-0 z-50 flex justify-center bg-[#1c1b1938] px-4 pt-[12vh] backdrop-blur-[2px]"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
       }}
-      role="presentation"
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="全局搜索"
-        className="animate-pop flex max-h-[460px] w-full max-w-[620px] flex-col overflow-hidden rounded-xl border border-line bg-white shadow-[var(--shadow-sheet)]"
+      <DialogPopup
+        showCloseButton={false}
+        className="max-h-[460px] max-w-[620px] gap-0 overflow-hidden p-0"
       >
-        <div className="flex h-12 shrink-0 items-center gap-2.5 border-b border-line px-3.5">
-          <Search size={16} className="shrink-0 text-faint" />
+        <DialogTitle className="sr-only">全局搜索</DialogTitle>
+
+        <div className="flex h-12 shrink-0 items-center gap-2.5 border-b px-3.5">
+          <Search size={16} className="shrink-0 text-muted-foreground" />
           <input
             ref={inputRef}
             value={query}
@@ -142,78 +142,83 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               }
             }}
             placeholder="搜索页面、策略、标的或工具"
-            className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-faint"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             aria-label="搜索"
           />
-          <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-[11px] text-faint">
-            Esc
-          </kbd>
+          <Kbd className="shrink-0">Esc</Kbd>
         </div>
 
-        <div className="scroll-pane flex-1 py-1.5">
-          {results.length === 0 && (
-            <p className="px-4 py-10 text-center text-[13px] text-dim">没有匹配的结果</p>
-          )}
-          {GROUP_ORDER.map((group) => {
-            const items = results.filter((item) => item.group === group);
-            if (!items.length) return null;
-            return (
-              <section key={group} className="pb-1">
-                <h3 className="px-3.5 pb-1 pt-2 text-[11px] font-semibold text-faint">
-                  {group}
-                </h3>
-                <ul>
-                  {items.map((item) => {
-                    const index = results.indexOf(item);
-                    const Icon = item.icon;
-                    return (
-                      <li key={item.id}>
-                        <button
-                          type="button"
-                          onMouseEnter={() => setActive(index)}
-                          onClick={() => choose(item)}
-                          data-selected={index === active ? "true" : undefined}
-                          className="flex h-9 w-full items-center gap-2.5 px-3.5 text-left data-[selected=true]:bg-[#efede8]"
-                        >
-                          {item.badge ? (
-                            <Badge label={item.badge} seed={item.id} size={22} rounded="rounded-[6px]" />
-                          ) : Icon ? (
-                            <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-[6px] bg-surface text-dim">
-                              <Icon size={13} />
-                            </span>
-                          ) : (
-                            <span className="h-[22px] w-[22px] shrink-0" />
-                          )}
-                          <span className="shrink-0 text-[13px] font-medium">{item.label}</span>
-                          {item.hint && (
-                            <span className="min-w-0 flex-1 truncate text-[12px] text-faint">
-                              {item.hint}
-                            </span>
-                          )}
-                          {index === active && (
-                            <ChevronRight size={13} className="ml-auto shrink-0 text-faint" />
-                          )}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            );
-          })}
-        </div>
+        <ScrollArea className="min-h-0 flex-1">
+          <div className="py-1.5">
+            {results.length === 0 && (
+              <p className="px-4 py-10 text-center text-sm text-muted-foreground">
+                没有匹配的结果
+              </p>
+            )}
+            {GROUP_ORDER.map((group) => {
+              const items = results.filter((item) => item.group === group);
+              if (!items.length) return null;
+              return (
+                <section key={group} className="pb-1">
+                  <h3 className="px-3.5 pb-1 pt-2 text-xs font-semibold text-muted-foreground">
+                    {group}
+                  </h3>
+                  <ul>
+                    {items.map((item) => {
+                      const index = results.indexOf(item);
+                      const Icon = item.icon;
+                      return (
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            onMouseEnter={() => setActive(index)}
+                            onClick={() => choose(item)}
+                            data-selected={index === active ? "true" : undefined}
+                            className="flex h-9 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left transition-colors hover:bg-accent/60 data-[selected=true]:bg-accent"
+                          >
+                            {item.badge ? (
+                              <Monogram label={item.badge} size={22} rounded="rounded-md" />
+                            ) : Icon ? (
+                              <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                                <Icon size={13} />
+                              </span>
+                            ) : (
+                              <span className="h-[22px] w-[22px] shrink-0" />
+                            )}
+                            <span className="shrink-0 text-[13px] font-medium">{item.label}</span>
+                            {item.hint && (
+                              <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                                {item.hint}
+                              </span>
+                            )}
+                            {index === active && (
+                              <ChevronRight
+                                size={13}
+                                className="ml-auto shrink-0 text-muted-foreground"
+                              />
+                            )}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              );
+            })}
+          </div>
+        </ScrollArea>
 
-        <div className="flex h-8 shrink-0 items-center gap-4 border-t border-line bg-[#fbfaf8] px-3.5 text-[11px] text-faint">
-          <span>
-            <kbd className="rounded border border-line bg-white px-1">↑</kbd>{" "}
-            <kbd className="rounded border border-line bg-white px-1">↓</kbd> 选择
+        <div className="flex h-9 shrink-0 items-center gap-4 border-t bg-muted/40 px-3.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Kbd>↑</Kbd>
+            <Kbd>↓</Kbd> 选择
           </span>
-          <span>
-            <kbd className="rounded border border-line bg-white px-1">↵</kbd> 打开
+          <span className="flex items-center gap-1">
+            <Kbd>↵</Kbd> 打开
           </span>
           <span className="ml-auto">输入以搜索全部内容</span>
         </div>
-      </div>
-    </div>
+      </DialogPopup>
+    </Dialog>
   );
 }

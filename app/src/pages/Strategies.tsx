@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Search, X } from "../components/Icons";
 import {
-  Badge,
+  Monogram,
   EmptyDetail,
   ListGroup,
   ListPane,
@@ -20,6 +20,9 @@ import {
   STRATEGY_BY_SLUG,
 } from "../data/strategies";
 import { StrategyView } from "./StrategyDetail";
+import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Toggle } from "@/components/ui/toggle";
 
 const OUTLOOKS = [
   ["all", "全部"],
@@ -50,20 +53,21 @@ export default function Strategies() {
             <div className="relative">
               <Search
                 size={13}
-                className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-faint"
+                className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
               />
-              <input
+              <Input
+                size="sm"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="筛选策略"
-                className="field h-7 pl-7 pr-7 text-[13px]"
+                className="[&_input]:pl-7 [&_input]:pr-7 [&_input]:text-[13px]"
                 aria-label="筛选策略"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-faint hover:text-text"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   aria-label="清除筛选"
                 >
                   <X size={12} />
@@ -74,23 +78,21 @@ export default function Strategies() {
 
           <div className="no-scrollbar flex gap-1 overflow-x-auto px-2 pb-2">
             {OUTLOOKS.map(([value, label]) => (
-              <button
+              <Toggle
                 key={value}
-                type="button"
-                onClick={() => setOutlook(value)}
-                className={`h-7 shrink-0 rounded-lg border px-2 text-[13px] font-medium transition-colors ${
-                  outlook === value
-                    ? "border-accent-line bg-accent-soft text-accent"
-                    : "border-line bg-white text-dim hover:text-text"
-                }`}
+                size="sm"
+                variant="outline"
+                pressed={outlook === value}
+                onPressedChange={() => setOutlook(value)}
+                className="h-7 min-w-0 shrink-0 px-2 text-[13px] data-pressed:border-brand-line data-pressed:bg-brand-soft data-pressed:text-brand"
               >
                 {label}
-              </button>
+              </Toggle>
             ))}
           </div>
 
           {filtered.length === 0 && (
-            <p className="px-3 py-10 text-center text-[12px] text-dim">没有符合条件的策略</p>
+            <p className="px-3 py-10 text-center text-[12px] text-muted-foreground">没有符合条件的策略</p>
           )}
 
           {CATEGORY_ORDER.map((category) => {
@@ -103,7 +105,7 @@ export default function Strategies() {
                     key={s.slug}
                     to={`/strategies/${s.slug}`}
                     selected={slug === s.slug}
-                    badge={<Badge label={s.name.slice(0, 2)} seed={s.slug} />}
+                    badge={<Monogram label={s.name.slice(0, 2)} seed={s.slug} />}
                     title={s.name}
                     subtitle={`${OUTLOOK_ZH[s.outlook]} · ${RISK_ZH[s.risk]}`}
                     meta={LEVEL_ZH[s.level]}
@@ -128,7 +130,7 @@ export default function Strategies() {
                 : "每篇都有盈亏图、最大盈利与亏损、一份算好的例子，以及它在什么情况下会失效。"
             }
             action={
-              <Link to={slug ? "/strategies" : "/calculator"} className="btn-secondary h-8 px-3">
+              <Link to={slug ? "/strategies" : "/calculator"} className={buttonVariants({ variant: "outline", size: "default" })}>
                 {slug ? "返回策略库" : "打开构建器"}
               </Link>
             }

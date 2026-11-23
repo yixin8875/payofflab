@@ -3,11 +3,11 @@ import { pct } from "../lib/format";
 import { volPoints, type VolExpiry } from "../lib/vol";
 
 const COLORS = {
-  atm: "#0364d3",
-  call: "#0b7a52",
-  put: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
+  atm: "#2563eb",
+  call: "#059669",
+  put: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
 };
 
 const SERIES = [
@@ -190,7 +190,7 @@ export function VolTermChart({
             x2={xAt(hover)}
             y1={padT}
             y2={padT + chartH}
-            stroke="#1c1b19"
+            stroke="#171717"
             strokeOpacity="0.14"
           />
         )}
@@ -198,17 +198,17 @@ export function VolTermChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[196px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[196px] rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{ left: Math.min(Math.max(8, xAt(hover ?? 0) - 98), width - 204) }}
         >
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-semibold text-text">{hovered.label}</span>
-            <span className="tnum text-faint">{hovered.dte} 天</span>
+            <span className="font-semibold text-foreground">{hovered.label}</span>
+            <span className="tnum text-muted-foreground">{hovered.dte} 天</span>
           </div>
           {SERIES.map((series) => (
             <div
               key={series.key}
-              className="mt-1 flex items-center justify-between gap-2 text-dim"
+              className="mt-1 flex items-center justify-between gap-2 text-muted-foreground"
             >
               <span className="flex items-center gap-1.5">
                 <span
@@ -217,12 +217,12 @@ export function VolTermChart({
                 />
                 {series.label}
               </span>
-              <span className="tnum text-text">
+              <span className="tnum text-foreground">
                 {hovered[series.key] != null ? pct(hovered[series.key] ?? 0, 1) : "—"}
               </span>
             </div>
           ))}
-          <div className="mt-1 border-t border-line-subtle pt-1 text-[11px] text-faint tnum">
+          <div className="mt-1 border-t border-border/60 pt-1 text-[11px] text-muted-foreground tnum">
             25Δ RR {hovered.rr != null ? volPoints(hovered.rr) : "—"}
           </div>
         </div>

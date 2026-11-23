@@ -9,6 +9,7 @@ import { liveRows } from "../lib/live";
 import { useLiveChain } from "../lib/useLiveChain";
 import { EXPIRIES, SYMBOL_COUNT, ticker } from "../data/tickers";
 import { pct } from "../lib/format";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function Chain() {
   const { symbol } = useParams<{ symbol?: string }>();
@@ -33,7 +34,7 @@ export default function Chain() {
             title="选择一个标的"
             body="看涨、行权价与看跌并排，附买价、卖价、成交量、未平仓量与隐含波动率。"
             action={
-              <Link to="/calculator" className="btn-secondary h-8 px-3">
+              <Link to="/calculator" className={buttonVariants({ variant: "outline", size: "default" })}>
                 打开构建器
               </Link>
             }
@@ -95,7 +96,7 @@ function ChainView({ symbol }: { symbol: string }) {
         <WatchlistMenu symbol={t.symbol} />
         <Link
           to={`/calculator?ticker=${t.symbol}&expiry=${expiry.iso}`}
-          className="btn-primary h-7 px-2.5"
+          className={buttonVariants({ size: "sm" })}
         >
           在构建器中打开
           <ArrowRight size={12} />
@@ -104,7 +105,7 @@ function ChainView({ symbol }: { symbol: string }) {
 
       <DetailScroll wide>
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 flex items-center gap-1 text-[11px] text-faint">
+          <span className="mr-1 flex items-center gap-1 text-[11px] text-muted-foreground">
             <Calendar size={12} />
             到期日
           </span>
@@ -115,12 +116,12 @@ function ChainView({ symbol }: { symbol: string }) {
               onClick={() => setExpiryIso(e.iso)}
               className={`flex h-6 shrink-0 items-center gap-1 rounded-lg border px-2 text-[12px] font-medium transition-colors ${
                 e.iso === expiry.iso
-                  ? "border-accent-line bg-accent-soft text-accent"
-                  : "border-line bg-white text-dim hover:text-text"
+                  ? "border-brand/40 bg-brand/10 text-brand"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
               {e.label}
-              <span className={`tnum text-[11px] ${e.iso === expiry.iso ? "text-accent/70" : "text-faint"}`}>
+              <span className={`tnum text-[11px] ${e.iso === expiry.iso ? "text-brand/70" : "text-muted-foreground"}`}>
                 {e.dte}天
               </span>
             </button>
@@ -130,7 +131,7 @@ function ChainView({ symbol }: { symbol: string }) {
               aria-label="更多到期日"
               value={moreExpiries.some((e) => e.iso === expiry.iso) ? expiry.iso : ""}
               onChange={(event) => event.target.value && setExpiryIso(event.target.value)}
-              className="h-6 shrink-0 rounded-lg border border-line bg-white px-1.5 text-[12px] text-dim"
+              className="h-6 shrink-0 rounded-lg border border-border bg-card px-1.5 text-[12px] text-muted-foreground"
             >
               <option value="">更多到期日</option>
               {moreExpiries.map((e) => (
@@ -141,21 +142,21 @@ function ChainView({ symbol }: { symbol: string }) {
             </select>
           )}
           <div className="ml-auto flex items-center gap-2">
-            <div className="flex rounded-lg border border-line bg-white p-0.5">
+            <div className="flex rounded-lg border border-border bg-card p-0.5">
               {(["live", "offline"] as const).map((value) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => setSource(value)}
                   className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                    source === value ? "bg-accent-soft text-accent" : "text-dim hover:text-text"
+                    source === value ? "bg-brand/10 text-brand" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {value === "live" ? "在线" : "合成"}
                 </button>
               ))}
             </div>
-            <span className="text-[11px] text-faint">
+            <span className="text-[11px] text-muted-foreground">
               {online
                 ? `CBOE 延迟 15 分钟 · ${chain?.asOf ?? ""}`
                 : source === "live" && live.loading
@@ -167,7 +168,7 @@ function ChainView({ symbol }: { symbol: string }) {
                 type="button"
                 onClick={live.reload}
                 disabled={live.loading}
-                className="text-[11px] font-medium text-accent disabled:text-faint"
+                className="text-[11px] font-medium text-brand disabled:text-muted-foreground"
               >
                 {live.loading ? "刷新中…" : "刷新"}
               </button>
@@ -176,35 +177,35 @@ function ChainView({ symbol }: { symbol: string }) {
         </div>
 
         {source === "live" && live.error && (
-          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-[#fbfaf8] px-2.5 py-1.5 text-[11px] text-dim">
+          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
             <span>在线行情不可用（{live.error}），当前使用合成数据。</span>
             <button
               type="button"
               onClick={live.reload}
-              className="font-medium text-accent hover:underline"
+              className="font-medium text-brand hover:underline"
             >
               重试
             </button>
           </div>
         )}
 
-        <div className="mt-3 overflow-hidden rounded-xl border border-line bg-white">
-          <div className="flex items-center justify-between border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[11px]">
+        <div className="mt-3 overflow-hidden rounded-2xl border bg-card shadow-xs/5">
+          <div className="flex items-center justify-between border-b border-border/60 bg-muted/40 px-3 py-1.5 text-[11px]">
             <span className="font-semibold">看涨期权</span>
-            <span className="text-faint">行权价居中</span>
+            <span className="text-muted-foreground">行权价居中</span>
             <span className="font-semibold">看跌期权</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[820px] border-collapse text-[12px] tnum">
               <thead>
-                <tr className="border-b border-line-subtle text-[11px] text-faint">
+                <tr className="border-b border-border/60 text-[11px] text-muted-foreground">
                   <th className="px-2.5 py-1.5 text-right font-medium">买价</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">卖价</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">成交量</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">未平仓</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">IV</th>
                   <th className="px-1.5 py-1.5 text-right font-medium">Delta</th>
-                  <th className="border-x border-line bg-[#fbfaf8] px-2.5 py-1.5 text-center font-semibold">
+                  <th className="border-x border-border bg-muted/40 px-2.5 py-1.5 text-center font-semibold">
                     行权价
                   </th>
                   <th className="px-1.5 py-1.5 text-right font-medium">Delta</th>
@@ -221,43 +222,43 @@ function ChainView({ symbol }: { symbol: string }) {
                   return (
                     <tr
                       key={row.strike}
-                      className={`border-b border-line-subtle last:border-0 ${
-                        atm ? "bg-accent-soft/60" : "hover:bg-hover"
+                      className={`border-b border-border/60 last:border-0 ${
+                        atm ? "bg-brand/60" : "hover:bg-accent"
                       }`}
                     >
-                      <td className={`px-2.5 py-1.5 text-right ${atm ? "text-accent" : "text-profit"}`}>
+                      <td className={`px-2.5 py-1.5 text-right ${atm ? "text-brand" : "text-profit"}`}>
                         {row.call.bid.toFixed(2)}
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-muted">{row.call.ask.toFixed(2)}</td>
-                      <td className="px-1.5 py-1.5 text-right text-dim">
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">{row.call.ask.toFixed(2)}</td>
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">
                         {row.call.volume.toLocaleString("en-US")}
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-dim">
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">
                         {row.call.oi.toLocaleString("en-US")}
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-muted">
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">
                         {(row.call.iv * 100).toFixed(1)}%
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-muted">{row.call.delta.toFixed(2)}</td>
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">{row.call.delta.toFixed(2)}</td>
                       <td
-                        className={`border-x border-line px-2.5 py-1.5 text-center font-semibold ${
-                          atm ? "bg-accent-soft text-accent" : "bg-[#fbfaf8] text-text"
+                        className={`border-x border-border px-2.5 py-1.5 text-center font-semibold ${
+                          atm ? "bg-brand/10 text-brand" : "bg-muted/40 text-foreground"
                         }`}
                       >
                         {row.strike.toFixed(2)}
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-muted">{row.put.delta.toFixed(2)}</td>
-                      <td className="px-1.5 py-1.5 text-right text-muted">
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">{row.put.delta.toFixed(2)}</td>
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">
                         {(row.put.iv * 100).toFixed(1)}%
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-dim">
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">
                         {row.put.oi.toLocaleString("en-US")}
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-dim">
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">
                         {row.put.volume.toLocaleString("en-US")}
                       </td>
-                      <td className="px-1.5 py-1.5 text-right text-muted">{row.put.ask.toFixed(2)}</td>
-                      <td className={`px-2.5 py-1.5 text-right ${atm ? "text-accent" : "text-loss"}`}>
+                      <td className="px-1.5 py-1.5 text-right text-muted-foreground">{row.put.ask.toFixed(2)}</td>
+                      <td className={`px-2.5 py-1.5 text-right ${atm ? "text-brand" : "text-loss"}`}>
                         {row.put.bid.toFixed(2)}
                       </td>
                     </tr>
@@ -271,17 +272,17 @@ function ChainView({ symbol }: { symbol: string }) {
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
             to={`/calculator?ticker=${t.symbol}&expiry=${expiry.iso}&preset=long-call`}
-            className="btn-secondary h-7 px-2.5"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             用平值看涨开始
           </Link>
           <Link
             to={`/tools/option-finder?ticker=${t.symbol}`}
-            className="btn-ghost h-7 px-2 text-muted"
+            className={buttonVariants({ variant: "ghost", size: "sm", className: "text-muted-foreground" })}
           >
             扫描 {t.symbol} 的价差
           </Link>
-          <span className="ml-auto text-[11px] text-faint">
+          <span className="ml-auto text-[11px] text-muted-foreground">
             {expiry.label} · {expiry.dte} 天 ·{" "}
             {online ? "CBOE 延迟行情，非投资建议" : "模型输出，非投资建议"}
           </span>

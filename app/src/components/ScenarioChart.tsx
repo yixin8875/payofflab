@@ -5,9 +5,9 @@ export type ScenarioPoint = { move: number; current: number; scenario: number };
 
 const COLORS = {
   current: "#a39d94",
-  scenario: "#0364d3",
-  grid: "#eeebe5",
-  axis: "#767169",
+  scenario: "#2563eb",
+  grid: "#f0f0f0",
+  axis: "#737373",
 };
 
 function moveLabel(v: number) {
@@ -169,7 +169,7 @@ export function ScenarioChart({
           x2={markerX}
           y1={padT - 4}
           y2={padT + chartH}
-          stroke="#6f6a63"
+          stroke="#737373"
           strokeDasharray="3 4"
           strokeOpacity="0.45"
         />
@@ -183,7 +183,7 @@ export function ScenarioChart({
             height="17"
             rx="4"
             fill="#ffffff"
-            stroke="#e3e0da"
+            stroke="#e5e5e5"
           />
           <text
             x={Math.min(Math.max(padL, markerX - 30), padL + chartW - 60) + 30}
@@ -191,7 +191,7 @@ export function ScenarioChart({
             textAnchor="middle"
             fontSize="11"
             fontWeight="600"
-            fill="#6f6a63"
+            fill="#737373"
             className="tnum"
           >
             {moveLabel(spotPct)}
@@ -205,7 +205,7 @@ export function ScenarioChart({
               x2={sx(hoverPoint.move)}
               y1={padT}
               y2={padT + chartH}
-              stroke="#1c1b19"
+              stroke="#171717"
               strokeOpacity="0.18"
             />
             <circle
@@ -226,19 +226,19 @@ export function ScenarioChart({
 
       {hoverPoint && (
         <div
-          className="pointer-events-none absolute top-1 z-10 rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{ left: Math.min(Math.max(8, sx(hoverPoint.move) - 62), width - 150) }}
         >
-          <div className="font-semibold text-text tnum">标的 {moveLabel(hoverPoint.move)}</div>
-          <div className="mt-1 flex items-center gap-1.5 text-dim">
+          <div className="font-semibold text-foreground tnum">标的 {moveLabel(hoverPoint.move)}</div>
+          <div className="mt-1 flex items-center gap-1.5 text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: COLORS.scenario }} />
             情景
-            <span className="ml-auto tnum text-text">{money(hoverPoint.scenario, { sign: true })}</span>
+            <span className="ml-auto tnum text-foreground">{money(hoverPoint.scenario, { sign: true })}</span>
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 text-dim">
+          <div className="mt-0.5 flex items-center gap-1.5 text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: COLORS.current }} />
             当前
-            <span className="ml-auto tnum text-text">{money(hoverPoint.current, { sign: true })}</span>
+            <span className="ml-auto tnum text-foreground">{money(hoverPoint.current, { sign: true })}</span>
           </div>
         </div>
       )}

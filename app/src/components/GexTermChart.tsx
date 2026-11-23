@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { gexAxisLabel, gexLabel, type GexExpiryRow } from "../lib/gex";
 
 const COLORS = {
-  positive: "#0b7a52",
-  negative: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
+  positive: "#059669",
+  negative: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
 };
 
 const MAX_BARS = 16;
@@ -48,7 +48,7 @@ export function GexTermChart({
 
   if (!shown.length) {
     return (
-      <div className="flex h-[120px] items-center justify-center rounded-lg border border-line-subtle bg-[#fbfaf8] text-[12px] text-dim">
+      <div className="flex h-[120px] items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-[12px] text-muted-foreground">
         当前筛选下没有可用的到期日数据。
       </div>
     );

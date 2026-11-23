@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Outlet } from "react-router-dom";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { Lock } from "../components/Icons";
 import { UpdateToast } from "../components/UpdateToast";
 import { usMarketStatus } from "../lib/market";
@@ -47,21 +48,28 @@ export default function AppLayout() {
   }, []);
 
   return (
-    <div className="app-window">
-      <TitleBar
-        onOpenPalette={() => setPaletteOpen(true)}
-        onToggleSidebar={() => setSidebarOpen((open) => !open)}
-      />
-      <div className="app-body">
-        {sidebarOpen && <Sidebar />}
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-chrome">
-          <Outlet />
-        </main>
+    <SidebarProvider
+      open={sidebarOpen}
+      onOpenChange={setSidebarOpen}
+      className="block h-full min-h-0 w-full"
+      style={{ "--sidebar-width": "var(--sidebar-w)" } as CSSProperties}
+    >
+      <div className="app-window">
+        <TitleBar
+          onOpenPalette={() => setPaletteOpen(true)}
+          onToggleSidebar={() => setSidebarOpen((open) => !open)}
+        />
+        <div className="app-body">
+          {sidebarOpen && <Sidebar />}
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
+            <Outlet />
+          </main>
+        </div>
+        <StatusBar />
+        <UpdateToast />
+        <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       </div>
-      <StatusBar />
-      <UpdateToast />
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
-    </div>
+    </SidebarProvider>
   );
 }
 
@@ -76,13 +84,13 @@ function StatusBar() {
   const market = usMarketStatus(now);
 
   return (
-    <footer className="flex h-[var(--statusbar-h)] shrink-0 items-center gap-4 border-t border-line bg-[#f7f5f1] px-3 text-[12px] text-dim">
+    <footer className="flex h-[var(--statusbar-h)] shrink-0 items-center gap-4 border-t bg-muted/40 px-3 text-xs text-muted-foreground">
       <span className="flex shrink-0 items-center gap-1.5">
         <span
-          className={`h-1.5 w-1.5 rounded-full ${market.open ? "bg-profit" : "bg-[#b8b3aa]"}`}
+          className={`h-1.5 w-1.5 rounded-full ${market.open ? "bg-profit" : "bg-muted-foreground/40"}`}
         />
         {market.label}
-        <span className="hidden text-faint sm:inline">· {market.detail}</span>
+        <span className="hidden text-muted-foreground sm:inline">· {market.detail}</span>
       </span>
       <span className="hidden truncate md:inline">行情延迟 15 分钟 · CBOE</span>
       <span className="ml-auto flex shrink-0 items-center gap-3">
@@ -91,7 +99,7 @@ function StatusBar() {
           <Lock size={11} />
           本机数据
         </span>
-        <span className="tnum text-faint">v{VERSION}</span>
+        <span className="tnum text-muted-foreground">v{VERSION}</span>
       </span>
     </footer>
   );

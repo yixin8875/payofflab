@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Download } from "./Icons";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useUpdater } from "../lib/updater";
 
 export function UpdateToast() {
@@ -23,22 +26,22 @@ export function UpdateToast() {
   const percent = update.progress != null ? Math.round(update.progress * 100) : null;
 
   return (
-    <aside
+    <Card
       aria-live="polite"
-      className="fixed bottom-[34px] right-4 z-[80] w-[340px] rounded-xl border border-line bg-white p-3 shadow-[0_14px_40px_rgba(30,25,18,0.18)]"
+      className="fixed bottom-[34px] right-4 z-[80] w-[340px] gap-0 p-3 shadow-lg"
     >
       <div className="flex items-start gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
           <Download size={16} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold">
+          <p className="text-sm font-semibold">
             {update.status === "available" && `发现新版本 v${update.version}`}
             {update.status === "downloading" && `正在下载 v${update.version}`}
             {update.status === "ready" && `v${update.version} 已安装`}
             {update.status === "error" && `更新 v${update.version} 未完成`}
           </p>
-          <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-[11px] leading-4 text-dim">
+          <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-xs leading-4 text-muted-foreground">
             {update.status === "available" &&
               (update.notes?.trim() || "包含最新修复与改进。")}
             {update.status === "downloading" &&
@@ -50,48 +53,36 @@ export function UpdateToast() {
       </div>
 
       {update.status === "downloading" && (
-        <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-[#ece8e2]">
-          <div
-            className="h-full rounded-full bg-accent transition-[width] duration-300"
-            style={{ width: `${percent ?? 12}%` }}
-          />
-        </div>
+        <Progress className="mt-2.5" value={percent ?? 12} />
       )}
 
       <div className="mt-2.5 flex items-center gap-2">
         {update.status === "available" && (
-          <button
-            type="button"
-            onClick={() => void update.install()}
-            className="btn-primary h-7 px-2.5"
-          >
+          <Button size="sm" onClick={() => void update.install()}>
             下载并安装
-          </button>
+          </Button>
         )}
         {update.status === "error" && (
-          <button
-            type="button"
-            onClick={() => void update.install()}
-            className="btn-primary h-7 px-2.5"
-          >
+          <Button size="sm" onClick={() => void update.install()}>
             重试
-          </button>
+          </Button>
         )}
-        <Link
-          to="/settings?section=update"
+        <Button
+          size="sm"
+          variant="ghost"
+          render={<Link to="/settings?section=update" />}
           onClick={() => setDismissed(true)}
-          className="btn-ghost h-7 px-2 text-muted"
         >
           更新详情
-        </Link>
+        </Button>
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="ml-auto text-[11px] text-faint hover:text-text"
+          className="ml-auto cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           {update.status === "ready" ? "关闭" : "稍后"}
         </button>
       </div>
-    </aside>
+    </Card>
   );
 }

@@ -12,7 +12,7 @@ import {
 import { PayoffChart } from "../components/PayoffChart";
 import { Sparkline } from "../components/Sparkline";
 import {
-  Badge,
+  Monogram,
   DetailScroll,
   ListGroup,
   ListPane,
@@ -24,6 +24,7 @@ import { OUTLOOK_ZH, STRATEGY_BY_SLUG } from "../data/strategies";
 import { EXPIRIES, ticker } from "../data/tickers";
 import { legsFor } from "../lib/presets";
 import { useTrades } from "../lib/store";
+import { buttonVariants } from "@/components/ui/button";
 
 const SPY = ticker("SPY");
 const EXPIRY = EXPIRIES[3];
@@ -81,21 +82,21 @@ export default function Overview() {
           title="最近"
           count={trades.length}
           actions={
-            <Link to="/calculator" className="icon-btn h-7 w-7" title="新建策略" aria-label="新建策略">
+            <Link to="/calculator" className={buttonVariants({ variant: "ghost", size: "icon-sm" })} title="新建策略" aria-label="新建策略">
               <Plus size={15} />
             </Link>
           }
         >
           {trades.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-white text-faint">
+              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-2xl border bg-card shadow-xs/5 text-muted-foreground">
                 <Plus size={16} />
               </span>
-              <p className="mt-3 text-[12px] text-dim">还没有持仓</p>
-              <p className="mx-auto mt-1 max-w-[190px] text-[11px] leading-4 text-faint">
+              <p className="mt-3 text-[12px] text-muted-foreground">还没有持仓</p>
+              <p className="mx-auto mt-1 max-w-[190px] text-[11px] leading-4 text-muted-foreground">
                 在构建器里搭好一笔持仓，保存后会按真实行情跟踪盈亏。
               </p>
-              <Link to="/calculator" className="btn-secondary mt-3 h-7 px-2.5">
+              <Link to="/calculator" className={buttonVariants({ variant: "outline", size: "sm", className: "mt-3" })}>
                 打开构建器
               </Link>
             </div>
@@ -106,7 +107,7 @@ export default function Overview() {
                   <ListRow
                     key={trade.id}
                     to={`/trades/${trade.id}`}
-                    badge={<Badge label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
+                    badge={<Monogram label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
                     title={trade.name}
                     subtitle={`${trade.symbol} · ${trade.legs.filter((leg) => leg.qty > 0).length} 条腿`}
                     meta={dayLabel(trade.savedAt)}
@@ -115,14 +116,14 @@ export default function Overview() {
               </ListGroup>
             ))
           )}
-          <div className="mx-3 mt-2 rounded-lg border border-line-subtle bg-white/60 px-2.5 py-2 text-[11px] leading-4 text-faint">
+          <div className="mx-3 mt-2 rounded-lg border border-border/60 bg-card/60 px-2.5 py-2 text-[11px] leading-4 text-muted-foreground">
             持仓与平仓记录只留在本机，不会同步到任何账户。
           </div>
         </ListPane>
       }
     >
       <PaneHeader title="概览" subtitle={dateLabel()}>
-        <Link to="/calculator" className="btn-primary h-8 px-3">
+        <Link to="/calculator" className={buttonVariants({ size: "default" })}>
           <Plus size={12} />
           新建策略
         </Link>
@@ -133,9 +134,9 @@ export default function Overview() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="text-[22px] font-semibold leading-7">交易台</h2>
-              <p className="mt-1 text-[14px] text-dim">先看市场结构，再决定今天做不做交易。</p>
+              <p className="mt-1 text-[14px] text-muted-foreground">先看市场结构，再决定今天做不做交易。</p>
             </div>
-            <div className="hidden items-center gap-1.5 text-[13px] text-faint md:flex">
+            <div className="hidden items-center gap-1.5 text-[13px] text-muted-foreground md:flex">
               <Calendar size={12} />
               延迟行情 · 上一交易时段
             </div>
@@ -148,20 +149,20 @@ export default function Overview() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="group flex items-start gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:border-line-strong"
+                  className="group flex items-start gap-3 rounded-2xl border bg-card shadow-xs/5 p-4 transition-colors hover:border-input"
                 >
                   <span
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
-                      index === 0 ? "bg-accent-soft text-accent" : "bg-surface text-dim"
+                      index === 0 ? "bg-brand/10 text-brand" : "bg-muted text-muted-foreground"
                     }`}
                   >
                     <Icon size={16} />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-[14px] font-medium group-hover:text-accent">
+                    <span className="block text-[14px] font-medium group-hover:text-brand">
                       {item.title}
                     </span>
-                    <span className="mt-0.5 block text-[13px] leading-4 text-dim">{item.body}</span>
+                    <span className="mt-0.5 block text-[13px] leading-4 text-muted-foreground">{item.body}</span>
                   </span>
                 </Link>
               );
@@ -173,28 +174,28 @@ export default function Overview() {
               <h2 className="text-[14px] font-semibold">精选策略</h2>
               <Link
                 to="/strategies"
-                className="flex items-center gap-0.5 text-[13px] text-dim hover:text-text"
+                className="flex items-center gap-0.5 text-[13px] text-muted-foreground hover:text-foreground"
               >
                 全部 {Object.keys(STRATEGY_BY_SLUG).length} 篇指南
-                <ChevronRight size={12} className="text-faint" />
+                <ChevronRight size={12} className="text-muted-foreground" />
               </Link>
             </div>
             <div className="grid gap-3 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
               {lead && (
                 <Link
                   to={`/strategies/${FEATURED[0]}`}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-line bg-white transition-colors hover:border-line-strong"
+                  className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-xs/5 transition-colors hover:border-input"
                 >
                   <div className="flex items-start justify-between gap-4 px-4 pt-4">
                     <div className="min-w-0">
-                      <p className="text-[14px] font-medium group-hover:text-accent">{lead.name}</p>
-                      <p className="mt-0.5 truncate text-[13px] text-dim">
+                      <p className="text-[14px] font-medium group-hover:text-brand">{lead.name}</p>
+                      <p className="mt-0.5 truncate text-[13px] text-muted-foreground">
                         {OUTLOOK_ZH[lead.outlook]} · {lead.desc}
                       </p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-3 pt-0.5 text-[12px] text-dim">
+                    <div className="flex shrink-0 items-center gap-3 pt-0.5 text-[12px] text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <span className="h-0.5 w-3 rounded bg-accent" />
+                        <span className="h-0.5 w-3 rounded bg-brand" />
                         今日
                       </span>
                       <span className="flex items-center gap-1">
@@ -227,13 +228,13 @@ export default function Overview() {
                     <Link
                       key={slug}
                       to={`/strategies/${slug}`}
-                      className="group flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 transition-colors hover:border-line-strong"
+                      className="group flex items-center gap-3 rounded-2xl border bg-card shadow-xs/5 px-4 py-3 transition-colors hover:border-input"
                     >
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[14px] font-medium group-hover:text-accent">
+                        <span className="block text-[14px] font-medium group-hover:text-brand">
                           {s.name}
                         </span>
-                        <span className="mt-0.5 block truncate text-[13px] text-dim">
+                        <span className="mt-0.5 block truncate text-[13px] text-muted-foreground">
                           {OUTLOOK_ZH[s.outlook]} · {s.desc}
                         </span>
                       </span>
@@ -257,14 +258,14 @@ export default function Overview() {
               <h2 className="text-[14px] font-semibold">市场</h2>
               <Link
                 to="/chain"
-                className="flex items-center gap-0.5 text-[13px] text-dim hover:text-text"
+                className="flex items-center gap-0.5 text-[13px] text-muted-foreground hover:text-foreground"
               >
                 打开期权链
-                <ChevronRight size={12} className="text-faint" />
+                <ChevronRight size={12} className="text-muted-foreground" />
               </Link>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] gap-2 border-b border-line-subtle bg-[#fbfaf8] px-4 py-2 text-[12px] font-medium text-faint">
+            <div className="overflow-hidden rounded-2xl border bg-card shadow-xs/5">
+              <div className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] gap-2 border-b border-border/60 bg-muted/40 px-4 py-2 text-[12px] font-medium text-muted-foreground">
                 <span>标的</span>
                 <span className="text-right">现价</span>
                 <span className="text-right">今日</span>
@@ -276,26 +277,26 @@ export default function Overview() {
                   <Link
                     key={symbol}
                     to={`/chain/${symbol.toLowerCase()}`}
-                    className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] items-center gap-2 border-b border-line-subtle px-4 py-2.5 text-[14px] last:border-0 hover:bg-hover"
+                    className="grid grid-cols-[minmax(0,1fr)_100px_90px_70px] items-center gap-2 border-b border-border/60 px-4 py-2.5 text-[14px] last:border-0 hover:bg-accent"
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <Badge label={symbol.slice(0, 2)} seed={symbol} size={22} rounded="rounded-[6px]" />
+                      <Monogram label={symbol.slice(0, 2)} seed={symbol} size={22} rounded="rounded-[6px]" />
                       <span className="font-medium">{symbol}</span>
-                      <span className="truncate text-[13px] text-dim">{t.name}</span>
+                      <span className="truncate text-[13px] text-muted-foreground">{t.name}</span>
                     </span>
                     <span className="text-right tnum">${t.spot.toFixed(2)}</span>
                     <span className={`text-right tnum ${t.change >= 0 ? "text-profit" : "text-loss"}`}>
                       {t.change >= 0 ? "+" : "−"}
                       {Math.abs(t.changePct * 100).toFixed(2)}%
                     </span>
-                    <span className="text-right tnum text-dim">{t.ivRank}</span>
+                    <span className="text-right tnum text-muted-foreground">{t.ivRank}</span>
                   </Link>
                 );
               })}
             </div>
           </section>
 
-          <p className="mt-6 text-[12px] leading-4 text-faint">
+          <p className="mt-6 text-[12px] leading-4 text-muted-foreground">
             行情为延迟数据，期权价格由 Black-Scholes 合成，仅供情景分析。所有计算都在本机完成。
           </p>
         </div>

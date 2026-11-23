@@ -16,6 +16,7 @@ import {
   type VolExpiry,
 } from "../lib/vol";
 import { useLiveChain } from "../lib/useLiveChain";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function Vol() {
   const { symbol } = useParams<{ symbol?: string }>();
@@ -44,7 +45,7 @@ export default function Vol() {
             title="选择一个标的"
             body="比较近月与远月的 ATM IV，查看 25Δ Call / Put 的偏斜，再判断一笔交易是在赚方向、时间还是波动率。"
             action={
-              <Link to="/vol/spy" className="btn-secondary h-8 px-3">
+              <Link to="/vol/spy" className={buttonVariants({ variant: "outline", size: "default" })}>
                 查看 SPY
                 <ArrowRight size={12} />
               </Link>
@@ -95,12 +96,12 @@ function VolView({ symbol }: { symbol: string }) {
           type="button"
           onClick={live.reload}
           disabled={live.loading}
-          className="btn-secondary h-7 px-2.5 disabled:opacity-40"
+          className={buttonVariants({ variant: "outline", size: "sm" })}
         >
           <Repeat size={12} />
           {live.loading ? "刷新中" : "刷新"}
         </button>
-        <Link to={`/chain/${symbol.toLowerCase()}`} className="btn-primary h-7 px-2.5">
+        <Link to={`/chain/${symbol.toLowerCase()}`} className={buttonVariants({ size: "sm" })}>
           期权链
           <ArrowRight size={12} />
         </Link>
@@ -111,13 +112,13 @@ function VolView({ symbol }: { symbol: string }) {
           {!chain && live.loading && <LoadingState />}
 
           {!chain && !live.loading && live.error && (
-            <div className="rounded-xl border border-line bg-white p-6 text-center">
+            <div className="rounded-2xl border bg-card shadow-xs/5 p-6 text-center">
               <p className="text-[13px] font-medium">在线行情不可用</p>
-              <p className="mt-1 text-[12px] text-dim">{live.error}</p>
+              <p className="mt-1 text-[12px] text-muted-foreground">{live.error}</p>
               <button
                 type="button"
                 onClick={live.reload}
-                className="btn-secondary mt-3 h-7 px-2.5"
+                className={buttonVariants({ variant: "outline", size: "sm", className: "mt-3" })}
               >
                 重试
               </button>
@@ -181,49 +182,49 @@ function VolView({ symbol }: { symbol: string }) {
               </div>
 
               {live.error && (
-                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-line bg-[#fbfaf8] px-2.5 py-1.5 text-[11px] text-dim">
+                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
                   <span>刷新失败（{live.error}），正在显示上次的行情。</span>
                   <button
                     type="button"
                     onClick={live.reload}
-                    className="font-medium text-accent hover:underline"
+                    className="font-medium text-brand hover:underline"
                   >
                     重试
                   </button>
                 </div>
               )}
 
-              <section className="mt-3 rounded-xl border border-line bg-white p-4">
+              <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div>
                     <h2 className="text-[13px] font-semibold">IV 期限结构</h2>
-                    <p className="mt-0.5 text-[11px] text-dim">
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       横轴按到期日等距排列；悬浮查看 ATM 与两侧 25Δ。
                     </p>
                   </div>
-                  <span className="text-[11px] text-faint tnum">
+                  <span className="text-[11px] text-muted-foreground tnum">
                     {surface.expiries.length} 个到期日
                   </span>
                 </div>
                 <div className="mt-2">
                   <VolTermChart rows={surface.expiries} height={300} />
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-dim">
-                  <Legend color="#0364d3" label="ATM" />
-                  <Legend color="#0b7a52" label="25Δ Call" />
-                  <Legend color="#bf3b2b" label="25Δ Put" />
-                  <span className="ml-auto text-faint">
+                <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                  <Legend color="#2563eb" label="ATM" />
+                  <Legend color="#059669" label="25Δ Call" />
+                  <Legend color="#dc2626" label="25Δ Put" />
+                  <span className="ml-auto text-muted-foreground">
                     IV 为 CBOE 延迟快照，25Δ 取最接近 0.25 的挂牌合约
                   </span>
                 </div>
               </section>
 
               <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-                <section className="rounded-xl border border-line bg-white p-4">
+                <section className="rounded-2xl border bg-card shadow-xs/5 p-4">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <div>
                       <h2 className="text-[13px] font-semibold">单到期日偏斜</h2>
-                      <p className="mt-0.5 text-[11px] text-dim">
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
                         低于现价用 Put IV，高于现价用 Call IV。
                       </p>
                     </div>
@@ -231,7 +232,7 @@ function VolView({ symbol }: { symbol: string }) {
                       aria-label="选择偏斜的到期日"
                       value={skewExpiry?.iso ?? ""}
                       onChange={(event) => setSkewIso(event.target.value)}
-                      className="h-6 max-w-[190px] rounded-lg border border-line bg-white px-1.5 text-[12px] text-dim"
+                      className="h-6 max-w-[190px] rounded-lg border border-border bg-card px-1.5 text-[12px] text-muted-foreground"
                     >
                       {surface.expiries.map((row) => (
                         <option key={row.iso} value={row.iso}>
@@ -250,15 +251,15 @@ function VolView({ symbol }: { symbol: string }) {
                       />
                     </div>
                   ) : (
-                    <div className="mt-6 rounded-lg border border-line bg-[#fbfaf8] px-3 py-6 text-center text-[12px] text-dim">
+                    <div className="mt-6 rounded-lg border border-border bg-muted/40 px-3 py-6 text-center text-[12px] text-muted-foreground">
                       这个到期日的可用 IV 报价不足，换一个到期日试试。
                     </div>
                   )}
-                  <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-dim">
-                    <Legend color="#0364d3" label="OTM IV" />
-                    <Legend color="#0b7a52" label="25Δ Call" />
-                    <Legend color="#bf3b2b" label="25Δ Put" />
-                    <Legend color="#6f6a63" label="现价" dashed />
+                  <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                    <Legend color="#2563eb" label="OTM IV" />
+                    <Legend color="#059669" label="25Δ Call" />
+                    <Legend color="#dc2626" label="25Δ Put" />
+                    <Legend color="#737373" label="现价" dashed />
                   </div>
                 </section>
 
@@ -269,20 +270,20 @@ function VolView({ symbol }: { symbol: string }) {
                 />
               </div>
 
-              <section className="mt-3 overflow-hidden rounded-xl border border-line bg-white">
-                <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line-subtle px-4 pb-2 pt-3">
+              <section className="mt-3 overflow-hidden rounded-2xl border bg-card shadow-xs/5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-border/60 px-4 pb-2 pt-3">
                   <div>
                     <h2 className="text-[13px] font-semibold">按到期日展开</h2>
-                    <p className="mt-0.5 text-[11px] text-dim">
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       点击一行，把上方偏斜图切到该到期日。
                     </p>
                   </div>
-                  <span className="text-[11px] text-faint">25Δ 按 Delta 最近匹配</span>
+                  <span className="text-[11px] text-muted-foreground">25Δ 按 Delta 最近匹配</span>
                 </div>
                 <div className="max-h-[360px] overflow-auto">
                   <table className="w-full min-w-[760px] border-collapse text-[12px] tnum">
-                    <thead className="sticky top-0 z-10 bg-[#fbfaf8]">
-                      <tr className="border-b border-line-subtle text-[11px] text-faint">
+                    <thead className="sticky top-0 z-10 bg-muted/40">
+                      <tr className="border-b border-border/60 text-[11px] text-muted-foreground">
                         <th className="px-4 py-1.5 text-left font-medium">到期日</th>
                         <th className="px-2 py-1.5 text-right font-medium">DTE</th>
                         <th className="px-2 py-1.5 text-right font-medium">ATM</th>
@@ -300,18 +301,18 @@ function VolView({ symbol }: { symbol: string }) {
                           <tr
                             key={row.iso}
                             onClick={() => setSkewIso(row.iso)}
-                            className={`cursor-pointer border-b border-line-subtle last:border-0 ${
-                              selected ? "bg-accent-soft/60" : "hover:bg-hover"
+                            className={`cursor-pointer border-b border-border/60 last:border-0 ${
+                              selected ? "bg-brand/60" : "hover:bg-accent"
                             }`}
                           >
                             <td
                               className={`px-4 py-1.5 ${
-                                selected ? "font-medium text-accent" : "text-text"
+                                selected ? "font-medium text-brand" : "text-foreground"
                               }`}
                             >
                               {row.label}
                             </td>
-                            <td className="px-2 py-1.5 text-right text-dim">{row.dte}</td>
+                            <td className="px-2 py-1.5 text-right text-muted-foreground">{row.dte}</td>
                             <td className="px-2 py-1.5 text-right">
                               {row.atm != null ? pct(row.atm, 1) : "—"}
                             </td>
@@ -324,7 +325,7 @@ function VolView({ symbol }: { symbol: string }) {
                             <td
                               className={`px-2 py-1.5 text-right ${
                                 row.rr == null
-                                  ? "text-dim"
+                                  ? "text-muted-foreground"
                                   : row.rr < 0
                                     ? "text-loss"
                                     : "text-profit"
@@ -332,10 +333,10 @@ function VolView({ symbol }: { symbol: string }) {
                             >
                               {row.rr != null ? volPoints(row.rr) : "—"}
                             </td>
-                            <td className="px-2 py-1.5 text-right text-dim">
+                            <td className="px-2 py-1.5 text-right text-muted-foreground">
                               {row.fly != null ? volPoints(row.fly) : "—"}
                             </td>
-                            <td className="px-4 py-1.5 text-right text-faint">
+                            <td className="px-4 py-1.5 text-right text-muted-foreground">
                               {row.quotes}
                             </td>
                           </tr>
@@ -346,7 +347,7 @@ function VolView({ symbol }: { symbol: string }) {
                 </div>
               </section>
 
-              <p className="mt-4 border-t border-line-subtle pt-3 text-[11px] leading-4 text-faint">
+              <p className="mt-4 border-t border-border/60 pt-3 text-[11px] leading-4 text-muted-foreground">
                 CBOE 延迟行情约 15 分钟；25Δ 是最近挂牌合约的近似值，不是拟合曲面。
                 期限斜率 = 最接近 90 天的到期日 ATM − 最近到期日 ATM，避开两年期
                 LEAPS 的干扰；正值叫正向结构，负值叫倒挂。
@@ -386,24 +387,24 @@ function Reading({
         : `近月 25Δ Call 比 Put 高 ${Math.abs(front.rr * 100).toFixed(1)} 点。正 RR 表示上行 IV 更贵，常见于强势或逼空环境。`;
 
   return (
-    <section className="rounded-xl border border-line bg-white p-4">
+    <section className="rounded-2xl border bg-card shadow-xs/5 p-4">
       <h2 className="text-[13px] font-semibold">怎么读这一页</h2>
-      <div className="mt-2 space-y-2.5 text-[12px] leading-5 text-muted">
+      <div className="mt-2 space-y-2.5 text-[12px] leading-5 text-muted-foreground">
         <p>
-          <b className="text-text">期限结构：</b>
+          <b className="text-foreground">期限结构：</b>
           {slopeText}
         </p>
         <p>
-          <b className="text-text">25Δ 偏斜：</b>
+          <b className="text-foreground">25Δ 偏斜：</b>
           {rrText}
         </p>
         <p>
-          <b className="text-text">先问自己在交易什么：</b>
+          <b className="text-foreground">先问自己在交易什么：</b>
           做日历先看 ATM 期限差；做垂直先看 RR；做跨式先看 ATM 与两侧的绝对水平。
           只看 IV30 一个数，会把期限和偏斜的信息都压扁。
         </p>
       </div>
-      <div className="mt-3 rounded-lg border border-line bg-[#fbfaf8] px-3 py-2 text-[11px] leading-4 text-dim">
+      <div className="mt-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-[11px] leading-4 text-muted-foreground">
         25Δ RR = Call 25Δ IV − Put 25Δ IV；25Δ Fly =（Call + Put）/ 2 − ATM。
         两者都是相对定价的读数，不是方向信号。
       </div>
@@ -442,14 +443,14 @@ function Stat({
   sub: string;
   tone?: "profit" | "loss" | "neutral";
 }) {
-  const color = tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-text";
+  const color = tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-foreground";
   return (
-    <div className="rounded-xl border border-line bg-white px-3.5 py-3">
-      <p className="text-[11px] font-semibold text-faint">{label}</p>
+    <div className="rounded-2xl border bg-card shadow-xs/5 px-3.5 py-3">
+      <p className="text-[11px] font-semibold text-muted-foreground">{label}</p>
       <p className={`mt-1 text-[18px] font-semibold leading-6 tnum ${color}`}>
         {value}
       </p>
-      <p className="mt-0.5 truncate text-[11px] text-dim tnum">{sub}</p>
+      <p className="mt-0.5 truncate text-[11px] text-muted-foreground tnum">{sub}</p>
     </div>
   );
 }
@@ -459,13 +460,13 @@ function LoadingState() {
     <div className="animate-pulse space-y-3" aria-label="正在载入波动率曲面">
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         {Array.from({ length: 5 }, (_, index) => (
-          <div key={index} className="h-[82px] rounded-xl border border-line bg-white" />
+          <div key={index} className="h-[82px] rounded-2xl border bg-card shadow-xs/5" />
         ))}
       </div>
-      <div className="h-[360px] rounded-xl border border-line bg-white" />
+      <div className="h-[360px] rounded-2xl border bg-card shadow-xs/5" />
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="h-[330px] rounded-xl border border-line bg-white" />
-        <div className="h-[330px] rounded-xl border border-line bg-white" />
+        <div className="h-[330px] rounded-2xl border bg-card shadow-xs/5" />
+        <div className="h-[330px] rounded-2xl border bg-card shadow-xs/5" />
       </div>
     </div>
   );

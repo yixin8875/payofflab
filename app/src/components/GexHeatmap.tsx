@@ -76,17 +76,17 @@ export function GexHeatmap({
   }, [data, hover]);
 
   return (
-    <section className="mt-3 rounded-xl border border-line bg-white p-4">
+    <section className="mt-3 rounded-2xl border bg-card shadow-xs/5 p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-[13px] font-semibold">行权价 × 到期日热力图</h2>
-          <p className="mt-0.5 text-[11px] text-dim">
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
             每个格子是一个到期日、一个行权价的净美元 Gamma；绿色为正、红色为负，用来定位 Gamma 集中在哪几天、哪些价位。
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1">
-            <span className="mr-0.5 text-[11px] text-faint">窗口</span>
+            <span className="mr-0.5 text-[11px] text-muted-foreground">窗口</span>
             {BANDS.map((item) => (
               <button
                 key={item.value}
@@ -97,15 +97,15 @@ export function GexHeatmap({
                 }}
                 className={`h-6 rounded-lg border px-2 text-[12px] font-medium transition-colors ${
                   band === item.value
-                    ? "border-accent-line bg-accent-soft text-accent"
-                    : "border-line bg-white text-dim hover:text-text"
+                    ? "border-brand/40 bg-brand/10 text-brand"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {item.label}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] text-faint">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <span>负</span>
             <span
               className="h-2 w-20 rounded-full"
@@ -122,15 +122,15 @@ export function GexHeatmap({
       <div className="mt-2 flex min-h-[20px] flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
         {hovered ? (
           <>
-            <span className="font-medium text-text tnum">
+            <span className="font-medium text-foreground tnum">
               行权价 {strikeLabel(hovered.strike)}
             </span>
-            <span className="text-dim">
+            <span className="text-muted-foreground">
               {hovered.expiry.label} · {hovered.expiry.dte} 天
             </span>
             {hovered.cell ? (
               <>
-                <span className="text-faint">净</span>
+                <span className="text-muted-foreground">净</span>
                 <span
                   className={`tnum font-semibold ${
                     hovered.cell.net >= 0 ? "text-profit" : "text-loss"
@@ -138,30 +138,30 @@ export function GexHeatmap({
                 >
                   {gexLabel(hovered.cell.net, { sign: true })}
                 </span>
-                <span className="text-faint">看涨</span>
-                <span className="tnum text-text">{gexLabel(hovered.cell.call, { sign: true })}</span>
-                <span className="text-faint">看跌</span>
-                <span className="tnum text-text">{gexLabel(hovered.cell.put, { sign: true })}</span>
+                <span className="text-muted-foreground">看涨</span>
+                <span className="tnum text-foreground">{gexLabel(hovered.cell.call, { sign: true })}</span>
+                <span className="text-muted-foreground">看跌</span>
+                <span className="tnum text-foreground">{gexLabel(hovered.cell.put, { sign: true })}</span>
               </>
             ) : (
-              <span className="text-faint">该价位没有挂牌合约，或未平仓量为零</span>
+              <span className="text-muted-foreground">该价位没有挂牌合约，或未平仓量为零</span>
             )}
           </>
         ) : (
-          <span className="text-faint">
+          <span className="text-muted-foreground">
             悬停格子查看明细；点击到期日列头可把上方统计切换到该到期日。
           </span>
         )}
       </div>
 
       {data.rows.length === 0 ? (
-        <div className="mt-2 rounded-lg border border-line-subtle bg-[#fbfaf8] px-4 py-8 text-center text-[12px] text-dim">
+        <div className="mt-2 rounded-lg border border-border/60 bg-muted/40 px-4 py-8 text-center text-[12px] text-muted-foreground">
           当前窗口内没有可用的未平仓数据，试试放大窗口或刷新行情。
         </div>
       ) : (
         <div
           ref={scrollRef}
-          className="mt-2 overflow-auto rounded-lg border border-line-subtle bg-[#fbfaf8]"
+          className="mt-2 overflow-auto rounded-lg border border-border/60 bg-muted/40"
           style={{ maxHeight: 500 }}
         >
           <table
@@ -172,7 +172,7 @@ export function GexHeatmap({
               <tr>
                 <th
                   scope="col"
-                  className="sticky left-0 top-0 z-30 w-[64px] min-w-[64px] bg-[#fbfaf8] px-1 py-1.5 text-right text-[11px] font-medium text-faint"
+                  className="sticky left-0 top-0 z-30 w-[64px] min-w-[64px] bg-muted/40 px-1 py-1.5 text-right text-[11px] font-medium text-muted-foreground"
                 >
                   行权价
                 </th>
@@ -180,16 +180,16 @@ export function GexHeatmap({
                   <th
                     key={expiry.iso}
                     scope="col"
-                    className="sticky top-0 z-20 bg-[#fbfaf8] p-0 font-medium"
+                    className="sticky top-0 z-20 bg-muted/40 p-0 font-medium"
                   >
                     <button
                       type="button"
                       onClick={() => onSelectExpiry?.(expiry.iso)}
-                      className="w-full rounded px-0 py-1 text-center text-[11px] leading-4 text-dim transition-colors hover:bg-hover hover:text-text"
+                      className="w-full rounded px-0 py-1 text-center text-[11px] leading-4 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                       title={`只看 ${expiry.label} 的统计`}
                     >
                       {expiry.label}
-                      <span className="block text-[11px] text-faint tnum">{expiry.dte}天</span>
+                      <span className="block text-[11px] text-muted-foreground tnum">{expiry.dte}天</span>
                     </button>
                   </th>
                 ))}
@@ -207,10 +207,10 @@ export function GexHeatmap({
                           ? `行权价 ${strikeLabel(row.strike)}，现价附近`
                           : `行权价 ${strikeLabel(row.strike)}`
                       }
-                      className={`sticky left-0 z-10 whitespace-nowrap border-l-2 bg-white px-2 text-right text-[11px] font-normal tnum ${
+                      className={`sticky left-0 z-10 whitespace-nowrap border-l-2 bg-card px-2 text-right text-[11px] font-normal tnum ${
                         isSpot
-                          ? "border-accent font-semibold text-accent"
-                          : "border-transparent text-dim"
+                          ? "border-brand font-semibold text-brand"
+                          : "border-transparent text-muted-foreground"
                       }`}
                     >
                       {strikeLabel(row.strike)}
@@ -232,10 +232,10 @@ export function GexHeatmap({
                           }
                           onMouseEnter={() => setHover({ strike: row.strike, iso: expiry.iso })}
                           onMouseLeave={() => setHover(null)}
-                          className={`h-[14px] p-0 ${cell ? "" : "bg-[#f1efea]"}`}
+                          className={`h-[14px] p-0 ${cell ? "" : "bg-muted/50"}`}
                           style={{
                             background: cell ? heatColor(cell.net, data.scale) : undefined,
-                            boxShadow: active ? "inset 0 0 0 1.5px #1c1b19" : undefined,
+                            boxShadow: active ? "inset 0 0 0 1.5px #171717" : undefined,
                           }}
                         />
                       );
@@ -248,7 +248,7 @@ export function GexHeatmap({
         </div>
       )}
 
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] text-faint">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
         <span className="tnum">
           {data.rows.length} 个行权价 × {data.expiries.length} 个到期日 · 按
           {options?.weight === "volume" ? "成交量" : "未平仓量"} · 颜色按 90 分位截断

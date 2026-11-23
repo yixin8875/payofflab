@@ -15,12 +15,12 @@ type Props = {
 };
 
 const COLORS = {
-  expiry: "#bf3b2b",
-  today: "#0364d3",
-  profit: "#0b7a52",
-  loss: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
+  expiry: "#dc2626",
+  today: "#2563eb",
+  profit: "#059669",
+  loss: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
 };
 
 function niceTicks(lo: number, hi: number, count: number): number[] {
@@ -191,7 +191,7 @@ export function PayoffChart({
             y={padT}
             width={Math.max(2, bandHi - bandLo)}
             height={chartH}
-            fill="#0364d3"
+            fill="#2563eb"
             fillOpacity="0.055"
           />
         )}
@@ -258,7 +258,7 @@ export function PayoffChart({
           x2={sx(spot)}
           y1={padT - 6}
           y2={padT + chartH}
-          stroke="#6f6a63"
+          stroke="#737373"
           strokeDasharray="3 4"
           strokeOpacity="0.45"
         />
@@ -273,10 +273,10 @@ export function PayoffChart({
               x2={sx(b)}
               y1={sy(0) - 8}
               y2={sy(0) + 8}
-              stroke="#6f6a63"
+              stroke="#737373"
               strokeOpacity="0.5"
             />
-            <circle cx={sx(b)} cy={sy(0)} r="3" fill="#fbfaf8" stroke="#6f6a63" strokeWidth="1.4" />
+            <circle cx={sx(b)} cy={sy(0)} r="3" fill="#fafafa" stroke="#737373" strokeWidth="1.4" />
             <text
               x={sx(b) + (i % 2 === 0 ? 8 : -8)}
               y={sy(0) + 4}
@@ -298,7 +298,7 @@ export function PayoffChart({
             height="18"
             rx="4"
             fill="#ffffff"
-            stroke="#e3e0da"
+            stroke="#e5e5e5"
           />
           <text
             x={sx(spot)}
@@ -306,7 +306,7 @@ export function PayoffChart({
             textAnchor="middle"
             fontSize="11"
             fontWeight="600"
-            fill="#6f6a63"
+            fill="#737373"
             className="tnum"
           >
             {spotLabel}
@@ -320,7 +320,7 @@ export function PayoffChart({
               x2={sx(hoverPoint.p)}
               y1={padT}
               y2={padT + chartH}
-              stroke="#1c1b19"
+              stroke="#171717"
               strokeOpacity="0.2"
             />
             <circle cx={sx(hoverPoint.p)} cy={sy(conv(hoverPoint.exp))} r="3" fill={COLORS.expiry} />
@@ -331,19 +331,19 @@ export function PayoffChart({
 
       {hoverPoint && interactive && (
         <div
-          className="pointer-events-none absolute top-1 z-10 rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{
             left: Math.min(Math.max(8, sx(hoverPoint.p) - 62), width - 140),
           }}
         >
-          <div className="font-semibold text-text tnum">${price(hoverPoint.p)}</div>
-          <div className="mt-1 flex items-center gap-1.5 text-dim">
+          <div className="font-semibold text-foreground tnum">${price(hoverPoint.p)}</div>
+          <div className="mt-1 flex items-center gap-1.5 text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: COLORS.today }} />
-            今日 <span className="ml-auto tnum text-text">{money(hoverPoint.now, { sign: true })}</span>
+            今日 <span className="ml-auto tnum text-foreground">{money(hoverPoint.now, { sign: true })}</span>
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 text-dim">
+          <div className="mt-0.5 flex items-center gap-1.5 text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: COLORS.expiry }} />
-            到期 <span className="ml-auto tnum text-text">{money(hoverPoint.exp, { sign: true })}</span>
+            到期 <span className="ml-auto tnum text-foreground">{money(hoverPoint.exp, { sign: true })}</span>
           </div>
         </div>
       )}

@@ -1,38 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Plus, Star } from "./Icons";
+import { Plus, Star } from "./Icons";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  addGroup,
-  groupsForSymbol,
-  toggleSymbol,
-  useWatchlist,
-  type WatchGroup,
-} from "../lib/watchlist";
+  Menu,
+  MenuCheckboxItem,
+  MenuLinkItem,
+  MenuPopup,
+  MenuSeparator,
+  MenuTrigger,
+} from "@/components/ui/menu";
+import { addGroup, groupsForSymbol, toggleSymbol, useWatchlist } from "../lib/watchlist";
 
 export function WatchlistMenu({ symbol }: { symbol: string }) {
   const groups = useWatchlist();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const box = useRef<HTMLDivElement>(null);
 
   const memberships = groupsForSymbol(groups, symbol);
   const starred = memberships.length > 0;
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointer = (event: PointerEvent) => {
-      if (box.current && !box.current.contains(event.target as Node)) setOpen(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("pointerdown", onPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
 
   const create = () => {
     const created = addGroup(name, symbol);
@@ -42,108 +29,88 @@ export function WatchlistMenu({ symbol }: { symbol: string }) {
   };
 
   return (
-    <div ref={box} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className={`btn-secondary h-7 gap-1 px-2.5 ${starred ? "text-accent" : ""}`}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        title={starred ? `已加入 ${memberships.length} 个分组` : "加入自选"}
+    <Menu open={open} onOpenChange={setOpen}>
+      <MenuTrigger
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            className={starred ? "gap-1 text-brand" : "gap-1"}
+            title={starred ? `已加入 ${memberships.length} 个分组` : "加入自选"}
+          />
+        }
       >
         <Star size={13} fill={starred ? "currentColor" : "none"} />
         {starred ? `自选 ${memberships.length}` : "自选"}
-      </button>
+      </MenuTrigger>
 
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 top-full z-50 mt-1 w-[248px] overflow-hidden rounded-xl border border-line bg-white shadow-[0_10px_30px_rgba(30,25,18,0.14)]"
+      <MenuPopup align="end" className="w-[264px] p-0">
+        <div className="border-b px-3 py-2">
+          <p className="text-sm font-semibold">加入自选</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {symbol} 可同时放入多个分组
+          </p>
+        </div>
+
+        <div className="max-h-[220px] overflow-y-auto p-1">
+          {groups.map((group) => (
+            <MenuCheckboxItem
+              key={group.id}
+              checked={group.symbols.includes(symbol)}
+              onCheckedChange={() => toggleSymbol(group.id, symbol)}
+            >
+              <span className="min-w-0 flex-1 truncate">{group.name}</span>
+              <span className="tnum text-xs text-muted-foreground">
+                {group.symbols.length}
+              </span>
+            </MenuCheckboxItem>
+          ))}
+          {groups.length === 0 && (
+            <p className="px-2 py-3 text-xs text-muted-foreground">
+              还没有分组，在下方新建一个。
+            </p>
+          )}
+        </div>
+
+        <MenuSeparator />
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            create();
+          }}
+          className="flex items-center gap-1 p-2"
         >
-          <div className="border-b border-line-subtle px-3 py-2">
-            <p className="text-[12px] font-semibold">加入自选</p>
-            <p className="mt-0.5 text-[11px] text-faint">{symbol} 可同时放入多个分组</p>
-          </div>
-
-          <div className="max-h-[220px] overflow-y-auto py-1">
-            {groups.map((group) => (
-              <GroupToggle
-                key={group.id}
-                group={group}
-                symbol={symbol}
-                checked={group.symbols.includes(symbol)}
-              />
-            ))}
-            {groups.length === 0 && (
-              <p className="px-3 py-3 text-[11px] text-faint">还没有分组，在下方新建一个。</p>
-            )}
-          </div>
-
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              create();
-            }}
-            className="flex items-center gap-1 border-t border-line-subtle px-2 py-2"
-          >
-            <input
+          <div className="min-w-0 flex-1">
+            <Input
+              size="sm"
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="新建分组，例如 半导体"
               maxLength={20}
-              className="field h-7 flex-1 px-2 text-[12px]"
               aria-label="新分组名称"
             />
-            <button
-              type="submit"
-              disabled={!name.trim()}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line text-dim hover:text-text disabled:opacity-40"
-              title="新建分组并加入"
-              aria-label="新建分组并加入"
-            >
-              <Plus size={13} />
-            </button>
-          </form>
-
-          <Link
-            to="/watchlist"
-            onClick={() => setOpen(false)}
-            className="block border-t border-line-subtle px-3 py-1.5 text-[11px] font-medium text-accent hover:bg-hover"
+          </div>
+          <Button
+            type="submit"
+            size="icon-sm"
+            variant="outline"
+            disabled={!name.trim()}
+            title="新建分组并加入"
+            aria-label="新建分组并加入"
           >
-            管理自选分组 →
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
+            <Plus size={13} />
+          </Button>
+        </form>
 
-function GroupToggle({
-  group,
-  symbol,
-  checked,
-}: {
-  group: WatchGroup;
-  symbol: string;
-  checked: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="menuitemcheckbox"
-      aria-checked={checked}
-      onClick={() => toggleSymbol(group.id, symbol)}
-      className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] hover:bg-hover"
-    >
-      <span
-        className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border ${
-          checked ? "border-accent bg-accent text-white" : "border-line bg-white"
-        }`}
-      >
-        {checked && <Check size={9} />}
-      </span>
-      <span className="min-w-0 flex-1 truncate">{group.name}</span>
-      <span className="tnum text-[11px] text-faint">{group.symbols.length}</span>
-    </button>
+        <MenuSeparator />
+        <MenuLinkItem
+          render={<Link to="/watchlist" />}
+          onClick={() => setOpen(false)}
+          className="text-brand"
+        >
+          管理自选分组 →
+        </MenuLinkItem>
+      </MenuPopup>
+    </Menu>
   );
 }

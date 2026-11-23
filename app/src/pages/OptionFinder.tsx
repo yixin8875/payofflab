@@ -11,6 +11,8 @@ import {
   type ScanRank,
 } from "../lib/scanner";
 import { useLiveChain } from "../lib/useLiveChain";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 
 const OUTLOOKS: { key: ScanOutlook; label: string; hint: string }[] = [
   { key: "bullish", label: "看涨", hint: "单腿、价差、备兑" },
@@ -62,8 +64,8 @@ export default function OptionFinder() {
   const pill = (active: boolean) =>
     `h-7 shrink-0 rounded-lg border px-2 text-[12px] font-medium transition-colors ${
       active
-        ? "border-accent-line bg-accent-soft text-accent"
-        : "border-line bg-white text-dim hover:text-text"
+        ? "border-brand/40 bg-brand/10 text-brand"
+        : "border-border bg-card text-muted-foreground hover:text-foreground"
     }`;
 
   return (
@@ -76,17 +78,19 @@ export default function OptionFinder() {
             : `${symbol} · 读取在线期权链`
         }
         leading={
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-soft text-accent">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand">
             <Target size={14} />
           </span>
         }
       >
-        <span className="chip">{chain ? "CBOE 延迟" : "在线"}</span>
+        <Badge variant={chain ? "warning" : "success"} size="lg">
+          {chain ? "CBOE 延迟" : "在线"}
+        </Badge>
         <button
           type="button"
           onClick={live.reload}
           disabled={live.loading}
-          className="btn-secondary h-7 px-2.5 disabled:opacity-40"
+          className={buttonVariants({ variant: "outline", size: "sm" })}
         >
           <Repeat size={12} />
           刷新
@@ -101,29 +105,29 @@ export default function OptionFinder() {
               setScanned(true);
               if (!chain && !live.loading) live.reload();
             }}
-            className="rounded-xl border border-line bg-white p-4"
+            className="rounded-2xl border bg-card shadow-xs/5 p-4"
           >
             <div className="flex flex-wrap items-end gap-2.5">
               <label className="block">
-                <span className="text-[11px] text-dim">标的</span>
+                <span className="text-[11px] text-muted-foreground">标的</span>
                 <input
                   value={symbol}
                   onChange={(event) => pickSymbol(event.target.value)}
-                  className="mt-1 block h-8 w-[96px] rounded-lg border border-line bg-white px-2 font-code text-[13px] font-semibold outline-none focus:border-accent focus:ring-2 focus:ring-accent/15"
+                  className="mt-1 block h-8 w-[96px] rounded-lg border border-border bg-card px-2 font-code text-[13px] font-semibold outline-none focus:border-brand focus:ring-2 focus:ring-brand/15"
                   aria-label="标的代码"
                 />
               </label>
 
               <div>
-                <span className="text-[11px] text-dim">观点</span>
-                <div className="mt-1 flex rounded-lg border border-line bg-surface p-0.5">
+                <span className="text-[11px] text-muted-foreground">观点</span>
+                <div className="mt-1 flex rounded-lg border border-border bg-muted p-0.5">
                   {OUTLOOKS.map((item) => (
                     <button
                       type="button"
                       key={item.key}
                       onClick={() => setOutlook(item.key)}
                       className={`rounded px-2 py-1 text-[12px] font-medium transition-colors ${
-                        outlook === item.key ? "bg-white text-text shadow-sm" : "text-dim"
+                        outlook === item.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                       }`}
                       title={item.hint}
                     >
@@ -134,12 +138,12 @@ export default function OptionFinder() {
               </div>
 
               <label className="block">
-                <span className="text-[11px] text-dim">到期</span>
+                <span className="text-[11px] text-muted-foreground">到期</span>
                 <select
                   value={expiry?.iso ?? ""}
                   onChange={(event) => setExpiryIso(event.target.value)}
                   disabled={!expiries.length}
-                  className="mt-1 block h-8 max-w-[150px] rounded-lg border border-line bg-white px-2 text-[12px] outline-none focus:border-accent disabled:opacity-50"
+                  className="mt-1 block h-8 max-w-[150px] rounded-lg border border-border bg-card px-2 text-[12px] outline-none focus:border-brand disabled:opacity-50"
                   aria-label="到期日"
                 >
                   {expiries.length === 0 && <option value="">加载中…</option>}
@@ -152,11 +156,11 @@ export default function OptionFinder() {
               </label>
 
               <label className="block">
-                <span className="text-[11px] text-dim">排序</span>
+                <span className="text-[11px] text-muted-foreground">排序</span>
                 <select
                   value={rank}
                   onChange={(event) => setRank(event.target.value as ScanRank)}
-                  className="mt-1 block h-8 rounded-lg border border-line bg-white px-2 text-[12px] outline-none focus:border-accent"
+                  className="mt-1 block h-8 rounded-lg border border-border bg-card px-2 text-[12px] outline-none focus:border-brand"
                   aria-label="排序方式"
                 >
                   {RANKS.map((item) => (
@@ -167,14 +171,14 @@ export default function OptionFinder() {
                 </select>
               </label>
 
-              <button type="submit" className="btn-primary ml-auto h-8 px-3">
+              <button type="submit" className={buttonVariants({ size: "default", className: "ml-auto" })}>
                 <Target size={13} />
                 扫描 {symbol}
               </button>
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-line-subtle pt-3">
-              <span className="mr-1 text-[11px] text-faint">流动性</span>
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-3">
+              <span className="mr-1 text-[11px] text-muted-foreground">流动性</span>
               {LIQUIDITIES.map((item) => (
                 <button
                   type="button"
@@ -186,10 +190,10 @@ export default function OptionFinder() {
                   {item.key}
                 </button>
               ))}
-              <span className="ml-1 text-[11px] text-faint">
+              <span className="ml-1 text-[11px] text-muted-foreground">
                 {LIQUIDITIES.find((item) => item.key === liquidity)?.note}
               </span>
-              <span className="ml-auto text-[11px] text-faint">
+              <span className="ml-auto text-[11px] text-muted-foreground">
                 买入按卖价、卖出按买价计入
               </span>
             </div>
@@ -198,7 +202,7 @@ export default function OptionFinder() {
           {live.error && (
             <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-loss/25 bg-loss-soft/40 px-3 py-2 text-[12px] text-loss">
               <span>在线行情不可用：{live.error}</span>
-              <button type="button" onClick={live.reload} className="btn-secondary h-7 px-2.5">
+              <button type="button" onClick={live.reload} className={buttonVariants({ variant: "outline", size: "sm" })}>
                 重试
               </button>
             </div>
@@ -206,11 +210,11 @@ export default function OptionFinder() {
 
           {scanned ? (
             !chain ? (
-              <div className="mt-8 text-center text-[12px] text-dim">
+              <div className="mt-8 text-center text-[12px] text-muted-foreground">
                 {live.loading ? `正在读取 ${symbol} 的在线期权链…` : "等待在线行情。"}
               </div>
             ) : !expiry ? (
-              <div className="mt-8 text-center text-[12px] text-dim">这个标的没有可用到期日。</div>
+              <div className="mt-8 text-center text-[12px] text-muted-foreground">这个标的没有可用到期日。</div>
             ) : (
               <section className="mt-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -218,13 +222,13 @@ export default function OptionFinder() {
                     {chain.symbol} · {OUTLOOKS.find((item) => item.key === outlook)?.label} ·{" "}
                     {expiry.label}
                   </h2>
-                  <span className="text-[11px] text-faint">
+                  <span className="text-[11px] text-muted-foreground">
                     {results.length} 个结果 · 按{rank}排序 · {liquidity}流动性
                   </span>
                 </div>
 
-                <div className="mt-2 overflow-hidden rounded-xl border border-line bg-white">
-                  <div className="grid grid-cols-[minmax(0,1fr)_60px_92px_84px_84px_84px] gap-2 border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[11px] font-medium text-faint">
+                <div className="mt-2 overflow-hidden rounded-2xl border bg-card shadow-xs/5">
+                  <div className="grid grid-cols-[minmax(0,1fr)_60px_92px_84px_84px_84px] gap-2 border-b border-border/60 bg-muted/40 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
                     <span>交易</span>
                     <span className="text-right">概率</span>
                     <span className="text-right">净权利金</span>
@@ -243,11 +247,11 @@ export default function OptionFinder() {
                       <Link
                         key={result.key}
                         to={`/calculator?ticker=${chain.symbol}&expiry=${expiry.iso}&legs=${draft}`}
-                        className="grid grid-cols-[minmax(0,1fr)_60px_92px_84px_84px_84px] items-center gap-2 border-b border-line-subtle px-3 py-2 last:border-0 hover:bg-hover"
+                        className="grid grid-cols-[minmax(0,1fr)_60px_92px_84px_84px_84px] items-center gap-2 border-b border-border/60 px-3 py-2 last:border-0 hover:bg-accent"
                       >
                         <span className="min-w-0">
                           <span className="block truncate text-[13px] font-medium">{result.name}</span>
-                          <span className="block truncate text-[11px] text-dim tnum">
+                          <span className="block truncate text-[11px] text-muted-foreground tnum">
                             {result.legText} · OI ≥ {result.minOi.toLocaleString()} · 价差{" "}
                             {(result.maxSpread * 100).toFixed(1)}%
                           </span>
@@ -257,7 +261,7 @@ export default function OptionFinder() {
                         </span>
                         <span
                           className={`text-right text-[12px] tnum ${
-                            result.netCredit >= 0 ? "text-profit" : "text-muted"
+                            result.netCredit >= 0 ? "text-profit" : "text-muted-foreground"
                           }`}
                         >
                           {result.netCredit >= 0 ? "+" : "−"}
@@ -280,14 +284,14 @@ export default function OptionFinder() {
                     );
                   })}
                   {results.length === 0 && (
-                    <p className="px-3 py-10 text-center text-[12px] leading-5 text-dim">
+                    <p className="px-3 py-10 text-center text-[12px] leading-5 text-muted-foreground">
                       这个观点下没有结构通过筛选。
                       <br />
                       试试“宽松”流动性、更远的到期日，或换一个流动性更好的标的。
                     </p>
                   )}
                 </div>
-                <p className="mt-2 text-[11px] leading-4 text-faint">
+                <p className="mt-2 text-[11px] leading-4 text-muted-foreground">
                   扫描基于 CBOE 延迟行情（约 15 分钟），买入按卖价、卖出按买价成交，未计佣金与滑点；
                   概率与预期价值来自 Black-Scholes 风险中性分布。点击任意一行可带入构建器。
                 </p>
@@ -295,16 +299,16 @@ export default function OptionFinder() {
             )
           ) : (
             <section className="mt-8 text-center">
-              <p className="text-[13px] text-dim">
+              <p className="text-[13px] text-muted-foreground">
                 {chain
                   ? `已读取 ${chain.symbol} 的 ${expiries.length} 个到期日，选好观点与流动性后开始扫描。`
                   : `正在读取 ${symbol} 的在线期权链…`}
               </p>
-              <p className="mt-1 text-[11px] leading-4 text-faint">
+              <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
                 扫描会遍历真实挂牌行权价，按买价/卖价计算净权利金，再筛选流动性并排序。
               </p>
               {!chain && !live.loading && (
-                <button type="button" onClick={live.reload} className="btn-secondary mt-3 h-7 px-2.5">
+                <button type="button" onClick={live.reload} className={buttonVariants({ variant: "outline", size: "sm", className: "mt-3" })}>
                   重新读取
                 </button>
               )}

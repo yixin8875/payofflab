@@ -15,6 +15,8 @@ import { legsFor } from "../lib/presets";
 import { analyse, type Instrument } from "../lib/options";
 import { EXPIRIES, ticker } from "../data/tickers";
 import { money, pct, price } from "../lib/format";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 
 const SPY = ticker("SPY");
 const EXPIRY = EXPIRIES[3];
@@ -35,36 +37,40 @@ export function StrategyView({ s }: { s: Strategy }) {
         subtitle={`${CATEGORY_ZH[s.category] ?? s.category} · ${OUTLOOK_ZH[s.outlook]} · ${RISK_ZH[s.risk]}`}
       >
         {s.preset && (
-          <Link to={`/calculator?preset=${s.preset}&ticker=SPY`} className="btn-primary h-7 px-2.5">
+          <Link to={`/calculator?preset=${s.preset}&ticker=SPY`} className={buttonVariants({ size: "sm" })}>
             在构建器中打开
             <ArrowRight size={12} />
           </Link>
         )}
-        <Link to="/chain/spy" className="btn-secondary h-7 px-2.5">
+        <Link to="/chain/spy" className={buttonVariants({ variant: "outline", size: "sm" })}>
           看 SPY 链
         </Link>
       </PaneHeader>
 
       <DetailScroll>
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="chip" data-selected="true">
+          <Badge variant="outline" size="lg" className="border-brand-line bg-brand-soft text-brand">
             {OUTLOOK_ZH[s.outlook]}
-          </span>
-          <span className="chip">{RISK_ZH[s.risk]}</span>
-          <span className="chip">{LEVEL_ZH[s.level]}</span>
-          <span className="ml-1 text-[12px] text-faint">{CATEGORY_ZH[s.category] ?? s.category}</span>
+          </Badge>
+          <Badge variant="outline" size="lg">
+            {RISK_ZH[s.risk]}
+          </Badge>
+          <Badge variant="outline" size="lg">
+            {LEVEL_ZH[s.level]}
+          </Badge>
+          <span className="ml-1 text-[12px] text-muted-foreground">{CATEGORY_ZH[s.category] ?? s.category}</span>
         </div>
 
-        <p className="mt-3 max-w-[680px] text-[14px] leading-5 text-muted">{s.desc}</p>
+        <p className="mt-3 max-w-[680px] text-[14px] leading-5 text-muted-foreground">{s.desc}</p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_250px]">
-          <div className="rounded-xl border border-line bg-white p-3">
+          <div className="rounded-2xl border bg-card shadow-xs/5 p-3">
             <div className="flex items-baseline justify-between px-0.5">
-              <p className="text-[12px] text-dim">
+              <p className="text-[12px] text-muted-foreground">
                 SPY · {EXPIRY.label}（{EXPIRY.dte}天）· 示例持仓
               </p>
               {a && (
-                <p className={`text-[12px] font-medium tnum ${a.isCredit ? "text-profit" : "text-text"}`}>
+                <p className={`text-[12px] font-medium tnum ${a.isCredit ? "text-profit" : "text-foreground"}`}>
                   净{a.isCredit ? "收入" : "支出"} {money(Math.abs(a.premium))}
                 </p>
               )}
@@ -84,7 +90,7 @@ export function StrategyView({ s }: { s: Strategy }) {
               <div className="flex h-[300px] items-center justify-center px-6 text-center">
                 <div>
                   <p className="text-[13px] font-medium">这是一个说明性策略</p>
-                  <p className="mt-1 max-w-[300px] text-[12px] leading-5 text-dim">
+                  <p className="mt-1 max-w-[300px] text-[12px] leading-5 text-muted-foreground">
                     它没有一键预设。可以照着右侧的腿，在构建器里手动拼出来。
                   </p>
                 </div>
@@ -93,7 +99,7 @@ export function StrategyView({ s }: { s: Strategy }) {
           </div>
 
           <aside className="space-y-3">
-            <div className="rounded-xl border border-line bg-white p-3">
+            <div className="rounded-2xl border bg-card shadow-xs/5 p-3">
               <h2 className="text-[13px] font-semibold">关键数字</h2>
               {a ? (
                 <dl className="mt-1.5 divide-y divide-line-subtle text-[12px]">
@@ -111,19 +117,19 @@ export function StrategyView({ s }: { s: Strategy }) {
                     ["每日 Theta", `${a.theta > 0 ? "+" : ""}${money(a.theta)}`],
                   ].map(([label, value]) => (
                     <div key={label} className="flex items-baseline justify-between gap-2 py-1.5">
-                      <dt className="text-dim">{label}</dt>
+                      <dt className="text-muted-foreground">{label}</dt>
                       <dd className="text-right font-medium tnum">{value}</dd>
                     </div>
                   ))}
                 </dl>
               ) : (
-                <p className="mt-1.5 text-[12px] leading-5 text-dim">
+                <p className="mt-1.5 text-[12px] leading-5 text-muted-foreground">
                   这个策略没有固定的一键预设，取决于你选择的行权价与到期日。
                 </p>
               )}
             </div>
 
-            <div className="rounded-xl border border-line bg-white p-3">
+            <div className="rounded-2xl border bg-card shadow-xs/5 p-3">
               <h2 className="text-[13px] font-semibold">示例腿（SPY）</h2>
               {legs.length ? (
                 <ul className="mt-1.5 space-y-1">
@@ -136,19 +142,19 @@ export function StrategyView({ s }: { s: Strategy }) {
                       >
                         {leg.side === -1 ? "卖出" : "买入"}
                       </span>
-                      <span className="tnum text-dim">×{leg.qty}</span>
-                      <span className="text-muted">
+                      <span className="tnum text-muted-foreground">×{leg.qty}</span>
+                      <span className="text-muted-foreground">
                         {leg.kind === "call" ? "看涨" : leg.kind === "put" ? "看跌" : "正股"}
                       </span>
                       <span className="ml-auto tnum">
                         {leg.kind === "stock" ? `$${leg.fill.toFixed(2)}` : leg.strike}
                       </span>
-                      <span className="w-9 text-right text-dim tnum">{price(leg.fill)}</span>
+                      <span className="w-9 text-right text-muted-foreground tnum">{price(leg.fill)}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="mt-1.5 text-[12px] text-dim">在构建器中自行添加各条腿。</p>
+                <p className="mt-1.5 text-[12px] text-muted-foreground">在构建器中自行添加各条腿。</p>
               )}
             </div>
           </aside>
@@ -157,14 +163,14 @@ export function StrategyView({ s }: { s: Strategy }) {
         <section className="mt-6 grid gap-5 md:grid-cols-2">
           <div>
             <h2 className="text-[13px] font-semibold">它是怎么运作的</h2>
-            <p className="mt-1.5 text-[13px] leading-5 text-muted">
+            <p className="mt-1.5 text-[13px] leading-5 text-muted-foreground">
               {s.desc}盈亏图把到期时的结算价值画成一条折线；折线与零轴的交点就是盈亏平衡点，
               曲线在零轴以上的区间，就是这笔交易赚钱的价格范围。
             </p>
           </div>
           <div>
             <h2 className="text-[13px] font-semibold">什么时候不该用它</h2>
-            <p className="mt-1.5 text-[13px] leading-5 text-muted">
+            <p className="mt-1.5 text-[13px] leading-5 text-muted-foreground">
               任何策略都有它不适用的行情。先确认自己的观点、能承受的最大亏损和持有期限，
               再对照上面的关键数字；如果最大亏损超出承受范围，就换一个结构，而不是缩小止损。
             </p>
@@ -172,16 +178,16 @@ export function StrategyView({ s }: { s: Strategy }) {
         </section>
 
         {related.length > 0 && (
-          <section className="mt-6 border-t border-line-subtle pt-4">
+          <section className="mt-6 border-t border-border/60 pt-4">
             <h2 className="text-[12px] font-semibold">同类策略</h2>
             <div className="mt-2 grid gap-2 sm:grid-cols-3">
               {related.map((r) => (
                 <Link
                   key={r.slug}
                   to={`/strategies/${r.slug}`}
-                  className="rounded-xl border border-line bg-white p-2.5 transition-colors hover:border-line-strong"
+                  className="rounded-2xl border bg-card shadow-xs/5 p-2.5 transition-colors hover:border-input"
                 >
-                  <p className="text-[11px] text-faint">
+                  <p className="text-[11px] text-muted-foreground">
                     {OUTLOOK_ZH[r.outlook]} · {RISK_ZH[r.risk]}
                   </p>
                   <p className="mt-0.5 text-[13px] font-medium">{r.name}</p>

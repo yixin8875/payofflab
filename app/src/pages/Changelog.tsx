@@ -379,7 +379,7 @@ export default function Changelog() {
       <PaneHeader title="更新日志" subtitle={`当前版本 v${VERSION}`} />
       <DetailScroll>
         <div className="max-w-[700px]">
-          <p className="text-[13px] leading-5 text-muted">
+          <p className="text-[13px] leading-5 text-muted-foreground">
             所有值得记录的改动都写在这里，仓库根目录的 CHANGELOG.md 与之对应。
           </p>
           <div className="mt-5 space-y-7">
@@ -390,22 +390,22 @@ export default function Changelog() {
                     v{entry.version} · {entry.title}
                   </h2>
                   {entry.latest && (
-                    <span className="rounded-full border border-accent-line bg-accent-soft px-1.5 py-0.5 text-[11px] font-medium text-accent">
+                    <span className="rounded-full border border-brand/40 bg-brand/10 px-1.5 py-0.5 text-[11px] font-medium text-brand">
                       当前
                     </span>
                   )}
-                  <span className="ml-auto text-[11px] text-faint tnum">{entry.date}</span>
+                  <span className="ml-auto text-[11px] text-muted-foreground tnum">{entry.date}</span>
                 </div>
-                <div className="mt-2.5 space-y-3 border-l border-line pl-4">
+                <div className="mt-2.5 space-y-3 border-l border-border pl-4">
                   {entry.groups.map((group) => (
                     <div key={group.label}>
-                      <h3 className="text-[11px] font-semibold text-faint">
+                      <h3 className="text-[11px] font-semibold text-muted-foreground">
                         {group.label}
                       </h3>
                       <ul className="mt-1 space-y-1">
                         {group.items.map((item) => (
-                          <li key={item} className="flex gap-2 text-[13px] leading-5 text-muted">
-                            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-line-strong" />
+                          <li key={item} className="flex gap-2 text-[13px] leading-5 text-muted-foreground">
+                            <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-border" />
                             <span>{item}</span>
                           </li>
                         ))}

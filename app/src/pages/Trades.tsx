@@ -4,7 +4,7 @@ import { ArrowRight, Bars, Repeat, Trash } from "../components/Icons";
 import { encodeDraft } from "../lib/draft";
 import { PayoffChart } from "../components/PayoffChart";
 import {
-  Badge,
+  Monogram,
   DetailScroll,
   EmptyDetail,
   ListGroup,
@@ -30,6 +30,7 @@ import {
   openTrades,
   useTrades,
 } from "../lib/store";
+import { buttonVariants } from "@/components/ui/button";
 
 function dayLabel(iso: string) {
   const date = new Date(iso);
@@ -47,7 +48,7 @@ function expiryLabel(iso: string) {
 }
 
 function pnlClass(value: number) {
-  return value > 0 ? "text-profit" : value < 0 ? "text-loss" : "text-muted";
+  return value > 0 ? "text-profit" : value < 0 ? "text-loss" : "text-muted-foreground";
 }
 
 export default function Trades() {
@@ -85,14 +86,14 @@ export default function Trades() {
               disabled={live.loading || symbols.length === 0}
               title="刷新全部行情"
               aria-label="刷新全部行情"
-              className="btn-ghost h-7 w-7 justify-center p-0 disabled:opacity-40"
+              className={buttonVariants({ variant: "ghost", size: "sm" })}
             >
               <Repeat size={13} />
             </button>
           }
           footer={
             live.error ? (
-              <p className="border-t border-line px-3 py-2 text-[11px] leading-4 text-loss">
+              <p className="border-t border-border px-3 py-2 text-[11px] leading-4 text-loss">
                 部分行情未更新：{live.error}
               </p>
             ) : undefined
@@ -101,11 +102,11 @@ export default function Trades() {
           <PortfolioCard portfolio={portfolio} loading={live.loading} />
           {trades.length === 0 ? (
             <div className="px-4 py-8 text-center">
-              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-white text-faint">
+              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-2xl border bg-card shadow-xs/5 text-muted-foreground">
                 <Bars size={16} />
               </span>
-              <p className="mt-3 text-[12px] text-dim">还没有保存的策略</p>
-              <p className="mt-1 text-[11px] leading-4 text-faint">
+              <p className="mt-3 text-[12px] text-muted-foreground">还没有保存的策略</p>
+              <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
                 在构建器里搭好持仓，点“保存策略”，它就会出现在这里。
               </p>
             </div>
@@ -122,7 +123,7 @@ export default function Trades() {
                           key={trade.id}
                           to={`/trades/${trade.id}`}
                           selected={trade.id === id}
-                          badge={<Badge label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
+                          badge={<Monogram label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
                           title={trade.name}
                           subtitle={`${trade.symbol} · ${trade.legs.filter((leg) => leg.qty > 0).length} 条腿 · ${expiryLabel(trade.expiry)}`}
                           meta={
@@ -144,7 +145,7 @@ export default function Trades() {
                         key={trade.id}
                         to={`/trades/${trade.id}`}
                         selected={trade.id === id}
-                        badge={<Badge label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
+                        badge={<Monogram label={trade.symbol.slice(0, 2)} seed={trade.symbol} />}
                         title={trade.name}
                         subtitle={`${trade.symbol} · ${trade.events.length} 次平仓`}
                         meta={
@@ -185,7 +186,7 @@ export default function Trades() {
                 : "在构建器里搭好一笔多腿持仓，保存后会在这里按实时行情跟踪盈亏。"
             }
             action={
-              <Link to="/calculator" className="btn-primary h-8 px-3">
+              <Link to="/calculator" className={buttonVariants({ size: "default" })}>
                 打开构建器
                 <ArrowRight size={12} />
               </Link>
@@ -207,10 +208,10 @@ function PortfolioCard({
   loading: boolean;
 }) {
   return (
-    <div className="mx-3 mt-3 rounded-xl border border-line bg-white p-3">
+    <div className="mx-3 mt-3 rounded-2xl border bg-card shadow-xs/5 p-3">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[11px] font-medium text-faint">组合未实现</span>
-        {loading && <span className="text-[11px] text-faint">更新中…</span>}
+        <span className="text-[11px] font-medium text-muted-foreground">组合未实现</span>
+        {loading && <span className="text-[11px] text-muted-foreground">更新中…</span>}
       </div>
       <p className={`mt-1 text-[24px] font-semibold leading-7 tnum ${pnlClass(portfolio.unrealized)}`}>
         {money(portfolio.unrealized, { sign: true })}
@@ -219,18 +220,18 @@ function PortfolioCard({
         <span className={pnlClass(portfolio.netUnrealized)}>
           清算后 {money(portfolio.netUnrealized, { sign: true })}
         </span>
-        <span className="text-faint">费用 {money(portfolio.fees)}</span>
+        <span className="text-muted-foreground">费用 {money(portfolio.fees)}</span>
       </div>
-      <div className="mt-2 grid grid-cols-3 gap-2 border-t border-line-subtle pt-2">
+      <div className="mt-2 grid grid-cols-3 gap-2 border-t border-border/60 pt-2">
         <MiniStat label="已实现" value={money(portfolio.realized, { sign: true })} tone={pnlClass(portfolio.realized)} />
         <MiniStat label="Delta" value={num(portfolio.delta, 0)} />
         <MiniStat label="Theta/日" value={money(portfolio.theta)} />
       </div>
-      <div className="mt-1.5 flex items-center justify-between text-[11px] text-faint">
+      <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
         <span>{portfolio.totalOpen} 笔未平仓</span>
         <span className="tnum">占用 {money(portfolio.margin)}</span>
       </div>
-      <div className="mt-1 flex items-center justify-between text-[11px] text-faint">
+      <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
         <span>买入腿按买价、卖出腿按卖价清算</span>
         <span>
           {loading
@@ -247,8 +248,8 @@ function PortfolioCard({
 function MiniStat({ label, value, tone }: { label: string; value: string; tone?: string }) {
   return (
     <div>
-      <p className="text-[11px] text-faint">{label}</p>
-      <p className={`mt-0.5 truncate text-[12px] font-medium tnum ${tone ?? "text-muted"}`}>{value}</p>
+      <p className="text-[11px] text-muted-foreground">{label}</p>
+      <p className={`mt-0.5 truncate text-[12px] font-medium tnum ${tone ?? "text-muted-foreground"}`}>{value}</p>
     </div>
   );
 }
@@ -321,22 +322,22 @@ function PositionView({
           type="button"
           onClick={refresh}
           disabled={refreshing}
-          className="btn-secondary h-7 px-2.5 disabled:opacity-40"
+          className={buttonVariants({ variant: "outline", size: "sm" })}
         >
           <Repeat size={12} />
           刷新
         </button>
         {rebuildHref && (
-          <Link to={rebuildHref} className="btn-secondary h-7 px-2.5">
+          <Link to={rebuildHref} className={buttonVariants({ variant: "outline", size: "sm" })}>
             在构建器中重建
           </Link>
         )}
         {open && (
-          <button type="button" onClick={closeAll} className="btn-secondary h-7 px-2.5">
+          <button type="button" onClick={closeAll} className={buttonVariants({ variant: "outline", size: "sm" })}>
             全部平仓
           </button>
         )}
-        <button type="button" onClick={onDelete} className="btn-ghost h-7 px-2 text-loss">
+        <button type="button" onClick={onDelete} className={buttonVariants({ variant: "ghost", size: "sm", className: "text-loss" })}>
           <Trash size={13} />
           删除
         </button>
@@ -344,13 +345,13 @@ function PositionView({
 
       <DetailScroll>
         <div className="max-w-[980px]">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-line bg-white px-3 py-2 text-[11px] text-dim">
-            <span className="font-medium text-text tnum">${price(metrics.spot)}</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border bg-card shadow-xs/5 px-3 py-2 text-[11px] text-muted-foreground">
+            <span className="font-medium text-foreground tnum">${price(metrics.spot)}</span>
             <span>IV {metrics.iv > 0 ? `${(metrics.iv * 100).toFixed(1)}%` : "—"}</span>
             <span>
               {open ? `最近到期 ${metrics.dte >= 0 ? `${metrics.dte} 天` : "—"}` : "已平仓"}
             </span>
-            <span className={metrics.online ? "text-profit" : "text-faint"}>
+            <span className={metrics.online ? "text-profit" : "text-muted-foreground"}>
               {refreshing && !metrics.online
                 ? "行情加载中…"
                 : metrics.online
@@ -368,22 +369,22 @@ function PositionView({
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <SummaryCard label="中间价盈亏" value={money(metrics.unrealized, { sign: true })} tone={pnlClass(metrics.unrealized)} />
             <SummaryCard label="清算盈亏" value={money(metrics.liqUnrealized, { sign: true })} tone={pnlClass(metrics.liqUnrealized)} />
-            <SummaryCard label="费用（往返）" value={money(metrics.fees)} tone="text-dim" />
+            <SummaryCard label="费用（往返）" value={money(metrics.fees)} tone="text-muted-foreground" />
             <SummaryCard label="净盈亏（清算后）" value={money(metrics.netUnrealized, { sign: true })} tone={pnlClass(metrics.netUnrealized)} />
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-xl border border-line bg-white px-3 py-2 text-[11px]">
-            <span className="text-faint">组合希腊值</span>
+          <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-2xl border bg-card shadow-xs/5 px-3 py-2 text-[11px]">
+            <span className="text-muted-foreground">组合希腊值</span>
             <Greek label="Δ" value={num(metrics.delta, 0)} />
             <Greek label="Γ" value={num(metrics.gamma, 2)} />
             <Greek label="Θ/日" value={money(metrics.theta, { cents: true })} />
             <Greek label="Vega/点" value={money(metrics.vega, { cents: true })} />
             <span className="ml-auto flex items-baseline gap-1">
-              <span className="text-faint">占用购买力</span>
-              <span className="font-medium text-muted tnum">
+              <span className="text-muted-foreground">占用购买力</span>
+              <span className="font-medium text-muted-foreground tnum">
                 {money(metrics.margin.requirement)}
               </span>
-              <span className="text-[11px] text-faint">
+              <span className="text-[11px] text-muted-foreground">
                 {metrics.margin.kind === "naked"
                   ? "含裸卖"
                   : metrics.margin.kind === "defined"
@@ -392,7 +393,7 @@ function PositionView({
               </span>
             </span>
           </div>
-          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-5 gap-y-1 px-1 text-[11px] text-faint tnum">
+          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-5 gap-y-1 px-1 text-[11px] text-muted-foreground tnum">
             <span>已实现 {money(metrics.realized, { sign: true })}</span>
             <span>总盈亏 {money(metrics.total, { sign: true })}</span>
             <span>当前市值 {money(metrics.marketValue)}</span>
@@ -405,11 +406,11 @@ function PositionView({
             <section className="mt-4">
               <div className="flex items-baseline justify-between">
                 <h2 className="text-[13px] font-semibold">到期盈亏</h2>
-                <span className="text-[11px] text-faint">
+                <span className="text-[11px] text-muted-foreground">
                   按当前剩余期限与实时 IV 估算
                 </span>
               </div>
-              <div className="mt-2 rounded-xl border border-line bg-white p-3">
+              <div className="mt-2 rounded-2xl border bg-card shadow-xs/5 p-3">
                 <PayoffChart
                   legs={openLegs.map((item) => item.leg)}
                   spot={metrics.spot}
@@ -426,8 +427,8 @@ function PositionView({
 
           <section className="mt-4">
             <h2 className="text-[13px] font-semibold">持仓腿</h2>
-            <div className="mt-2 overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-[44px_36px_minmax(0,1fr)_72px_72px_88px_64px_48px] gap-2 border-b border-line-subtle bg-[#fbfaf8] px-3 py-1.5 text-[11px] font-medium text-faint">
+            <div className="mt-2 overflow-hidden rounded-2xl border bg-card shadow-xs/5">
+              <div className="grid grid-cols-[44px_36px_minmax(0,1fr)_72px_72px_88px_64px_48px] gap-2 border-b border-border/60 bg-muted/40 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
                 <span>方向</span>
                 <span className="text-right">数量</span>
                 <span>合约</span>
@@ -450,7 +451,7 @@ function PositionView({
                 />
               ))}
             </div>
-            <p className="mt-1.5 text-[11px] leading-4 text-faint">
+            <p className="mt-1.5 text-[11px] leading-4 text-muted-foreground">
               现价为 CBOE 延迟行情的买卖中间价；清算价按买入腿卖在买价、卖出腿买回在卖价估算。
               费用默认每张合约每边 $0.69，可在设置中调整；保证金为估算值，不含正股融资。
               平仓操作只记录本机盈亏，不会发送到券商。
@@ -460,16 +461,16 @@ function PositionView({
           {trade.events.length > 0 && (
             <section className="mt-4">
               <h2 className="text-[13px] font-semibold">平仓记录</h2>
-              <div className="mt-2 overflow-hidden rounded-xl border border-line bg-white">
+              <div className="mt-2 overflow-hidden rounded-2xl border bg-card shadow-xs/5">
                 {[...trade.events].reverse().map((event) => {
                   const leg = trade.legs.find((item) => item.id === event.legId);
                   return (
                     <div
                       key={event.id}
-                      className="flex items-center gap-2 border-b border-line-subtle px-3 py-2 text-[12px] last:border-0"
+                      className="flex items-center gap-2 border-b border-border/60 px-3 py-2 text-[12px] last:border-0"
                     >
-                      <span className="w-12 shrink-0 text-faint">{dayLabel(event.at)}</span>
-                      <span className="min-w-0 flex-1 truncate text-muted">
+                      <span className="w-12 shrink-0 text-muted-foreground">{dayLabel(event.at)}</span>
+                      <span className="min-w-0 flex-1 truncate text-muted-foreground">
                         {leg
                           ? `${leg.kind === "call" ? "C" : leg.kind === "put" ? "P" : "股"}${leg.kind === "stock" ? "" : leg.strike}`
                           : "已删除的腿"}{" "}
@@ -492,9 +493,9 @@ function PositionView({
 
 function SummaryCard({ label, value, tone }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-white px-3 py-2.5">
-      <p className="text-[11px] text-faint">{label}</p>
-      <p className={`mt-0.5 text-[16px] font-semibold tnum ${tone ?? "text-text"}`}>{value}</p>
+    <div className="rounded-2xl border bg-card shadow-xs/5 px-3 py-2.5">
+      <p className="text-[11px] text-muted-foreground">{label}</p>
+      <p className={`mt-0.5 text-[16px] font-semibold tnum ${tone ?? "text-foreground"}`}>{value}</p>
     </div>
   );
 }
@@ -502,8 +503,8 @@ function SummaryCard({ label, value, tone }: { label: string; value: string; ton
 function Greek({ label, value }: { label: string; value: string }) {
   return (
     <span className="flex items-baseline gap-1">
-      <span className="text-faint">{label}</span>
-      <span className="font-medium text-muted tnum">{value}</span>
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium text-muted-foreground tnum">{value}</span>
     </span>
   );
 }
@@ -527,7 +528,7 @@ function LegRow({
     Number.isFinite(fillPrice) && qty > 0 ? leg.side * qty * 100 * (fillPrice - leg.fill) : 0;
 
   return (
-    <div className="border-b border-line-subtle px-3 py-2 text-[12px] last:border-0">
+    <div className="border-b border-border/60 px-3 py-2 text-[12px] last:border-0">
       <div className="grid grid-cols-[44px_36px_minmax(0,1fr)_72px_72px_88px_64px_48px] items-center gap-2">
         <span
           className={`w-8 rounded px-1 py-0.5 text-center text-[11px] font-medium ${
@@ -536,25 +537,25 @@ function LegRow({
         >
           {leg.side === -1 ? "卖出" : "买入"}
         </span>
-        <span className="text-right tnum text-dim">{leg.qty}</span>
+        <span className="text-right tnum text-muted-foreground">{leg.qty}</span>
         <span className="min-w-0 truncate">
           <span className="font-medium">
             {leg.kind === "call" ? "看涨" : leg.kind === "put" ? "看跌" : "正股"}
           </span>
-          <span className="ml-1 tnum text-muted">
+          <span className="ml-1 tnum text-muted-foreground">
             {leg.kind === "stock" ? `@ $${price(leg.fill)}` : leg.strike}
           </span>
           {leg.kind !== "stock" && (
-            <span className="ml-1 text-[11px] text-faint">{expiryLabel(leg.expiry)}</span>
+            <span className="ml-1 text-[11px] text-muted-foreground">{expiryLabel(leg.expiry)}</span>
           )}
         </span>
-        <span className="text-right tnum text-muted">{leg.kind === "stock" ? "—" : price(leg.fill)}</span>
+        <span className="text-right tnum text-muted-foreground">{leg.kind === "stock" ? "—" : price(leg.fill)}</span>
         <span className="text-right tnum">
           {price(item.mark)}
-          <span className="ml-1 text-[11px] text-faint">
+          <span className="ml-1 text-[11px] text-muted-foreground">
             {item.source === "live" ? "实时" : item.source === "expired" ? "到期" : item.source === "stock" ? "" : "模型"}
           </span>
-          <span className="mt-0.5 block text-[11px] text-faint tnum">
+          <span className="mt-0.5 block text-[11px] text-muted-foreground tnum">
             清算 {price(item.liqMark)}
           </span>
         </span>
@@ -566,7 +567,7 @@ function LegRow({
             </span>
           )}
         </span>
-        <span className="text-right text-[11px] text-faint">
+        <span className="text-right text-[11px] text-muted-foreground">
           {leg.qty <= 0 ? "已平" : leg.kind === "stock" ? "—" : item.dte < 0 ? "已到期" : `${item.dte}天`}
         </span>
         <span className="text-right">
@@ -578,7 +579,7 @@ function LegRow({
                   ? setClosing(null)
                   : setClosing({ legId: leg.id, qty: String(leg.qty), price: item.liqMark.toFixed(2) })
               }
-              className="text-[11px] font-medium text-accent hover:underline"
+              className="text-[11px] font-medium text-brand hover:underline"
             >
               {editing ? "取消" : "平仓"}
             </button>
@@ -594,10 +595,10 @@ function LegRow({
             if (closing?.price.trim() === "") return;
             onClose(leg.id, qty, fillPrice);
           }}
-          className="mt-2 flex flex-wrap items-end gap-2 rounded-lg border border-accent-line bg-accent-soft/40 p-2"
+          className="mt-2 flex flex-wrap items-end gap-2 rounded-lg border border-brand/40 bg-brand/40 p-2"
         >
           <label className="block">
-            <span className="text-[11px] text-dim">平仓数量</span>
+            <span className="text-[11px] text-muted-foreground">平仓数量</span>
             <input
               type="number"
               min={1}
@@ -607,11 +608,11 @@ function LegRow({
               onChange={(event) =>
                 setClosing({ legId: leg.id, qty: event.target.value, price: closing?.price ?? item.liqMark.toFixed(2) })
               }
-              className="mt-0.5 block h-7 w-16 rounded border border-line bg-white px-1.5 text-[12px] tnum outline-none focus:border-accent"
+              className="mt-0.5 block h-7 w-16 rounded border border-border bg-card px-1.5 text-[12px] tnum outline-none focus:border-brand"
             />
           </label>
           <label className="block">
-            <span className="text-[11px] text-dim">成交价</span>
+            <span className="text-[11px] text-muted-foreground">成交价</span>
             <input
               type="number"
               min={0}
@@ -620,16 +621,16 @@ function LegRow({
               onChange={(event) =>
                 setClosing({ legId: leg.id, qty: closing?.qty ?? String(leg.qty), price: event.target.value })
               }
-              className="mt-0.5 block h-7 w-20 rounded border border-line bg-white px-1.5 text-[12px] tnum outline-none focus:border-accent"
+              className="mt-0.5 block h-7 w-20 rounded border border-border bg-card px-1.5 text-[12px] tnum outline-none focus:border-brand"
             />
           </label>
-          <span className="pb-1 text-[11px] text-dim">
+          <span className="pb-1 text-[11px] text-muted-foreground">
             预计已实现{" "}
             <span className={`font-medium tnum ${pnlClass(estimate)}`}>
               {money(estimate, { sign: true })}
             </span>
           </span>
-          <button type="submit" className="btn-primary h-7 px-2.5">
+          <button type="submit" className={buttonVariants({ size: "sm" })}>
             确认平仓
           </button>
         </form>

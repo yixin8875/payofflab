@@ -4,7 +4,7 @@ import { ArrowRight, Plus, Star, Trash } from "../components/Icons";
 import { PayoffChart } from "../components/PayoffChart";
 import { WatchlistMenu } from "../components/WatchlistMenu";
 import {
-  Badge,
+  Monogram,
   DetailScroll,
   EmptyDetail,
   ListPane,
@@ -26,6 +26,8 @@ import {
   useWatchlist,
   type WatchGroup,
 } from "../lib/watchlist";
+import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Watchlist() {
   const { symbol } = useParams<{ symbol?: string }>();
@@ -73,7 +75,7 @@ export default function Watchlist() {
             <button
               type="button"
               onClick={() => setCreating((value) => !value)}
-              className="icon-btn h-6 w-6"
+              className={buttonVariants({ variant: "ghost", size: "icon-xs" })}
               title="新建分组"
               aria-label="新建分组"
             >
@@ -89,16 +91,17 @@ export default function Watchlist() {
               }}
               className="flex items-center gap-1 px-2 pb-2"
             >
-              <input
+              <Input
                 autoFocus
+                size="sm"
                 value={groupName}
                 onChange={(event) => setGroupName(event.target.value)}
                 placeholder="分组名称"
                 maxLength={20}
-                className="field h-7 flex-1 px-2 text-[12px]"
+                className="flex-1 [&_input]:px-2 [&_input]:text-[12px]"
                 aria-label="分组名称"
               />
-              <button type="submit" disabled={!groupName.trim()} className="btn-secondary h-7 px-2">
+              <button type="submit" disabled={!groupName.trim()} className={buttonVariants({ variant: "outline", size: "sm" })}>
                 新建
               </button>
             </form>
@@ -107,15 +110,15 @@ export default function Watchlist() {
           {groups.map((group) => (
             <section key={group.id} className="pb-1">
               <div className="flex items-center gap-1 px-3 pb-1 pt-3">
-                <h3 className="flex min-w-0 flex-1 items-baseline gap-1.5 text-[11px] font-semibold text-faint">
+                <h3 className="flex min-w-0 flex-1 items-baseline gap-1.5 text-[11px] font-semibold text-muted-foreground">
                   <span className="truncate">{group.name}</span>
-                  <span className="shrink-0 font-normal text-faint/80">{group.symbols.length}</span>
+                  <span className="shrink-0 font-normal text-muted-foreground/80">{group.symbols.length}</span>
                 </h3>
-                <div className="flex shrink-0 items-center gap-0.5 text-faint">
+                <div className="flex shrink-0 items-center gap-0.5 text-muted-foreground">
                   <button
                     type="button"
                     onClick={() => promptAdd(group)}
-                    className="flex h-5 w-5 items-center justify-center rounded hover:bg-hover hover:text-text"
+                    className="flex h-5 w-5 items-center justify-center rounded hover:bg-accent hover:text-foreground"
                     title={`向「${group.name}」添加代码`}
                     aria-label={`向「${group.name}」添加代码`}
                   >
@@ -124,7 +127,7 @@ export default function Watchlist() {
                   <button
                     type="button"
                     onClick={() => promptRename(group)}
-                    className="rounded px-1 py-0.5 text-[11px] hover:bg-hover hover:text-text"
+                    className="rounded px-1 py-0.5 text-[11px] hover:bg-accent hover:text-foreground"
                     title="重命名分组"
                   >
                     改名
@@ -132,7 +135,7 @@ export default function Watchlist() {
                   <button
                     type="button"
                     onClick={() => removeGroup(group)}
-                    className="flex h-5 w-5 items-center justify-center rounded hover:bg-hover hover:text-loss"
+                    className="flex h-5 w-5 items-center justify-center rounded hover:bg-accent hover:text-loss"
                     title="删除分组"
                     aria-label={`删除分组「${group.name}」`}
                   >
@@ -148,14 +151,14 @@ export default function Watchlist() {
                       key={`${group.id}:${sym}`}
                       to={`/watchlist/${sym.toLowerCase()}`}
                       selected={selected === sym}
-                      badge={<Badge label={sym.slice(0, 2)} seed={sym} />}
+                      badge={<Monogram label={sym.slice(0, 2)} seed={sym} />}
                       title={sym}
                       subtitle={t.name}
                       action={
                         <button
                           type="button"
                           onClick={() => removeSymbol(group.id, sym)}
-                          className="flex h-5 w-5 items-center justify-center rounded text-faint hover:bg-[#f5efec] hover:text-loss"
+                          className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:bg-[#f5efec] hover:text-loss"
                           title={`从「${group.name}」移除`}
                           aria-label={`从「${group.name}」移除 ${sym}`}
                         >
@@ -166,13 +169,13 @@ export default function Watchlist() {
                   );
                 })}
                 {group.symbols.length === 0 && (
-                  <li className="px-3 py-1.5 text-[11px] text-faint">还没有标的，点上方 + 添加</li>
+                  <li className="px-3 py-1.5 text-[11px] text-muted-foreground">还没有标的，点上方 + 添加</li>
                 )}
               </ul>
             </section>
           ))}
 
-          <div className="mx-3 mt-3 border-t border-line-subtle pt-2 text-[11px] leading-4 text-faint">
+          <div className="mx-3 mt-3 border-t border-border/60 pt-2 text-[11px] leading-4 text-muted-foreground">
             自选只保存在本机。也可以在期权链页面点「自选」直接收藏。
           </div>
         </ListPane>
@@ -191,12 +194,12 @@ export default function Watchlist() {
                 <button
                   type="button"
                   onClick={() => setCreating(true)}
-                  className="btn-secondary h-8 px-3"
+                  className={buttonVariants({ variant: "outline", size: "default" })}
                 >
                   <Star size={12} />
                   新建分组
                 </button>
-                <Link to="/chain" className="btn-primary h-8 px-3">
+                <Link to="/chain" className={buttonVariants({ size: "default" })}>
                   打开期权链
                 </Link>
               </div>
@@ -248,11 +251,11 @@ function WatchView({ symbol }: { symbol: string }) {
         subtitle={online ? "在线 · CBOE 延迟 15 分钟" : "自选 · 本机保存"}
       >
         <WatchlistMenu symbol={t.symbol} />
-        <Link to={`/chain/${t.symbol.toLowerCase()}`} className="btn-primary h-7 px-2.5">
+        <Link to={`/chain/${t.symbol.toLowerCase()}`} className={buttonVariants({ size: "sm" })}>
           查看期权链
           <ArrowRight size={12} />
         </Link>
-        <Link to={`/tools/option-finder?ticker=${t.symbol}`} className="btn-secondary h-7 px-2.5">
+        <Link to={`/tools/option-finder?ticker=${t.symbol}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
           扫描价差
         </Link>
       </PaneHeader>
@@ -260,7 +263,7 @@ function WatchView({ symbol }: { symbol: string }) {
       <DetailScroll>
         <div className="flex flex-wrap items-end gap-x-5 gap-y-1">
           <div>
-            <p className="text-[11px] text-faint">参考价</p>
+            <p className="text-[11px] text-muted-foreground">参考价</p>
             <p className="mt-0.5 text-[32px] font-semibold leading-9 tnum">
               ${market.spot.toFixed(2)}
             </p>
@@ -274,7 +277,7 @@ function WatchView({ symbol }: { symbol: string }) {
             {market.change >= 0 ? "+" : "−"}
             {Math.abs(market.changePct * 100).toFixed(2)}%)
           </p>
-          <p className="pb-1 text-[12px] text-faint">
+          <p className="pb-1 text-[12px] text-muted-foreground">
             {online ? `CBOE 延迟 15 分钟 · ${chain?.asOf}` : "上一交易时段 · 模型合成"}
           </p>
         </div>
@@ -290,18 +293,18 @@ function WatchView({ symbol }: { symbol: string }) {
             ["行权价间距", `$${t.strikeStep}`, online ? "按挂牌合约对齐" : "合成链"],
             ["到期预期波动", `±${money(expectedMove)}`, `±${pct(expectedMove / market.spot)}`],
           ].map(([label, value, hint]) => (
-            <div key={label} className="rounded-xl border border-line bg-white px-3 py-2.5">
-              <p className="text-[11px] text-faint">{label}</p>
+            <div key={label} className="rounded-2xl border bg-card shadow-xs/5 px-3 py-2.5">
+              <p className="text-[11px] text-muted-foreground">{label}</p>
               <p className="mt-0.5 text-[16px] font-semibold tnum">{value}</p>
-              <p className="mt-0.5 text-[11px] text-faint">{hint}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-4 rounded-xl border border-line bg-white p-3">
+        <div className="mt-4 rounded-2xl border bg-card shadow-xs/5 p-3">
           <div className="flex items-baseline justify-between px-0.5">
             <h2 className="text-[13px] font-semibold">示例 · 买入平值看涨</h2>
-            <span className="text-[11px] text-faint">
+            <span className="text-[11px] text-muted-foreground">
               {expiry.label} · {expiry.dte} 天
             </span>
           </div>
@@ -328,16 +331,16 @@ function WatchView({ symbol }: { symbol: string }) {
               <Link
                 key={preset}
                 to={`/calculator?preset=${preset}&ticker=${t.symbol}&expiry=${expiry.iso}`}
-                className="group rounded-xl border border-line bg-white p-2.5 transition-colors hover:border-line-strong"
+                className="group rounded-2xl border bg-card shadow-xs/5 p-2.5 transition-colors hover:border-input"
               >
-                <p className="text-[13px] font-medium group-hover:text-accent">{name}</p>
-                <p className="mt-0.5 text-[11px] text-dim">{hint}</p>
+                <p className="text-[13px] font-medium group-hover:text-brand">{name}</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        <p className="mt-5 text-[11px] leading-4 text-faint">
+        <p className="mt-5 text-[11px] leading-4 text-muted-foreground">
           {online
             ? "示例按 CBOE 延迟报价与 Black-Scholes 计算，不代表可成交价格。自选分组只保存在本机。"
             : "示例按合成报价与 Black-Scholes 计算，不代表可成交价格。自选分组只保存在本机。"}

@@ -3,12 +3,12 @@ import { pct, price } from "../lib/format";
 import type { VolPoint } from "../lib/vol";
 
 const COLORS = {
-  line: "#0364d3",
-  spot: "#6f6a63",
-  call: "#0b7a52",
-  put: "#bf3b2b",
-  grid: "#eeebe5",
-  axis: "#767169",
+  line: "#2563eb",
+  spot: "#737373",
+  call: "#059669",
+  put: "#dc2626",
+  grid: "#f0f0f0",
+  axis: "#737373",
 };
 
 export function VolSkewChart({
@@ -256,7 +256,7 @@ export function VolSkewChart({
             x2={xAt(hovered.strike)}
             y1={padT}
             y2={padT + chartH}
-            stroke="#1c1b19"
+            stroke="#171717"
             strokeOpacity="0.14"
           />
         )}
@@ -264,7 +264,7 @@ export function VolSkewChart({
 
       {hovered && (
         <div
-          className="pointer-events-none absolute top-1 z-10 w-[156px] rounded-xl border border-line bg-white/95 px-2.5 py-2 text-[12px] shadow-pop"
+          className="pointer-events-none absolute top-1 z-10 w-[156px] rounded-xl border border-border bg-popover/95 px-2.5 py-2 text-[12px] shadow-lg"
           style={{
             left: Math.min(
               Math.max(8, xAt(hovered.strike) - 78),
@@ -273,20 +273,20 @@ export function VolSkewChart({
           }}
         >
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-semibold text-text tnum">
+            <span className="font-semibold text-foreground tnum">
               {formatStrike(hovered.strike)}
             </span>
-            <span className="tnum text-faint">
+            <span className="tnum text-muted-foreground">
               {hovered.kind === "call" ? "Call" : "Put"}
             </span>
           </div>
-          <div className="mt-1 flex items-center justify-between text-dim">
+          <div className="mt-1 flex items-center justify-between text-muted-foreground">
             <span>IV</span>
-            <span className="tnum text-text">{pct(hovered.iv, 1)}</span>
+            <span className="tnum text-foreground">{pct(hovered.iv, 1)}</span>
           </div>
-          <div className="mt-0.5 flex items-center justify-between text-dim">
+          <div className="mt-0.5 flex items-center justify-between text-muted-foreground">
             <span>Delta</span>
-            <span className="tnum text-text">{hovered.delta.toFixed(2)}</span>
+            <span className="tnum text-foreground">{hovered.delta.toFixed(2)}</span>
           </div>
         </div>
       )}
