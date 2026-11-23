@@ -74,13 +74,13 @@
 发布新版本时，先同步修改 `app/package.json`、`app/src-tauri/Cargo.toml`、`app/src-tauri/tauri.conf.json` 与 `app/src/desktop/nav.ts` 中的版本号，提交后执行：
 
 ```bash
-git tag v1.7.0
-git push origin v1.7.0
+git tag v1.8.0
+git push origin v1.8.0
 ```
 
 ## 技术栈
 
-- **界面**：React 19 + TypeScript + Vite 7 + Tailwind CSS 4
+- **界面**：React 19 + TypeScript + Vite 7 + Tailwind CSS 4 + [coss/ui](https://coss.com/ui)（Base UI）
 - **桌面壳**：Tauri 2（Windows WebView2）
 - **安装包**：NSIS / MSI，产物在 `app/src-tauri/target/release/bundle/`
 
@@ -106,8 +106,8 @@ npm run tauri build              # 桌面安装包与 exe
 ## 产物
 
 - 免安装程序：`app/src-tauri/target/release/payofflab.exe`
-- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.7.0_x64-setup.exe`
-- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.7.0_x64_zh-CN.msi`
+- NSIS 安装包：`app/src-tauri/target/release/bundle/nsis/PayoffLab_1.8.0_x64-setup.exe`
+- MSI 安装包：`app/src-tauri/target/release/bundle/msi/PayoffLab_1.8.0_x64_zh-CN.msi`
 - 更新包：安装包同目录的 `.sig` 签名文件，由发布流程上传。
 
 ## 目录

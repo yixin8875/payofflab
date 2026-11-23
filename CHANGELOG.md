@@ -3,6 +3,25 @@
 本项目所有值得记录的改动都写在这里。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循[语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.8.0] - 2026-11-23
+
+全站界面迁移到 [coss.com/ui](https://coss.com/ui)（Base UI + Tailwind v4），结构与业务逻辑保持不变。
+
+### 变更
+
+- 引入 coss 组件库：39 个组件（Button、Card、Dialog、Menu、Select、Sidebar、Field、Table、Toggle、Badge 等）与 `cn`、`useMediaQuery` 工具，替换手写的按钮、输入框、下拉、弹层与标签。
+- 重写全局样式：以 coss 主题变量为基础，保留品牌蓝、盈利绿、亏损红、警示黄的金融语义色，以及桌面壳层尺寸（侧边栏、标题栏、状态栏、列表行高）。
+- 侧边栏改用 coss Sidebar，标题栏改用 Button/Kbd，全局搜索改用 Dialog + ScrollArea，更新提示改用 Card + Progress。
+- 构建器到期日改为下拉选择，买卖方向、看涨/看跌/股票、盈亏口径与专业模式改用 ToggleGroup；策略库与情景分析的筛选改为 Toggle，标签改用 Badge，搜索框改用 Input。
+
+### 修复
+
+- 构建器到期日下拉不再向上溢出压住标题栏，改为在触发器下方展开。
+
+### 构建
+
+- 版本号提升到 `1.8.0`。
+
 ## [1.7.0] - 2026-11-15
 
 Gamma 敞口的深度分析、二阶敞口与 IV 冲击，以及覆盖全库的单元测试。

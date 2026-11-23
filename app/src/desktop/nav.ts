@@ -16,7 +16,7 @@ import {
   Waves,
 } from "../components/Icons";
 
-export const VERSION = "1.7.0";
+export const VERSION = "1.8.0";
 
 export type NavItem = {
   href: string;

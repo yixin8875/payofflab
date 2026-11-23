@@ -3,10 +3,35 @@ import { VERSION } from "../desktop/nav";
 
 const ENTRIES = [
   {
+    version: "1.8.0",
+    date: "2026-11-23",
+    title: "界面迁移到 coss/ui 组件体系",
+    latest: true,
+    groups: [
+      {
+        label: "变更",
+        items: [
+          "全站迁移到 coss.com/ui（Base UI + Tailwind v4）：39 个组件与 cn、useMediaQuery 工具替换手写的按钮、输入框、下拉、弹层与标签。",
+          "重写全局样式：以 coss 主题变量为基础，保留品牌蓝、盈利绿、亏损红、警示黄与桌面壳层尺寸。",
+          "侧边栏、标题栏、全局搜索与更新提示分别改用 Sidebar、Button/Kbd、Dialog + ScrollArea、Card + Progress。",
+          "构建器到期日改为下拉选择，方向与腿型改用 ToggleGroup；策略库与情景分析的筛选改为 Toggle，标签改用 Badge，搜索框改用 Input。",
+        ],
+      },
+      {
+        label: "修复",
+        items: ["构建器到期日下拉不再向上溢出压住标题栏，改为在触发器下方展开。"],
+      },
+      {
+        label: "构建",
+        items: ["版本号提升到 1.8.0。"],
+      },
+    ],
+  },
+  {
     version: "1.7.0",
     date: "2026-11-15",
     title: "Gamma 深度分析与全线单元测试",
-    latest: true,
+    latest: false,
     groups: [
       {
         label: "新增",
